@@ -38,25 +38,15 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Poppins', sans-serif;
     
     /* Breakpoints */
-    --mobile: 320px;
     --tablet: 768px;
     --laptop: 1024px;
     --desktop: 1440px;
     
-    /* Container widths */
-    --container-small: 600px;
-    --container-medium: 720px;
-    --container-large: 960px;
-    --container-xlarge: 1140px;
   }
 
   a {
     text-decoration: none;
     color: inherit;
-    
-    &:hover {
-      opacity: 0.8;
-    }
   }
 
   body {
@@ -74,16 +64,18 @@ const GlobalStyle = createGlobalStyle`
     padding: 1rem;
     margin: 0 auto;
 
-    @media (min-width: 320px) {
-      max-width: var(--container-small);
+    // Mobile
+    @media (width < var(--tablet)) {
+      
     }
 
-    @media (min-width: 768px) {
-      max-width: var(--container-medium);
+    // Tablet
+    @media (min-width > var(--tablet)) {
+      
     }
 
-    @media (min-width: 1024px) {
-      max-width: var(--container-large);
+    @media (min-width > var(--desktop)) {
+     
     }
 
     @media (min-width: 1440px) {

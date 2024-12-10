@@ -1,9 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router';
 import styled from 'styled-components';
-import Switch from './Switch';
-import SunIcon from './icons/SunIcon';
-import MoonIcon from './icons/MoonIcon';
+import ThemeSwitcher from './ThemeSwitcher';
+
 import { ThemeProvider, useTheme } from '../context/ThemeContext.jsx';
 
 const StyledMenu = styled.ul`
@@ -41,11 +40,7 @@ function TopMenu() {
           <NavLink to='/endpoints'>Endpoints</NavLink>
         </li>
       </StyledMenu>
-      <ThemeToggle>
-        <SunIcon />
-        <Switch isToggled={theme.isDark} onToggle={toggleTheme} />
-        <MoonIcon />
-      </ThemeToggle>
+      <ThemeSwitcher />
     </StyledNav>
   );
 }
