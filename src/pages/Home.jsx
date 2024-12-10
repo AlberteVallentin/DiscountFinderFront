@@ -1,6 +1,7 @@
 import styled, { keyframes } from 'styled-components';
-import Logo from '../components/Logo';
 import { useTheme } from '../context/ThemeContext';
+import Card from '../components/Card';
+import { Car } from 'lucide-react';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -15,14 +16,6 @@ const HomeContainer = styled.div`
   padding: 2rem;
   min-height: 80vh;
   animation: ${fadeIn} 0.6s ease-out;
-`;
-
-const StyledLogo = styled(Logo)`
-  margin: 0 auto;
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: scale(1.05);
-  }
 `;
 
 const TextContent = styled.div`
@@ -121,7 +114,7 @@ const StyledLink = styled.a`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-const Card = styled.div`
+const HomeCard = styled.div`
   background: ${({ theme }) => theme.colors.card};
   border-radius: 20px;
   padding: 3rem;
@@ -136,8 +129,8 @@ function Home() {
 
   return (
     <HomeContainer theme={theme}>
-      <StyledLogo width='300px' height='300px' />
-      <Card theme={theme}>
+      <Card theme={theme} />
+      <HomeCard theme={theme}>
         <TextContent>
           <Title theme={theme}>The Discount Finder API</Title>
           <Description theme={theme}>
@@ -165,7 +158,7 @@ function Home() {
             </StyledLink>
           </LinksContainer>
         </TextContent>
-      </Card>
+      </HomeCard>
     </HomeContainer>
   );
 }

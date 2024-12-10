@@ -36,6 +36,7 @@ const GlobalStyle = createGlobalStyle`
   :root {
     font-size: 16px;
     font-family: 'Poppins', sans-serif;
+    width: 100vw;
     
     /* Breakpoints */
     --tablet: 768px;
@@ -50,10 +51,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+  
     background-color: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.text};
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -61,7 +59,6 @@ const GlobalStyle = createGlobalStyle`
 
   header, main, footer {
     width: 100%;
-    padding: 1rem;
     margin: 0 auto;
 
     // Mobile
@@ -74,12 +71,14 @@ const GlobalStyle = createGlobalStyle`
       
     }
 
+    // Laptop
     @media (min-width > var(--desktop)) {
      
     }
-
+    
+    // Desktop
     @media (min-width: 1440px) {
-      max-width: var(--container-xlarge);
+    
     }
   }
 

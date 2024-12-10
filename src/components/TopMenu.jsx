@@ -14,8 +14,10 @@ const StyledMenu = styled.ul`
 const StyledNav = styled.nav`
   display: flex;
   align-items: center;
+  padding: 1rem;
   gap: 20px;
   height: 10vh;
+  background-color: ${({ theme }) => theme.colors.header};
 `;
 
 const ThemeToggle = styled.div`
@@ -28,7 +30,7 @@ function TopMenu() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <StyledNav>
+    <StyledNav theme={theme}>
       <StyledMenu>
         <li>
           <NavLink to='/'>Home</NavLink>
