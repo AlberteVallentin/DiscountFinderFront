@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router';
 import styled from 'styled-components';
 import ThemeSwitcher from './ThemeSwitcher';
-import { Menu, X } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { Menu, X, Home, Eye, Terminal } from 'lucide-react';
 
 const StyledNav = styled.nav`
   display: flex;
@@ -11,6 +10,10 @@ const StyledNav = styled.nav`
   justify-content: space-between;
   padding: 1rem;
   height: 10vh;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
   background-color: ${({ theme }) => theme.colors.header};
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
 `;
@@ -46,7 +49,7 @@ const SideMenu = styled.div`
   width: 300px;
   height: 100%;
   background-color: ${({ theme }) => theme.colors.card};
-  padding: 5rem 1rem 1rem;
+  padding: 6rem 1rem 1rem;
   transition: left 0.4s ease;
   z-index: 50;
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
@@ -62,12 +65,19 @@ const MenuItem = styled.li`
   margin: 1rem 0;
 
   a {
-    display: block;
-    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: var(--fs-m);
+    font-weight: var(--fw-medium);
+    padding-left: 1rem;
     color: ${({ theme }) => theme.colors.text};
-    text-decoration: none;
-    border-radius: 0.5rem;
     transition: background-color 0.4s ease;
+
+    svg {
+      width: var(--fs-n);
+      height: var(--fs-n);
+    }
   }
 `;
 
@@ -77,9 +87,26 @@ const RightSection = styled.div`
   gap: 1rem;
 `;
 
+const StyledIcon = styled.div`
+  svg {
+    width: var(--fs-m);
+    height: var(--fs-m);
+  }
+`;
+
+const StyledNavLink = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  svg {
+    width: var(--fs-m);
+    height: var(--fs-m);
+  }
+`;
+
 function TopMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { theme } = useTheme();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -91,9 +118,9 @@ function TopMenu() {
 
   return (
     <>
-      <StyledNav theme={theme}>
-        <MenuButton onClick={toggleMenu} theme={theme}>
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      <StyledNav>
+        <MenuButton onClick={toggleMenu}>
+          <StyledIcon>{isMenuOpen ? <X /> : <Menu />}</StyledIcon>
         </MenuButton>
         <RightSection>
           <ThemeSwitcher />
@@ -102,20 +129,23 @@ function TopMenu() {
 
       <MenuOverlay isOpen={isMenuOpen} onClick={closeMenu} />
 
-      <SideMenu isOpen={isMenuOpen} theme={theme}>
+      <SideMenu isOpen={isMenuOpen}>
         <StyledMenu>
-          <MenuItem theme={theme}>
+          <MenuItem>
             <NavLink to='/' onClick={closeMenu}>
+              <Home />
               Home
             </NavLink>
           </MenuItem>
-          <MenuItem theme={theme}>
+          <MenuItem>
             <NavLink to='/vision' onClick={closeMenu}>
+              <Eye />
               Vision
             </NavLink>
           </MenuItem>
-          <MenuItem theme={theme}>
+          <MenuItem>
             <NavLink to='/endpoints' onClick={closeMenu}>
+              <Terminal />
               Endpoints
             </NavLink>
           </MenuItem>

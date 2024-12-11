@@ -1,7 +1,13 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
+
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
   *, *::before, *::after {
     box-sizing: border-box;
@@ -34,15 +40,29 @@ const GlobalStyle = createGlobalStyle`
   }
 
   :root {
-    font-size: 16px;
-    font-family: 'Poppins', sans-serif;
     width: 100vw;
-    
+
     /* Breakpoints */
     --tablet: 768px;
     --laptop: 1024px;
     --desktop: 1440px;
-    
+
+    /* Font sizes using clamp */
+    --fs-s: clamp(0.8333rem, 0.7754rem + 0.2899vi, 1rem);
+    --fs-n: clamp(1rem, 0.913rem + 0.4348vi, 1.25rem);
+    --fs-m: clamp(1.2rem, 1.0739rem + 0.6304vi, 1.5625rem);
+    --fs-l: clamp(1.44rem, 1.2615rem + 0.8924vi, 1.9531rem);
+    --fs-xl: clamp(1.8rem, 1.5rem + 1.25vi, 2.5rem);
+
+    /* Font weights */
+    --fw-light: 300;
+    --fw-normal: 400;
+    --fw-medium: 500;
+    --fw-semi-bold: 600;
+    --fw-bold: 700;
+
+    /* Typography */
+    font-family: 'Poppins', sans-serif;
   }
 
   a {
@@ -56,67 +76,44 @@ const GlobalStyle = createGlobalStyle`
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  header, main, footer {
-    width: 100%;
-    margin: 0 auto;
-
-    // Mobile
-    @media (width < var(--tablet)) {
-      
-    }
-
-    // Tablet
-    @media (min-width > var(--tablet)) {
-      
-    }
-
-    // Laptop
-    @media (min-width > var(--desktop)) {
-     
-    }
-    
-    // Desktop
-    @media (min-width: 1440px) {
-    
-    }
-  }
+  
 
   main {
     min-height: 80vh;
-    padding: 1rem
+    padding: 1rem;
+    margin-top: 10vh;
+    display: flex;
+    flex-direction: column;
+  
   }
+
 
   footer {
     display: flex;
     justify-content: space-evenly;
   }
 
+  /* Typography rules */
   h1 {
-    font-size: 2rem;
-    color: ${({ theme }) => theme.colors.text};
-    font-weight: 600;
-
-    @media (min-width: 768px) {
-      font-size: 2.5rem;
-    }
-
-    @media (min-width: 1024px) {
-      font-size: 3rem;
-    }
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    text-align: center;
+    padding: 1rem;
   }
 
   h2 {
-    font-size: 1.5rem;
-    font-weight: 500;
-
-    @media (min-width: 768px) {
-      font-size: 2rem;
-    }
+    font-size: var(--fs-l);
+    font-weight: var(--fw-semi-bold);
   }
 
-  p {
-    font-size: 1rem;
-    font-weight: 400;
+  h3 {
+    font-size: var(--fs-m);
+    font-weight: var(--fw-medium);
+  }
+
+  p, select, option, input, label, textarea {
+    font-size: var(--fs-n);
+    font-weight: var(--fw-normal);
   }
 `;
 

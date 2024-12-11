@@ -1,12 +1,13 @@
 import { Outlet } from 'react-router';
 import GlobalStyle from '../styles/GlobalStyle';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import TopMenu from '../components/TopMenu';
 import { useTheme } from '../context/ThemeContext';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   width: 100%;
 `;
 
@@ -14,9 +15,9 @@ function MainLayout() {
   const { theme } = useTheme();
 
   return (
-    <>
-      <GlobalStyle theme={theme} />
-      <Container theme={theme}>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <Container>
         <header>
           <TopMenu />
         </header>
@@ -28,7 +29,7 @@ function MainLayout() {
           <p>Todo system v. 0.9</p>
         </footer>
       </Container>
-    </>
+    </ThemeProvider>
   );
 }
 
