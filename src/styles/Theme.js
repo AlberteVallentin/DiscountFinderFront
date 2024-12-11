@@ -1,6 +1,13 @@
 const colors = {
+    neutralLight: "#f7f7f7",
+    neutralDark: "#14181C",
     white: "#FFFFFF",
     black: "#000000",
+    boxShadowLight: "0 10px 30px rgba(0, 0, 0, 0.1)",
+    boxShadowDark: "0 10px 30px rgba(255, 255, 255, 0.05)",
+
+
+
     lightGray: "#EAEBEE",
     darkBlue: "#1A202C",
     darkSlate: "#2D3748",
@@ -25,31 +32,23 @@ const colors = {
 export const lightTheme = {
     isDark: false,
     colors: {
-        text: colors.black,
-        background: colors.lightGray,
+        text: colors.neutralDark,
+        background: colors.neutralLight,
         card: colors.white,
         header: colors.white,
+        boxShadow: colors.boxShadowLight,
         border: '#e0e0e0',
-        primary: '#2196f3',
-        secondary: '#f50057',
-        success: '#4caf50',
-        error: '#f44336',
-        warning: '#ff9800'
     }
 };
 
 export const darkTheme = {
     isDark: true,
     colors: {
-        text: colors.lightGray,
-        background: colors.darkBlue,
-        card: '#A0A2B1',
-        header: colors.darkSlate,
+        text: colors.neutralLight,
+        background: colors.neutralDark,
+        card: '#2C3440',
+        header: "#2C3440",
+        boxShadow: colors.boxShadowDark,
         border: '#A0A2B1',
-        primary: '#90caf9',
-        secondary: '#f48fb1',
-        success: '#81c784',
-        error: '#e57373',
-        warning: '#ffb74d'
     }
 };

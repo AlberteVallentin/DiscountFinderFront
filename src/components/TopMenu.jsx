@@ -12,6 +12,7 @@ const StyledNav = styled.nav`
   padding: 1rem;
   height: 10vh;
   background-color: ${({ theme }) => theme.colors.header};
+  box-shadow: ${({ theme }) => theme.colors.boxShadow};
 `;
 
 const MenuButton = styled.button`
@@ -46,9 +47,9 @@ const SideMenu = styled.div`
   height: 100%;
   background-color: ${({ theme }) => theme.colors.card};
   padding: 5rem 1rem 1rem;
-  transition: left 0.3s ease;
+  transition: left 0.4s ease;
   z-index: 50;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.colors.boxShadow};
 `;
 
 const StyledMenu = styled.ul`
@@ -66,18 +67,7 @@ const MenuItem = styled.li`
     color: ${({ theme }) => theme.colors.text};
     text-decoration: none;
     border-radius: 0.5rem;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: ${({ theme }) =>
-        theme.isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
-    }
-
-    &.active {
-      background-color: ${({ theme }) => theme.colors.primary};
-      color: ${({ theme }) =>
-        theme.isDark ? theme.colors.background : theme.colors.card};
-    }
+    transition: background-color 0.4s ease;
   }
 `;
 

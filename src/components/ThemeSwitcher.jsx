@@ -7,8 +7,7 @@ const ThemeToggle = styled.div`
   display: flex;
   align-items: center;
   margin-left: auto;
-  color: ${({ theme }) =>
-    theme.isDark ? 'var(--text-color-dark)' : 'var(--text-color-light)'};
+  color: ${({ theme }) => theme.colors.text};
 
   svg {
     width: 20px;
@@ -18,9 +17,10 @@ const ThemeToggle = styled.div`
 
 const ThemeSwitcher = () => {
   const { isDark, toggleTheme } = useTheme();
+  const { theme } = useTheme();
 
   return (
-    <ThemeToggle>
+    <ThemeToggle theme={theme}>
       <Sun />
       <Switch isToggled={isDark} onToggle={toggleTheme} />
       <Moon />
