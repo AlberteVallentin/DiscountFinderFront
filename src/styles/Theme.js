@@ -3,6 +3,8 @@ const colors = {
     black: "#000000",
     lightGray: "#EAEBEE",
     darkBlue: "#1A202C",
+    darkSlate: "#2D3748",
+
     steelBlue: "#333757",
     mediumBlue: "#2D3748",      // Kort baggrund (dark theme)
     lightBlue: "#A3BFFA",       // Accentfarve (dark theme)
@@ -40,9 +42,9 @@ export const darkTheme = {
     isDark: true,
     colors: {
         text: colors.lightGray,
-        background: '#1D2145',
-        card: colors.steelBlue,
-        header: colors.steelBlue,
+        background: colors.darkBlue,
+        card: '#A0A2B1',
+        header: colors.darkSlate,
         border: '#A0A2B1',
         primary: '#90caf9',
         secondary: '#f48fb1',

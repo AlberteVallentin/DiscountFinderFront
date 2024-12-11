@@ -82,19 +82,14 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
-  header {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-  }
-
   main {
     min-height: 80vh;
-    padding: 2rem 1rem;
+    padding: 1rem
   }
 
   footer {
     display: flex;
     justify-content: space-evenly;
-    border-top: 1px solid ${({ theme }) => theme.colors.border};
   }
 
   h1 {
