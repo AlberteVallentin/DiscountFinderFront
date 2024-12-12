@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router';
 import styled from 'styled-components';
 import ThemeSwitcher from './ThemeSwitcher';
-import { Menu, X, Home, Eye, Terminal } from 'lucide-react';
+import { Menu, X, Home, Eye, Terminal, Search } from 'lucide-react';
 
 const StyledNav = styled.nav`
   display: flex;
@@ -135,6 +135,12 @@ function TopMenu() {
             <NavLink to='/' onClick={closeMenu}>
               <Home />
               Home
+            </NavLink>
+          </MenuItem>
+          <MenuItem>
+            <NavLink to='/stores' onClick={closeMenu}>
+              <Search />
+              Find butikker
             </NavLink>
           </MenuItem>
           <MenuItem>

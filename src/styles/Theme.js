@@ -1,12 +1,11 @@
 const colors = {
     neutralLight: "#f7f7f7",
     neutralDark: "#14181C",
+    neutralBlue: "#2C3440",
     white: "#FFFFFF",
     black: "#000000",
     boxShadowLight: "0 10px 30px rgba(0, 0, 0, 0.1)",
     boxShadowDark: "0 10px 30px rgba(255, 255, 255, 0.05)",
-
-
 
     lightGray: "#EAEBEE",
     darkBlue: "#1A202C",
@@ -29,6 +28,12 @@ const colors = {
     mutedGray: "#A0AEC0",       // Placeholder tekst (light theme)
 };
 
+const tintedColors = {
+    neutralDark50: `color-mix(in oklab, ${colors.neutralDark} 90%, ${colors.neutralBlue})`,
+    neutralLight50: `color-mix(in oklab, ${colors.neutralLight} 50%, ${colors.black} 50%)`,
+
+};
+
 export const lightTheme = {
     isDark: false,
     colors: {
@@ -47,7 +52,7 @@ export const darkTheme = {
         text: colors.neutralLight,
         background: colors.neutralDark,
         card: '#2C3440',
-        header: "#2C3440",
+        header: '#2C3440',
         boxShadow: colors.boxShadowDark,
         border: '#A0A2B1',
     }

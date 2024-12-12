@@ -24,10 +24,7 @@ function MainLayout() {
         <main>
           <Outlet />
         </main>
-        <footer>
-          <p>&copy; Jon Bertelsen</p>
-          <p>Todo system v. 0.9</p>
-        </footer>
+        <footer></footer>
       </Container>
     </ThemeProvider>
   );

@@ -10,12 +10,14 @@ import {
 } from 'react-router';
 import Vision from './pages/Vision.jsx';
 import Endpoints from './pages/Endpoints.jsx';
+import Stores from './pages/Stores.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<MainLayout />}>
       <Route index element={<Home />} />
+      <Route path='stores' element={<Stores />} />
       <Route path='vision' element={<Vision />} />
       <Route path='endpoints' element={<Endpoints />} />
     </Route>
