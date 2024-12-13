@@ -11,15 +11,18 @@ Content-Type: application/json
     "password": "test123"
 }
 
+
+
 ###
 POST {{url}}/auth/login/
-Accept: application/json
 Content-Type: application/json
+Accept: application/json
 
 {
-    "email": "test@admin.dk",
-    "password": "test123"
+  "email": "test@admin.dk",
+  "password": "test123"
 }
+
 
 ###
 GET {{url}}/stores
@@ -27,7 +30,7 @@ Accept: application/json
 Authorization: Bearer {{jwt_token}}
 
 ###
-GET {{url}}/stores/76
+GET {{url}}/stores/19
 Accept: application/json
 Authorization: Bearer {{jwt_token}}
 

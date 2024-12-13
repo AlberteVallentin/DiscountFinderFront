@@ -211,6 +211,82 @@ const LoginButton = styled.button`
     opacity: 0.9;
   }
 `;
+const Dropdown = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const DropdownContent = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  min-width: 200px;
+  background: ${({ theme }) => theme.colors.card};
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  box-shadow: ${({ theme }) => theme.colors.boxShadow};
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+`;
+
+const DropdownItem = styled.div`
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.background};
+  }
+`;
+
+const FilterPanel = styled.div`
+  padding: 1rem;
+  background: ${({ theme }) => theme.colors.card};
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  margin-top: 1rem;
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+`;
+
+const FilterSection = styled.div`
+  margin-bottom: 1rem;
+`;
+
+const FilterTitle = styled.h3`
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+`;
+
+const RangeInputs = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+`;
+
+const RangeInput = styled.input`
+  padding: 0.5rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 4px;
+  width: 100px;
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+`;
 
 export default function StoreProductsModal({
   store,
@@ -219,9 +295,23 @@ export default function StoreProductsModal({
   navigate,
 }) {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Filtering state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({
+    categories: new Set(),
+    priceRange: { min: '', max: '' },
+    discountRange: { min: '', max: '' },
+    stockOnly: false,
+  });
+
+  // Sorting state
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [sortOption, setSortOption] = useState('');
 
   useEffect(() => {
     if (isLoggedIn && store) {
@@ -229,10 +319,15 @@ export default function StoreProductsModal({
     }
   }, [store, isLoggedIn]);
 
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [products, filterOptions, sortOption, searchTerm]);
+
   const fetchStoreProducts = async () => {
     try {
       const data = await facade.fetchData(`/stores/${store.id}`);
       setProducts(data.products || []);
+      setFilteredProducts(data.products || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -240,9 +335,94 @@ export default function StoreProductsModal({
     }
   };
 
-  const handleLogin = () => {
-    onClose();
-    navigate('/login');
+  const applyFiltersAndSort = () => {
+    let filtered = [...products];
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter((product) =>
+        product.productName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (filterOptions.categories.size > 0) {
+      filtered = filtered.filter((product) =>
+        product.categories.some((cat) =>
+          filterOptions.categories.has(cat.nameDa)
+        )
+      );
+    }
+
+    // Apply price range filter
+    if (filterOptions.priceRange.min || filterOptions.priceRange.max) {
+      filtered = filtered.filter((product) => {
+        const price = product.price.newPrice;
+        const min = filterOptions.priceRange.min
+          ? parseFloat(filterOptions.priceRange.min)
+          : 0;
+        const max = filterOptions.priceRange.max
+          ? parseFloat(filterOptions.priceRange.max)
+          : Infinity;
+        return price >= min && price <= max;
+      });
+    }
+
+    // Apply discount range filter
+    if (filterOptions.discountRange.min || filterOptions.discountRange.max) {
+      filtered = filtered.filter((product) => {
+        const discount = product.price.percentDiscount;
+        const min = filterOptions.discountRange.min
+          ? parseFloat(filterOptions.discountRange.min)
+          : 0;
+        const max = filterOptions.discountRange.max
+          ? parseFloat(filterOptions.discountRange.max)
+          : Infinity;
+        return discount >= min && discount <= max;
+      });
+    }
+
+    // Apply stock filter
+    if (filterOptions.stockOnly) {
+      filtered = filtered.filter((product) => product.stock.quantity > 0);
+    }
+
+    // Apply sorting
+    if (sortOption) {
+      filtered.sort((a, b) => {
+        switch (sortOption) {
+          case 'price-asc':
+            return a.price.newPrice - b.price.newPrice;
+          case 'price-desc':
+            return b.price.newPrice - a.price.newPrice;
+          case 'discount-desc':
+            return b.price.percentDiscount - a.price.percentDiscount;
+          case 'expiry-asc':
+            return new Date(a.timing.endTime) - new Date(b.timing.endTime);
+          case 'stock-desc':
+            return b.stock.quantity - a.stock.quantity;
+          default:
+            return 0;
+        }
+      });
+    }
+
+    setFilteredProducts(filtered);
+  };
+
+  const handleFilterChange = (type, value) => {
+    setFilterOptions((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+  };
+
+  const getAllCategories = () => {
+    const categories = new Set();
+    products.forEach((product) => {
+      product.categories.forEach((cat) => categories.add(cat.nameDa));
+    });
+    return Array.from(categories);
   };
 
   if (!isLoggedIn) {
@@ -255,7 +435,14 @@ export default function StoreProductsModal({
           <LoginPrompt>
             <h2>Log ind for at se tilbud</h2>
             <p>Du skal være logget ind for at se tilbuddene i denne butik.</p>
-            <LoginButton onClick={handleLogin}>Log ind</LoginButton>
+            <LoginButton
+              onClick={() => {
+                onClose();
+                navigate('/login');
+              }}
+            >
+              Log ind
+            </LoginButton>
           </LoginPrompt>
         </ModalContent>
       </ModalOverlay>
@@ -281,19 +468,137 @@ export default function StoreProductsModal({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </SearchBar>
-            <Button>
+
+            <Button onClick={() => setIsFilterOpen(!isFilterOpen)}>
               <SlidersHorizontal size={20} />
               Filter
             </Button>
-            <Button>
-              <ArrowDownUp size={20} />
-              Sorter
-            </Button>
+
+            <Dropdown>
+              <Button onClick={() => setIsSortOpen(!isSortOpen)}>
+                <ArrowDownUp size={20} />
+                Sorter
+              </Button>
+              <DropdownContent $isOpen={isSortOpen}>
+                <DropdownItem onClick={() => setSortOption('price-asc')}>
+                  Pris (laveste først)
+                </DropdownItem>
+                <DropdownItem onClick={() => setSortOption('price-desc')}>
+                  Pris (højeste først)
+                </DropdownItem>
+                <DropdownItem onClick={() => setSortOption('discount-desc')}>
+                  Største besparelse
+                </DropdownItem>
+                <DropdownItem onClick={() => setSortOption('expiry-asc')}>
+                  Udløber snart
+                </DropdownItem>
+                <DropdownItem onClick={() => setSortOption('stock-desc')}>
+                  Antal på lager
+                </DropdownItem>
+              </DropdownContent>
+            </Dropdown>
           </Controls>
         </Header>
 
+        <FilterPanel $isOpen={isFilterOpen}>
+          <FilterSection>
+            <FilterTitle>Kategorier</FilterTitle>
+            <CheckboxContainer>
+              {getAllCategories().map((category) => (
+                <CheckboxLabel key={category}>
+                  <input
+                    type='checkbox'
+                    checked={filterOptions.categories.has(category)}
+                    onChange={(e) => {
+                      const newCategories = new Set(filterOptions.categories);
+                      if (e.target.checked) {
+                        newCategories.add(category);
+                      } else {
+                        newCategories.delete(category);
+                      }
+                      handleFilterChange('categories', newCategories);
+                    }}
+                  />
+                  {category}
+                </CheckboxLabel>
+              ))}
+            </CheckboxContainer>
+          </FilterSection>
+
+          <FilterSection>
+            <FilterTitle>Prisinterval</FilterTitle>
+            <RangeInputs>
+              <RangeInput
+                type='number'
+                placeholder='Min'
+                value={filterOptions.priceRange.min}
+                onChange={(e) =>
+                  handleFilterChange('priceRange', {
+                    ...filterOptions.priceRange,
+                    min: e.target.value,
+                  })
+                }
+              />
+              <span>-</span>
+              <RangeInput
+                type='number'
+                placeholder='Max'
+                value={filterOptions.priceRange.max}
+                onChange={(e) =>
+                  handleFilterChange('priceRange', {
+                    ...filterOptions.priceRange,
+                    max: e.target.value,
+                  })
+                }
+              />
+            </RangeInputs>
+          </FilterSection>
+
+          <FilterSection>
+            <FilterTitle>Besparelse (%)</FilterTitle>
+            <RangeInputs>
+              <RangeInput
+                type='number'
+                placeholder='Min %'
+                value={filterOptions.discountRange.min}
+                onChange={(e) =>
+                  handleFilterChange('discountRange', {
+                    ...filterOptions.discountRange,
+                    min: e.target.value,
+                  })
+                }
+              />
+              <span>-</span>
+              <RangeInput
+                type='number'
+                placeholder='Max %'
+                value={filterOptions.discountRange.max}
+                onChange={(e) =>
+                  handleFilterChange('discountRange', {
+                    ...filterOptions.discountRange,
+                    max: e.target.value,
+                  })
+                }
+              />
+            </RangeInputs>
+          </FilterSection>
+
+          <FilterSection>
+            <CheckboxLabel>
+              <input
+                type='checkbox'
+                checked={filterOptions.stockOnly}
+                onChange={(e) =>
+                  handleFilterChange('stockOnly', e.target.checked)
+                }
+              />
+              Vis kun varer på lager
+            </CheckboxLabel>
+          </FilterSection>
+        </FilterPanel>
+
         <ProductsGrid>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard key={product.ean}>
               <ProductTitle>{product.productName}</ProductTitle>
               <TagsContainer>
