@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useOutletContext } from 'react-router';
 import { Search, Filter } from 'lucide-react';
 import Card from '../components/Card';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
+import StoreProductsModal from '../components/StoreProductsModal';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -183,6 +185,9 @@ const Stores = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBrands, setSelectedBrands] = useState(new Set());
+  const [selectedStore, setSelectedStore] = useState(null);
+  const navigate = useNavigate();
+  const { loggedIn } = useOutletContext();
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -327,7 +332,7 @@ const Stores = () => {
 
       <StoresGrid>
         {filteredStores.map((store) => (
-          <StoreCard key={store.id}>
+          <StoreCard key={store.id} onClick={() => setSelectedStore(store)}>
             <StoreName>{store.name}</StoreName>
             <StoreAddress>
               <div>{store.address.addressLine}</div>
@@ -339,6 +344,16 @@ const Stores = () => {
           </StoreCard>
         ))}
       </StoresGrid>
+
+      {selectedStore && (
+        <StoreProductsModal
+          store={selectedStore}
+          onClose={() => setSelectedStore(null)}
+          isLoggedIn={loggedIn}
+          navigate={navigate}
+        />
+      )}
+
       <ScrollToTop />
     </StoresContainer>
   );
