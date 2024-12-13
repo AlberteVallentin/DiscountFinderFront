@@ -7,12 +7,14 @@ const ThemeToggle = styled.div`
   display: flex;
   align-items: center;
   margin-left: auto;
-  color: ${({ theme }) =>
-    theme.isDark ? 'var(--text-color-dark)' : 'var(--text-color-light)'};
+  margin-right: 1rem;
+  color: ${({ theme }) => theme.colors.text};
+`;
 
+const StyledIcon = styled.div`
   svg {
-    width: 20px;
-    height: 20px;
+    width: var(--fs-m);
+    height: var(--fs-m);
   }
 `;
 
@@ -21,9 +23,13 @@ const ThemeSwitcher = () => {
 
   return (
     <ThemeToggle>
-      <Sun />
+      <StyledIcon>
+        <Sun />
+      </StyledIcon>
       <Switch isToggled={isDark} onToggle={toggleTheme} />
-      <Moon />
+      <StyledIcon>
+        <Moon />
+      </StyledIcon>
     </ThemeToggle>
   );
 };

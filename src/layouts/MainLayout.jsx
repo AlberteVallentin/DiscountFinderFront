@@ -1,36 +1,34 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router';
 import GlobalStyle from '../styles/GlobalStyle';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import TopMenu from '../components/TopMenu';
 import { useTheme } from '../context/ThemeContext';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: var(--small-device);
+  min-height: 100vh;
   width: 100%;
-  border: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 function MainLayout() {
   const { theme } = useTheme();
+  const [loggedIn, setLoggedIn] = useState(false);
 
   return (
-    <>
-      <GlobalStyle theme={theme} />
-      <Container theme={theme}>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <Container>
         <header>
-          <TopMenu />
+          <TopMenu loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
         </header>
         <main>
-          <Outlet />
+          <Outlet context={{ loggedIn, setLoggedIn }} />
         </main>
-        <footer>
-          <p>&copy; Jon Bertelsen</p>
-          <p>Todo system v. 0.9</p>
-        </footer>
+        <footer></footer>
       </Container>
-    </>
+    </ThemeProvider>
   );
 }
 
