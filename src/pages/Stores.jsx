@@ -3,6 +3,7 @@ import { Search, Filter } from 'lucide-react';
 import Card from '../components/Card';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
+import ScrollToTop from '../components/ScrollToTop';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -338,6 +339,7 @@ const Stores = () => {
           </StoreCard>
         ))}
       </StoresGrid>
+      <ScrollToTop />
     </StoresContainer>
   );
 };

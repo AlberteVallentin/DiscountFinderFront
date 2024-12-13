@@ -11,13 +11,16 @@ import {
 import Vision from './pages/Vision.jsx';
 import Endpoints from './pages/Endpoints.jsx';
 import Stores from './pages/Stores.jsx';
+import LoginPage from './pages/LoginPage';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<MainLayout />}>
+    <Route path='/' element={<MainLayout />} errorElement={<ErrorBoundary />}>
       <Route index element={<Home />} />
       <Route path='stores' element={<Stores />} />
+      <Route path='/login' element={<LoginPage />} />
       <Route path='vision' element={<Vision />} />
       <Route path='endpoints' element={<Endpoints />} />
     </Route>

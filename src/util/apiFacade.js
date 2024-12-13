@@ -31,8 +31,8 @@ function apiFacade() {
             try {
                 const payloadBase64 = getToken().split('.')[1];
                 const decodedClaims = JSON.parse(window.atob(payloadBase64));
-                const roles = decodedClaims.roles;
-                return roles;
+                const role = decodedClaims.role; // Note: Single role, not roles array
+                return role;
             } catch (error) {
                 console.error("Error decoding token:", error);
                 return "";
@@ -41,12 +41,12 @@ function apiFacade() {
     };
 
     const hasUserAccess = (neededRole, loggedIn) => {
-        const roles = getUserRoles().split(',');
-        return loggedIn && roles.includes(neededRole);
+        const role = getUserRoles();
+        return loggedIn && role === neededRole;
     };
 
-    const login = async (user, password) => {
-        const options = makeOptions("POST", false, { username: user, password: password });
+    const login = async (email, password) => {
+        const options = makeOptions("POST", false, { email, password });
         try {
             const response = await fetch(URL + "/auth/login", options);
             const data = await handleHttpErrors(response);

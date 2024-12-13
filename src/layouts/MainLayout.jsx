@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router';
 import GlobalStyle from '../styles/GlobalStyle';
 import styled, { ThemeProvider } from 'styled-components';
@@ -13,16 +14,17 @@ const Container = styled.div`
 
 function MainLayout() {
   const { theme } = useTheme();
+  const [loggedIn, setLoggedIn] = useState(false);
 
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Container>
         <header>
-          <TopMenu />
+          <TopMenu loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
         </header>
         <main>
-          <Outlet />
+          <Outlet context={{ loggedIn, setLoggedIn }} />
         </main>
         <footer></footer>
       </Container>
