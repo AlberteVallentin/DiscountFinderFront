@@ -6,6 +6,7 @@ import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
 import StoreProductsModal from '../components/StoreProductsModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -275,7 +276,10 @@ const Stores = () => {
     setFilteredStores(filtered);
   };
 
-  if (loading) return <LoadingContainer>Loading stores...</LoadingContainer>;
+  if (loading) {
+    return <LoadingSpinner text='Henter butikker...' fullscreen={true} />;
+  }
+
   if (error) return <ErrorContainer>Error: {error}</ErrorContainer>;
 
   return (

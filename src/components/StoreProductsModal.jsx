@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { X, Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import facade from '../util/apiFacade';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -500,133 +501,141 @@ export default function StoreProductsModal({
           </Controls>
         </Header>
 
-        <FilterPanel $isOpen={isFilterOpen}>
-          <FilterSection>
-            <FilterTitle>Kategorier</FilterTitle>
-            <CheckboxContainer>
-              {getAllCategories().map((category) => (
-                <CheckboxLabel key={category}>
+        {loading ? (
+          <LoadingSpinner text='Henter tilbud...' />
+        ) : (
+          <>
+            <FilterPanel $isOpen={isFilterOpen}>
+              <FilterSection>
+                <FilterTitle>Kategorier</FilterTitle>
+                <CheckboxContainer>
+                  {getAllCategories().map((category) => (
+                    <CheckboxLabel key={category}>
+                      <input
+                        type='checkbox'
+                        checked={filterOptions.categories.has(category)}
+                        onChange={(e) => {
+                          const newCategories = new Set(
+                            filterOptions.categories
+                          );
+                          if (e.target.checked) {
+                            newCategories.add(category);
+                          } else {
+                            newCategories.delete(category);
+                          }
+                          handleFilterChange('categories', newCategories);
+                        }}
+                      />
+                      {category}
+                    </CheckboxLabel>
+                  ))}
+                </CheckboxContainer>
+              </FilterSection>
+
+              <FilterSection>
+                <FilterTitle>Prisinterval</FilterTitle>
+                <RangeInputs>
+                  <RangeInput
+                    type='number'
+                    placeholder='Min'
+                    value={filterOptions.priceRange.min}
+                    onChange={(e) =>
+                      handleFilterChange('priceRange', {
+                        ...filterOptions.priceRange,
+                        min: e.target.value,
+                      })
+                    }
+                  />
+                  <span>-</span>
+                  <RangeInput
+                    type='number'
+                    placeholder='Max'
+                    value={filterOptions.priceRange.max}
+                    onChange={(e) =>
+                      handleFilterChange('priceRange', {
+                        ...filterOptions.priceRange,
+                        max: e.target.value,
+                      })
+                    }
+                  />
+                </RangeInputs>
+              </FilterSection>
+
+              <FilterSection>
+                <FilterTitle>Besparelse (%)</FilterTitle>
+                <RangeInputs>
+                  <RangeInput
+                    type='number'
+                    placeholder='Min %'
+                    value={filterOptions.discountRange.min}
+                    onChange={(e) =>
+                      handleFilterChange('discountRange', {
+                        ...filterOptions.discountRange,
+                        min: e.target.value,
+                      })
+                    }
+                  />
+                  <span>-</span>
+                  <RangeInput
+                    type='number'
+                    placeholder='Max %'
+                    value={filterOptions.discountRange.max}
+                    onChange={(e) =>
+                      handleFilterChange('discountRange', {
+                        ...filterOptions.discountRange,
+                        max: e.target.value,
+                      })
+                    }
+                  />
+                </RangeInputs>
+              </FilterSection>
+
+              <FilterSection>
+                <CheckboxLabel>
                   <input
                     type='checkbox'
-                    checked={filterOptions.categories.has(category)}
-                    onChange={(e) => {
-                      const newCategories = new Set(filterOptions.categories);
-                      if (e.target.checked) {
-                        newCategories.add(category);
-                      } else {
-                        newCategories.delete(category);
-                      }
-                      handleFilterChange('categories', newCategories);
-                    }}
+                    checked={filterOptions.stockOnly}
+                    onChange={(e) =>
+                      handleFilterChange('stockOnly', e.target.checked)
+                    }
                   />
-                  {category}
+                  Vis kun varer på lager
                 </CheckboxLabel>
+              </FilterSection>
+            </FilterPanel>
+
+            <ProductsGrid>
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.ean}>
+                  <ProductTitle>{product.productName}</ProductTitle>
+                  <TagsContainer>
+                    {product.categories.map((category) => (
+                      <Tag key={category.nameDa}>{category.nameDa}</Tag>
+                    ))}
+                  </TagsContainer>
+                  <PriceInfo>
+                    <div>
+                      <Price>{product.price.newPrice.toFixed(2)} kr</Price>
+                      <OriginalPrice>
+                        {product.price.originalPrice.toFixed(2)} kr
+                      </OriginalPrice>
+                    </div>
+                    <Discount>
+                      -{product.price.percentDiscount.toFixed(0)}%
+                    </Discount>
+                  </PriceInfo>
+                  <StockInfo>
+                    <span>På lager: {product.stock.quantity} stk.</span>
+                  </StockInfo>
+                  <DateInfo>
+                    Tilbud gælder til:{' '}
+                    {new Date(product.timing.endTime).toLocaleDateString()}
+                  </DateInfo>
+                </ProductCard>
               ))}
-            </CheckboxContainer>
-          </FilterSection>
-
-          <FilterSection>
-            <FilterTitle>Prisinterval</FilterTitle>
-            <RangeInputs>
-              <RangeInput
-                type='number'
-                placeholder='Min'
-                value={filterOptions.priceRange.min}
-                onChange={(e) =>
-                  handleFilterChange('priceRange', {
-                    ...filterOptions.priceRange,
-                    min: e.target.value,
-                  })
-                }
-              />
-              <span>-</span>
-              <RangeInput
-                type='number'
-                placeholder='Max'
-                value={filterOptions.priceRange.max}
-                onChange={(e) =>
-                  handleFilterChange('priceRange', {
-                    ...filterOptions.priceRange,
-                    max: e.target.value,
-                  })
-                }
-              />
-            </RangeInputs>
-          </FilterSection>
-
-          <FilterSection>
-            <FilterTitle>Besparelse (%)</FilterTitle>
-            <RangeInputs>
-              <RangeInput
-                type='number'
-                placeholder='Min %'
-                value={filterOptions.discountRange.min}
-                onChange={(e) =>
-                  handleFilterChange('discountRange', {
-                    ...filterOptions.discountRange,
-                    min: e.target.value,
-                  })
-                }
-              />
-              <span>-</span>
-              <RangeInput
-                type='number'
-                placeholder='Max %'
-                value={filterOptions.discountRange.max}
-                onChange={(e) =>
-                  handleFilterChange('discountRange', {
-                    ...filterOptions.discountRange,
-                    max: e.target.value,
-                  })
-                }
-              />
-            </RangeInputs>
-          </FilterSection>
-
-          <FilterSection>
-            <CheckboxLabel>
-              <input
-                type='checkbox'
-                checked={filterOptions.stockOnly}
-                onChange={(e) =>
-                  handleFilterChange('stockOnly', e.target.checked)
-                }
-              />
-              Vis kun varer på lager
-            </CheckboxLabel>
-          </FilterSection>
-        </FilterPanel>
-
-        <ProductsGrid>
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.ean}>
-              <ProductTitle>{product.productName}</ProductTitle>
-              <TagsContainer>
-                {product.categories.map((category) => (
-                  <Tag key={category.nameDa}>{category.nameDa}</Tag>
-                ))}
-              </TagsContainer>
-              <PriceInfo>
-                <div>
-                  <Price>{product.price.newPrice.toFixed(2)} kr</Price>
-                  <OriginalPrice>
-                    {product.price.originalPrice.toFixed(2)} kr
-                  </OriginalPrice>
-                </div>
-                <Discount>
-                  -{product.price.percentDiscount.toFixed(0)}%
-                </Discount>
-              </PriceInfo>
-              <StockInfo>
-                <span>På lager: {product.stock.quantity} stk.</span>
-              </StockInfo>
-              <DateInfo>
-                Tilbud gælder til:{' '}
-                {new Date(product.timing.endTime).toLocaleDateString()}
-              </DateInfo>
-            </ProductCard>
-          ))}
-        </ProductsGrid>
+            </ProductsGrid>
+          </>
+        )}
       </ModalContent>
     </ModalOverlay>
   );
