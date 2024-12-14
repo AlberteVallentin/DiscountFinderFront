@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router';
 import { Search, Filter } from 'lucide-react';
-import Card from '../components/Card';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
 import StoreProductsModal from '../components/StoreProductsModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import StoreCard from '../components/Card/StoreCard';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -76,43 +76,20 @@ const FilterButton = styled.button`
 const StoresGrid = styled.div`
   display: grid;
   gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  grid-template-columns: ${({ $singleItem }) =>
+    $singleItem
+      ? 'minmax(auto, 400px)'
+      : 'repeat(auto-fill, minmax(300px, 1fr))'};
   width: min(90%, 70rem);
   margin-inline: auto;
   padding: 1rem;
-`;
+  justify-content: center;
 
-const StoreCard = styled.div`
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 1em;
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: 12px;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-4px);
+  > * {
+    width: 100%;
+    max-width: 400px;
+    justify-self: center;
   }
-`;
-
-const StoreName = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin: 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const StoreAddress = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const PostalCodeSelect = styled.select`
@@ -128,15 +105,6 @@ const PostalCodeSelect = styled.select`
   &:focus {
     outline: none;
   }
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-  font-size: var(--fs-l);
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ErrorContainer = styled.div`
@@ -334,18 +302,13 @@ const Stores = () => {
         </BrandButton>
       </BrandSection>
 
-      <StoresGrid>
+      <StoresGrid $singleItem={filteredStores.length === 1}>
         {filteredStores.map((store) => (
-          <StoreCard key={store.id} onClick={() => setSelectedStore(store)}>
-            <StoreName>{store.name}</StoreName>
-            <StoreAddress>
-              <div>{store.address.addressLine}</div>
-              <div>
-                {store.address.postalCode.postalCode}{' '}
-                {store.address.postalCode.city}
-              </div>
-            </StoreAddress>
-          </StoreCard>
+          <StoreCard
+            key={store.id}
+            store={store}
+            onClick={() => setSelectedStore(store)}
+          />
         ))}
       </StoresGrid>
 

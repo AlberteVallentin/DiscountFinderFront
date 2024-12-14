@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { X, Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import facade from '../util/apiFacade';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ProductCard from './Card/ProductCard';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -118,76 +119,6 @@ const ProductsGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
-`;
-
-const ProductCard = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const ProductTitle = styled.h3`
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-  margin: 0;
-`;
-
-const TagsContainer = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-`;
-
-const Tag = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
-  padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.8rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const PriceInfo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const Price = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const Discount = styled.span`
-  background: #dc2626;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.8rem;
-`;
-
-const OriginalPrice = styled.span`
-  text-decoration: line-through;
-  color: ${({ theme }) => theme.colors.border};
-  font-size: 0.9rem;
-`;
-
-const StockInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 0.9rem;
-`;
-
-const DateInfo = styled.div`
-  font-size: 0.9rem;
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const LoginPrompt = styled.div`
@@ -606,32 +537,7 @@ export default function StoreProductsModal({
 
             <ProductsGrid>
               {filteredProducts.map((product) => (
-                <ProductCard key={product.ean}>
-                  <ProductTitle>{product.productName}</ProductTitle>
-                  <TagsContainer>
-                    {product.categories.map((category) => (
-                      <Tag key={category.nameDa}>{category.nameDa}</Tag>
-                    ))}
-                  </TagsContainer>
-                  <PriceInfo>
-                    <div>
-                      <Price>{product.price.newPrice.toFixed(2)} kr</Price>
-                      <OriginalPrice>
-                        {product.price.originalPrice.toFixed(2)} kr
-                      </OriginalPrice>
-                    </div>
-                    <Discount>
-                      -{product.price.percentDiscount.toFixed(0)}%
-                    </Discount>
-                  </PriceInfo>
-                  <StockInfo>
-                    <span>På lager: {product.stock.quantity} stk.</span>
-                  </StockInfo>
-                  <DateInfo>
-                    Tilbud gælder til:{' '}
-                    {new Date(product.timing.endTime).toLocaleDateString()}
-                  </DateInfo>
-                </ProductCard>
+                <ProductCard product={product} />
               ))}
             </ProductsGrid>
           </>
