@@ -7,6 +7,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import StoreProductsModal from '../components/StoreProductsModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/Card/StoreCard';
+import CardGrid from '../components/Card/CardGrid';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -73,25 +74,6 @@ const FilterButton = styled.button`
   }
 `;
 
-const StoresGrid = styled.div`
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: ${({ $singleItem }) =>
-    $singleItem
-      ? 'minmax(auto, 400px)'
-      : 'repeat(auto-fill, minmax(300px, 1fr))'};
-  width: min(90%, 70rem);
-  margin-inline: auto;
-  padding: 1rem;
-  justify-content: center;
-
-  > * {
-    width: 100%;
-    max-width: 400px;
-    justify-self: center;
-  }
-`;
-
 const PostalCodeSelect = styled.select`
   background: ${({ theme }) => theme.colors.card};
   color: ${({ theme }) => theme.colors.text};
@@ -143,6 +125,14 @@ const BrandButton = styled.button`
     opacity: 0.9;
     transform: translateY(-2px);
   }
+`;
+
+// Styled CardGrid til at håndtere single item
+const StyledCardGrid = styled(CardGrid)`
+  grid-template-columns: ${({ $singleItem }) =>
+    $singleItem
+      ? 'minmax(auto, 400px)'
+      : 'repeat(auto-fill, minmax(300px, 1fr))'};
 `;
 
 const Stores = () => {
@@ -302,7 +292,7 @@ const Stores = () => {
         </BrandButton>
       </BrandSection>
 
-      <StoresGrid $singleItem={filteredStores.length === 1}>
+      <StyledCardGrid $singleItem={filteredStores.length === 1}>
         {filteredStores.map((store) => (
           <StoreCard
             key={store.id}
@@ -310,7 +300,7 @@ const Stores = () => {
             onClick={() => setSelectedStore(store)}
           />
         ))}
-      </StoresGrid>
+      </StyledCardGrid>
 
       {selectedStore && (
         <StoreProductsModal

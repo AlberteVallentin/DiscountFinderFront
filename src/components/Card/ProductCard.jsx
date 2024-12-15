@@ -1,12 +1,6 @@
 import styled from 'styled-components';
 import BaseCard from './BaseCard';
 
-const ProductCardContainer = styled(BaseCard)`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
 const ProductTitle = styled.h3`
   font-size: var(--fs-n);
   font-weight: var(--fw-medium);
@@ -33,6 +27,7 @@ const PriceInfo = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: auto;
 `;
 
 const Price = styled.div`
@@ -68,33 +63,30 @@ const DateInfo = styled.div`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-const ProductCard = ({ product }) => {
-  return (
-    <ProductCardContainer>
-      <ProductTitle>{product.productName}</ProductTitle>
-      <TagsContainer>
-        {product.categories.map((category) => (
-          <Tag key={category.nameDa}>{category.nameDa}</Tag>
-        ))}
-      </TagsContainer>
-      <PriceInfo>
-        <div>
-          <Price>{product.price.newPrice.toFixed(2)} kr</Price>
-          <OriginalPrice>
-            {product.price.originalPrice.toFixed(2)} kr
-          </OriginalPrice>
-        </div>
-        <Discount>-{product.price.percentDiscount.toFixed(0)}%</Discount>
-      </PriceInfo>
-      <StockInfo>
-        <span>På lager: {product.stock.quantity} stk.</span>
-      </StockInfo>
-      <DateInfo>
-        Tilbud gælder til:{' '}
-        {new Date(product.timing.endTime).toLocaleDateString()}
-      </DateInfo>
-    </ProductCardContainer>
-  );
-};
+const ProductCard = ({ product }) => (
+  <BaseCard>
+    <ProductTitle>{product.productName}</ProductTitle>
+    <TagsContainer>
+      {product.categories.map((category) => (
+        <Tag key={category.nameDa}>{category.nameDa}</Tag>
+      ))}
+    </TagsContainer>
+    <PriceInfo>
+      <div>
+        <Price>{product.price.newPrice.toFixed(2)} kr</Price>
+        <OriginalPrice>
+          {product.price.originalPrice.toFixed(2)} kr
+        </OriginalPrice>
+      </div>
+      <Discount>-{product.price.percentDiscount.toFixed(0)}%</Discount>
+    </PriceInfo>
+    <StockInfo>
+      <span>På lager: {product.stock.quantity} stk.</span>
+    </StockInfo>
+    <DateInfo>
+      Tilbud gælder til: {new Date(product.timing.endTime).toLocaleDateString()}
+    </DateInfo>
+  </BaseCard>
+);
 
 export default ProductCard;

@@ -1,13 +1,8 @@
 import styled from 'styled-components';
 import BaseCard from './BaseCard';
 
-const StoreCardContainer = styled(BaseCard)`
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 1rem;
+const StyledCard = styled(BaseCard)`
   cursor: ${({ onClick }) => (onClick ? 'pointer' : 'default')};
-  max-width: 300px;
-  align-items: center;
 `;
 
 const StoreName = styled.h2`
@@ -28,18 +23,16 @@ const StoreAddress = styled.div`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-const StoreCard = ({ store, onClick }) => {
-  return (
-    <StoreCardContainer onClick={onClick} interactive={!!onClick}>
-      <StoreName>{store.name}</StoreName>
-      <StoreAddress>
-        <div>{store.address.addressLine}</div>
-        <div>
-          {store.address.postalCode.postalCode} {store.address.postalCode.city}
-        </div>
-      </StoreAddress>
-    </StoreCardContainer>
-  );
-};
+const StoreCard = ({ store, onClick }) => (
+  <StyledCard onClick={onClick}>
+    <StoreName>{store.name}</StoreName>
+    <StoreAddress>
+      <div>{store.address.addressLine}</div>
+      <div>
+        {store.address.postalCode.postalCode} {store.address.postalCode.city}
+      </div>
+    </StoreAddress>
+  </StyledCard>
+);
 
 export default StoreCard;

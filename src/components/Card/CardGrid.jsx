@@ -1,19 +1,19 @@
 import styled from 'styled-components';
 
-const StoreGrid = styled.div`
+const CardGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: min(90%, 70rem);
+  margin-inline: auto;
   padding: 1rem;
-  justify-items: center;
+  justify-content: center;
 
   > * {
     width: 100%;
     max-width: 400px;
+    justify-self: center;
   }
 `;
 
-export default StoreGrid;
+export default CardGrid;
