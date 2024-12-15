@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router';
-import { Search, Filter } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
@@ -56,21 +56,16 @@ const SearchInput = styled.input`
   }
 `;
 
-const FilterButton = styled.button`
+const SelectWrapper = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: ${({ theme }) => theme.colors.card};
-  color: ${({ theme }) => theme.colors.text};
-  border: none;
-  border-radius: 2rem;
-  padding: 1rem 2rem;
-  cursor: pointer;
-  font-size: var(--fs-n);
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
 
-  &:hover {
-    opacity: 0.9;
+  svg {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    color: ${({ theme }) => theme.colors.text};
   }
 `;
 
@@ -80,9 +75,13 @@ const PostalCodeSelect = styled.select`
   border: none;
   border-radius: 2rem;
   padding: 1rem 2rem;
+  padding-right: 3rem;
   font-size: var(--fs-n);
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
   &:focus {
     outline: none;
@@ -127,7 +126,6 @@ const BrandButton = styled.button`
   }
 `;
 
-// Styled CardGrid til at håndtere single item
 const StyledCardGrid = styled(CardGrid)`
   grid-template-columns: ${({ $singleItem }) =>
     $singleItem
@@ -253,22 +251,20 @@ const Stores = () => {
           />
         </SearchBar>
 
-        <PostalCodeSelect
-          value={selectedPostalCode}
-          onChange={handlePostalCodeChange}
-        >
-          <option value=''>Alle postnumre</option>
-          {postalCodes.map((code) => (
-            <option key={code} value={code}>
-              {code}
-            </option>
-          ))}
-        </PostalCodeSelect>
-
-        <FilterButton>
-          <Filter size={20} />
-          Filter
-        </FilterButton>
+        <SelectWrapper>
+          <PostalCodeSelect
+            value={selectedPostalCode}
+            onChange={handlePostalCodeChange}
+          >
+            <option value=''>Alle postnumre</option>
+            {postalCodes.map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
+          </PostalCodeSelect>
+          <ChevronDown size={20} />
+        </SelectWrapper>
       </SearchSection>
 
       <BrandSection>
