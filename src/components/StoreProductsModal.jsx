@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import { X, Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import facade from '../util/apiFacade';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ProductCard from './Card/ProductCard';
-import CardGrid from './Card/CardGrid';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -30,9 +28,25 @@ const ModalContent = styled.div`
   position: relative;
   padding: 2rem;
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
+`;
 
-  ${CardGrid} {
-    margin-top: 2rem;
+const CloseButton = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text};
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -46,7 +60,7 @@ const Header = styled.div`
 `;
 
 const StoreName = styled.h2`
-  font-size: var(--fs-l);
+  font-size: 1.5rem;
   color: ${({ theme }) => theme.colors.text};
 `;
 
@@ -66,7 +80,6 @@ const SearchBar = styled.div`
   flex: 1;
   min-width: 250px;
   border: 1px solid ${({ theme }) => theme.colors.border};
-  gap: 0.5rem;
 `;
 
 const SearchInput = styled.input`
@@ -75,15 +88,10 @@ const SearchInput = styled.input`
   padding: 0.5rem;
   width: 100%;
   color: ${({ theme }) => theme.colors.text};
-  font-size: var(--fs-n);
+  font-size: 1rem;
 
   &:focus {
     outline: none;
-  }
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.text};
-    opacity: 0.7;
   }
 `;
 
@@ -97,7 +105,7 @@ const Button = styled.button`
   background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
   cursor: pointer;
-  font-size: var(--fs-n);
+  font-size: 0.9rem;
   transition: all 0.2s;
 
   &:hover {
@@ -105,16 +113,105 @@ const Button = styled.button`
   }
 `;
 
-const CloseButton = styled(Button)`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.5rem;
-  border-radius: 50%;
-  background: none;
-  border: none;
+const ProductsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
 `;
 
+const ProductCard = styled.div`
+  background: ${({ theme }) => theme.colors.background};
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const ProductTitle = styled.h3`
+  font-size: 1rem;
+  color: ${({ theme }) => theme.colors.text};
+  margin: 0;
+`;
+
+const TagsContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
+const Tag = styled.span`
+  background: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+`;
+
+const PriceInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const Price = styled.div`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const Discount = styled.span`
+  background: #dc2626;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+`;
+
+const OriginalPrice = styled.span`
+  text-decoration: line-through;
+  color: ${({ theme }) => theme.colors.border};
+  font-size: 0.9rem;
+`;
+
+const StockInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 0.9rem;
+`;
+
+const DateInfo = styled.div`
+  font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const LoginPrompt = styled.div`
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+`;
+
+const LoginButton = styled.button`
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
 const Dropdown = styled.div`
   position: relative;
   display: inline-block;
@@ -139,7 +236,9 @@ const DropdownItem = styled.div`
   padding: 0.75rem 1rem;
   cursor: pointer;
   border-radius: 4px;
-  color: ${({ theme }) => theme.colors.text};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &:hover {
     background: ${({ theme }) => theme.colors.background};
@@ -156,17 +255,12 @@ const FilterPanel = styled.div`
 `;
 
 const FilterSection = styled.div`
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-bottom: 1rem;
 `;
 
 const FilterTitle = styled.h3`
-  font-size: var(--fs-n);
-  margin-bottom: 1rem;
-  color: ${({ theme }) => theme.colors.text};
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 `;
 
 const RangeInputs = styled.div`
@@ -180,8 +274,6 @@ const RangeInput = styled.input`
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 4px;
   width: 100px;
-  color: ${({ theme }) => theme.colors.text};
-  background: ${({ theme }) => theme.colors.background};
 `;
 
 const CheckboxContainer = styled.div`
@@ -195,27 +287,6 @@ const CheckboxLabel = styled.label`
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const LoginPrompt = styled.div`
-  text-align: center;
-  padding: 4rem 2rem;
-  max-width: 500px;
-  margin: 0 auto;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const LoginButton = styled(Button)`
-  background: ${({ theme }) => theme.colors.text};
-  color: ${({ theme }) => theme.colors.background};
-  border: none;
-  margin-top: 1rem;
-  padding: 0.75rem 2rem;
-
-  &:hover {
-    opacity: 0.9;
-  }
 `;
 
 export default function StoreProductsModal({
@@ -229,16 +300,19 @@ export default function StoreProductsModal({
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('');
 
+  // Filtering state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     categories: new Set(),
     priceRange: { min: '', max: '' },
     discountRange: { min: '', max: '' },
     stockOnly: false,
   });
+
+  // Sorting state
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [sortOption, setSortOption] = useState('');
 
   useEffect(() => {
     if (isLoggedIn && store) {
@@ -265,14 +339,14 @@ export default function StoreProductsModal({
   const applyFiltersAndSort = () => {
     let filtered = [...products];
 
-    // Search filter
+    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Category filter
+    // Apply category filter
     if (filterOptions.categories.size > 0) {
       filtered = filtered.filter((product) =>
         product.categories.some((cat) =>
@@ -281,7 +355,7 @@ export default function StoreProductsModal({
       );
     }
 
-    // Price range filter
+    // Apply price range filter
     if (filterOptions.priceRange.min || filterOptions.priceRange.max) {
       filtered = filtered.filter((product) => {
         const price = product.price.newPrice;
@@ -295,7 +369,7 @@ export default function StoreProductsModal({
       });
     }
 
-    // Discount range filter
+    // Apply discount range filter
     if (filterOptions.discountRange.min || filterOptions.discountRange.max) {
       filtered = filtered.filter((product) => {
         const discount = product.price.percentDiscount;
@@ -309,7 +383,7 @@ export default function StoreProductsModal({
       });
     }
 
-    // Stock filter
+    // Apply stock filter
     if (filterOptions.stockOnly) {
       filtered = filtered.filter((product) => product.stock.quantity > 0);
     }
@@ -530,11 +604,36 @@ export default function StoreProductsModal({
               </FilterSection>
             </FilterPanel>
 
-            <CardGrid>
+            <ProductsGrid>
               {filteredProducts.map((product) => (
-                <ProductCard key={product.ean} product={product} />
+                <ProductCard key={product.ean}>
+                  <ProductTitle>{product.productName}</ProductTitle>
+                  <TagsContainer>
+                    {product.categories.map((category) => (
+                      <Tag key={category.nameDa}>{category.nameDa}</Tag>
+                    ))}
+                  </TagsContainer>
+                  <PriceInfo>
+                    <div>
+                      <Price>{product.price.newPrice.toFixed(2)} kr</Price>
+                      <OriginalPrice>
+                        {product.price.originalPrice.toFixed(2)} kr
+                      </OriginalPrice>
+                    </div>
+                    <Discount>
+                      -{product.price.percentDiscount.toFixed(0)}%
+                    </Discount>
+                  </PriceInfo>
+                  <StockInfo>
+                    <span>På lager: {product.stock.quantity} stk.</span>
+                  </StockInfo>
+                  <DateInfo>
+                    Tilbud gælder til:{' '}
+                    {new Date(product.timing.endTime).toLocaleDateString()}
+                  </DateInfo>
+                </ProductCard>
               ))}
-            </CardGrid>
+            </ProductsGrid>
           </>
         )}
       </ModalContent>
