@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router';
-import { Search, Filter } from 'lucide-react';
-import Card from '../components/Card';
+import { Search, ChevronDown } from 'lucide-react';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
 import StoreProductsModal from '../components/StoreProductsModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import StoreCard from '../components/Card/StoreCard';
+import CardGrid from '../components/Card/CardGrid';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -55,64 +56,17 @@ const SearchInput = styled.input`
   }
 `;
 
-const FilterButton = styled.button`
+const SelectWrapper = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: ${({ theme }) => theme.colors.card};
-  color: ${({ theme }) => theme.colors.text};
-  border: none;
-  border-radius: 2rem;
-  padding: 1rem 2rem;
-  cursor: pointer;
-  font-size: var(--fs-n);
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
 
-  &:hover {
-    opacity: 0.9;
+  svg {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    color: ${({ theme }) => theme.colors.text};
   }
-`;
-
-const StoresGrid = styled.div`
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-  width: min(90%, 70rem);
-  margin-inline: auto;
-  padding: 1rem;
-`;
-
-const StoreCard = styled.div`
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 1em;
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: 12px;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
-`;
-
-const StoreName = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin: 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const StoreAddress = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const PostalCodeSelect = styled.select`
@@ -121,22 +75,17 @@ const PostalCodeSelect = styled.select`
   border: none;
   border-radius: 2rem;
   padding: 1rem 2rem;
+  padding-right: 3rem;
   font-size: var(--fs-n);
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 
   &:focus {
     outline: none;
   }
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-  font-size: var(--fs-l);
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ErrorContainer = styled.div`
@@ -175,6 +124,13 @@ const BrandButton = styled.button`
     opacity: 0.9;
     transform: translateY(-2px);
   }
+`;
+
+const StyledCardGrid = styled(CardGrid)`
+  grid-template-columns: ${({ $singleItem }) =>
+    $singleItem
+      ? 'minmax(auto, 400px)'
+      : 'repeat(auto-fill, minmax(300px, 1fr))'};
 `;
 
 const Stores = () => {
@@ -295,22 +251,20 @@ const Stores = () => {
           />
         </SearchBar>
 
-        <PostalCodeSelect
-          value={selectedPostalCode}
-          onChange={handlePostalCodeChange}
-        >
-          <option value=''>Alle postnumre</option>
-          {postalCodes.map((code) => (
-            <option key={code} value={code}>
-              {code}
-            </option>
-          ))}
-        </PostalCodeSelect>
-
-        <FilterButton>
-          <Filter size={20} />
-          Filter
-        </FilterButton>
+        <SelectWrapper>
+          <PostalCodeSelect
+            value={selectedPostalCode}
+            onChange={handlePostalCodeChange}
+          >
+            <option value=''>Alle postnumre</option>
+            {postalCodes.map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
+          </PostalCodeSelect>
+          <ChevronDown size={20} />
+        </SelectWrapper>
       </SearchSection>
 
       <BrandSection>
@@ -334,20 +288,15 @@ const Stores = () => {
         </BrandButton>
       </BrandSection>
 
-      <StoresGrid>
+      <StyledCardGrid $singleItem={filteredStores.length === 1}>
         {filteredStores.map((store) => (
-          <StoreCard key={store.id} onClick={() => setSelectedStore(store)}>
-            <StoreName>{store.name}</StoreName>
-            <StoreAddress>
-              <div>{store.address.addressLine}</div>
-              <div>
-                {store.address.postalCode.postalCode}{' '}
-                {store.address.postalCode.city}
-              </div>
-            </StoreAddress>
-          </StoreCard>
+          <StoreCard
+            key={store.id}
+            store={store}
+            onClick={() => setSelectedStore(store)}
+          />
         ))}
-      </StoresGrid>
+      </StyledCardGrid>
 
       {selectedStore && (
         <StoreProductsModal
