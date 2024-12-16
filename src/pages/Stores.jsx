@@ -279,13 +279,15 @@ function Stores() {
         ))}
       </CardGrid>
 
-      <StoreProductsModal
-        isOpen={selectedStore !== null}
-        store={selectedStore}
-        onClose={() => setSelectedStore(null)}
-        isLoggedIn={loggedIn}
-        navigate={navigate}
-      />
+      {selectedStore && (
+        <StoreProductsModal
+          isOpen={true}
+          store={selectedStore}
+          onClose={() => setSelectedStore(null)}
+          isLoggedIn={loggedIn}
+          navigate={navigate}
+        />
+      )}
 
       <ScrollToTop />
     </StoresContainer>

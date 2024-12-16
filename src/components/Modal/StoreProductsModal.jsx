@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
-import Modal from './Modal';
+import Modal from '../Modal/BaseModal';
 import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../util/apiFacade';
 
@@ -150,11 +150,8 @@ const OriginalPrice = styled.span`
 `;
 
 const StockInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text};
   font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const DateInfo = styled.div`
@@ -196,6 +193,26 @@ const CheckboxLabel = styled.label`
   color: ${({ theme }) => theme.colors.text};
 `;
 
+const LoginContainer = styled.div`
+  text-align: center;
+  padding: 2rem;
+`;
+
+const LoginButton = styled.button`
+  background: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.background};
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
 const StoreProductsModal = ({
   isOpen,
   store,
@@ -217,11 +234,33 @@ const StoreProductsModal = ({
   });
   const [sortOption, setSortOption] = useState('');
 
+  const resetFilters = () => {
+    setSearchTerm('');
+    setFilterOptions({
+      categories: new Set(),
+      priceRange: { min: '', max: '' },
+      discountRange: { min: '', max: '' },
+      stockOnly: false,
+    });
+    setSortOption('');
+    setIsFilterOpen(false);
+    setIsSortOpen(false);
+  };
+
+  const handleModalClose = () => {
+    onClose();
+    resetFilters();
+  };
+
   useEffect(() => {
-    if (isLoggedIn && store && isOpen) {
+    if (isLoggedIn && store?.id && isOpen) {
+      setProducts([]);
+      setFilteredProducts([]);
+      setLoading(true);
+      resetFilters();
       fetchStoreProducts();
     }
-  }, [store, isLoggedIn, isOpen]);
+  }, [store?.id, isLoggedIn, isOpen]);
 
   useEffect(() => {
     applyFiltersAndSort();
@@ -242,14 +281,12 @@ const StoreProductsModal = ({
   const applyFiltersAndSort = () => {
     let filtered = [...products];
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Category filter
     if (filterOptions.categories.size > 0) {
       filtered = filtered.filter((product) =>
         product.categories.some((cat) =>
@@ -258,7 +295,6 @@ const StoreProductsModal = ({
       );
     }
 
-    // Price range
     if (filterOptions.priceRange.min || filterOptions.priceRange.max) {
       filtered = filtered.filter((product) => {
         const price = product.price.newPrice;
@@ -272,7 +308,6 @@ const StoreProductsModal = ({
       });
     }
 
-    // Discount range
     if (filterOptions.discountRange.min || filterOptions.discountRange.max) {
       filtered = filtered.filter((product) => {
         const discount = product.price.percentDiscount;
@@ -286,12 +321,10 @@ const StoreProductsModal = ({
       });
     }
 
-    // Stock filter
     if (filterOptions.stockOnly) {
       filtered = filtered.filter((product) => product.stock.quantity > 0);
     }
 
-    // Sorting
     if (sortOption) {
       filtered.sort((a, b) => {
         switch (sortOption) {
@@ -322,21 +355,21 @@ const StoreProductsModal = ({
     return Array.from(categories);
   };
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn && isOpen) {
     return (
       <Modal isOpen={isOpen} onClose={onClose} maxWidth='500px'>
-        <div>
+        <LoginContainer>
           <h2>Log ind for at se tilbud</h2>
           <p>Du skal være logget ind for at se tilbuddene i denne butik.</p>
-          <button
+          <LoginButton
             onClick={() => {
               onClose();
               navigate('/login');
             }}
           >
             Log ind
-          </button>
-        </div>
+          </LoginButton>
+        </LoginContainer>
       </Modal>
     );
   }
@@ -344,7 +377,7 @@ const StoreProductsModal = ({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleModalClose}
       maxWidth='1200px'
       title={store?.name}
     >
@@ -528,9 +561,7 @@ const StoreProductsModal = ({
                   -{product.price.percentDiscount.toFixed(0)}%
                 </Discount>
               </PriceInfo>
-              <StockInfo>
-                <span>På lager: {product.stock.quantity} stk.</span>
-              </StockInfo>
+              <StockInfo>På lager: {product.stock.quantity} stk.</StockInfo>
               <DateInfo>
                 Tilbud gælder til:{' '}
                 {new Date(product.timing.endTime).toLocaleDateString()}
