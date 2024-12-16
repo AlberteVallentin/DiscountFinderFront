@@ -8,6 +8,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/Card/StoreCard';
 import CardGrid from '../components/Card/CardGrid';
 import StoreProductsView from '../components/StoreProductsView';
+import SearchBar from '../components/SearchBar';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -24,35 +25,6 @@ const SearchSection = styled.div`
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 2rem;
-`;
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: 2rem;
-  padding: 0.5rem 1.5rem;
-  gap: 0.5rem;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-  flex: 1;
-  max-width: 600px;
-`;
-
-const SearchInput = styled.input`
-  border: none;
-  background: none;
-  padding: 0.5rem;
-  width: 100%;
-  color: ${({ theme }) => theme.colors.text};
-
-  &:focus {
-    outline: none;
-  }
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.text};
-    opacity: 0.7;
-  }
 `;
 
 const SelectWrapper = styled.div`
@@ -222,15 +194,11 @@ function Stores() {
   return (
     <StoresContainer>
       <SearchSection>
-        <SearchBar>
-          <Search size={20} />
-          <SearchInput
-            type='text'
-            placeholder='Søg efter en butik...'
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </SearchBar>
+        <SearchBar
+          placeholder='Søg efter en butik...'
+          value={searchTerm}
+          onChange={handleSearch}
+        />
 
         <SelectWrapper>
           <PostalCodeSelect

@@ -7,9 +7,11 @@ import facade from '../../util/apiFacade';
 
 const Controls = styled.div`
   display: flex;
-  gap: 1rem;
-  align-items: center;
   flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
 `;
 
 const SearchBar = styled.div`
