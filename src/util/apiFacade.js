@@ -8,6 +8,16 @@ function handleHttpErrors(res) {
     return res.json();
 }
 
+const processProducts = (data) => {
+    if (data?.products) {
+        data.products = data.products.map(product => ({
+            ...product,
+            productName: product.productName?.replace(/#/g, 'Ø')
+        }));
+    }
+    return data;
+};
+
 function apiFacade() {
     const setToken = (token) => {
         localStorage.setItem('jwtToken', token);
@@ -62,7 +72,8 @@ function apiFacade() {
         const options = makeOptions("GET", addToken);
         try {
             const response = await fetch(URL + endpoint, options);
-            return await handleHttpErrors(response);
+            const data = await handleHttpErrors(response);
+            return processProducts(data);
         } catch (error) {
             console.error("Fetch error:", error);
             throw error;
