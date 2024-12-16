@@ -7,7 +7,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/Card/StoreCard';
 import CardGrid from '../components/Card/CardGrid';
-import StoreProductsModal from '../components/Modal/StoreProductsModal';
+import StoreProductsView from '../components/StoreProductsView';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -126,25 +126,25 @@ function Stores() {
   const { loggedIn } = useOutletContext();
 
   useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const data = await facade.fetchData('/stores', false);
-        setStores(data);
-        setFilteredStores(data);
-
-        const uniquePostalCodes = [
-          ...new Set(data.map((store) => store.address.postalCode.postalCode)),
-        ].sort();
-        setPostalCodes(uniquePostalCodes);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStores();
   }, []);
+
+  const fetchStores = async () => {
+    try {
+      const data = await facade.fetchData('/stores', false);
+      setStores(data);
+      setFilteredStores(data);
+
+      const uniquePostalCodes = [
+        ...new Set(data.map((store) => store.address.postalCode.postalCode)),
+      ].sort();
+      setPostalCodes(uniquePostalCodes);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (event) => {
     const term = event.target.value.toLowerCase();
@@ -280,8 +280,7 @@ function Stores() {
       </CardGrid>
 
       {selectedStore && (
-        <StoreProductsModal
-          isOpen={true}
+        <StoreProductsView
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
           isLoggedIn={loggedIn}

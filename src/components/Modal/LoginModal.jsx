@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from './Modal';
+import BaseModal from './BaseModal';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -8,13 +8,7 @@ const LoginContainer = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 2rem;
-`;
-
-const LoginTitle = styled.h2`
-  color: ${({ theme }) => theme.colors.text};
-  font-size: var(--fs-l);
-  margin-bottom: 1.5rem;
+  padding: 1rem;
 `;
 
 const LoginDescription = styled.p`
@@ -35,7 +29,6 @@ const LoginButton = styled.button`
   font-weight: var(--fw-medium);
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
 
   &:hover {
     transform: translateY(-2px);
@@ -45,20 +38,19 @@ const LoginButton = styled.button`
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
   return (
-    <Modal
+    <BaseModal
       isOpen={isOpen}
       onClose={onClose}
+      title='Log ind for at se tilbud'
       maxWidth='500px'
-      closeOnOutsideClick={false}
     >
       <LoginContainer>
-        <LoginTitle>Log ind for at se tilbud</LoginTitle>
         <LoginDescription>
           Du skal være logget ind for at se tilbuddene i denne butik.
         </LoginDescription>
         <LoginButton onClick={onLogin}>Log ind</LoginButton>
       </LoginContainer>
-    </Modal>
+    </BaseModal>
   );
 };
 
