@@ -149,18 +149,6 @@ function TopMenu() {
               Login / Opret
             </NavLink>
           </MenuItem>
-          <MenuItem>
-            <NavLink to='/vision' onClick={closeMenu}>
-              <Eye />
-              Vision
-            </NavLink>
-          </MenuItem>
-          <MenuItem>
-            <NavLink to='/endpoints' onClick={closeMenu}>
-              <Terminal />
-              Endpoints
-            </NavLink>
-          </MenuItem>
         </StyledMenu>
       </SideMenu>
     </>
