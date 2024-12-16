@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import BaseModal from './BaseModal';
+import Modal from './Modal';
 
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
   text-align: center;
   padding: 2rem;
 `;
@@ -44,9 +43,14 @@ const LoginButton = styled.button`
   }
 `;
 
-const LoginModal = ({ onClose, onLogin }) => {
+const LoginModal = ({ isOpen, onClose, onLogin }) => {
   return (
-    <BaseModal onClose={onClose} maxWidth='500px'>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      maxWidth='500px'
+      closeOnOutsideClick={false}
+    >
       <LoginContainer>
         <LoginTitle>Log ind for at se tilbud</LoginTitle>
         <LoginDescription>
@@ -54,8 +58,6 @@ const LoginModal = ({ onClose, onLogin }) => {
         </LoginDescription>
         <LoginButton onClick={onLogin}>Log ind</LoginButton>
       </LoginContainer>
-    </BaseModal>
+    </Modal>
   );
 };
-
-export default LoginModal;

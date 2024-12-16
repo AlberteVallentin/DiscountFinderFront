@@ -4,10 +4,10 @@ import { Search, ChevronDown } from 'lucide-react';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
-import StoreProductsModal from '../components/StoreProductsModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/Card/StoreCard';
 import CardGrid from '../components/Card/CardGrid';
+import StoreProductsModal from '../components/Modal/StoreProductsModal';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -44,7 +44,6 @@ const SearchInput = styled.input`
   padding: 0.5rem;
   width: 100%;
   color: ${({ theme }) => theme.colors.text};
-  font-size: var(--fs-n);
 
   &:focus {
     outline: none;
@@ -80,23 +79,10 @@ const PostalCodeSelect = styled.select`
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   cursor: pointer;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 
   &:focus {
     outline: none;
   }
-`;
-
-const ErrorContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-  font-size: var(--fs-m);
-  color: red;
-  text-align: center;
-  padding: 2rem;
 `;
 
 const BrandSection = styled.div`
@@ -126,14 +112,7 @@ const BrandButton = styled.button`
   }
 `;
 
-const StyledCardGrid = styled(CardGrid)`
-  grid-template-columns: ${({ $singleItem }) =>
-    $singleItem
-      ? 'minmax(auto, 400px)'
-      : 'repeat(auto-fill, minmax(300px, 1fr))'};
-`;
-
-const Stores = () => {
+function Stores() {
   const [stores, setStores] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPostalCode, setSelectedPostalCode] = useState('');
@@ -236,7 +215,9 @@ const Stores = () => {
     return <LoadingSpinner text='Henter butikker...' fullscreen={true} />;
   }
 
-  if (error) return <ErrorContainer>Error: {error}</ErrorContainer>;
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <StoresContainer>
@@ -288,7 +269,7 @@ const Stores = () => {
         </BrandButton>
       </BrandSection>
 
-      <StyledCardGrid $singleItem={filteredStores.length === 1}>
+      <CardGrid>
         {filteredStores.map((store) => (
           <StoreCard
             key={store.id}
@@ -296,20 +277,19 @@ const Stores = () => {
             onClick={() => setSelectedStore(store)}
           />
         ))}
-      </StyledCardGrid>
+      </CardGrid>
 
-      {selectedStore && (
-        <StoreProductsModal
-          store={selectedStore}
-          onClose={() => setSelectedStore(null)}
-          isLoggedIn={loggedIn}
-          navigate={navigate}
-        />
-      )}
+      <StoreProductsModal
+        isOpen={selectedStore !== null}
+        store={selectedStore}
+        onClose={() => setSelectedStore(null)}
+        isLoggedIn={loggedIn}
+        navigate={navigate}
+      />
 
       <ScrollToTop />
     </StoresContainer>
   );
-};
+}
 
 export default Stores;
