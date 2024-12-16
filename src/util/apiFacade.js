@@ -8,6 +8,33 @@ function handleHttpErrors(res) {
     return res.json();
 }
 
+// I /util/apiFacade.js
+
+const convertHashToOe = (text) => {
+    if (!text) return text;
+    // Erstat # med Ø
+    return text.replace(/#/g, 'Ø');
+};
+
+const processObject = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+
+    const newObj = Array.isArray(obj) ? [] : {};
+
+    for (const key in obj) {
+        const value = obj[key];
+        if (typeof value === 'string') {
+            newObj[key] = convertHashToOe(value);
+        } else if (typeof value === 'object') {
+            newObj[key] = processObject(value);
+        } else {
+            newObj[key] = value;
+        }
+    }
+
+    return newObj;
+};
+
 function apiFacade() {
     const setToken = (token) => {
         localStorage.setItem('jwtToken', token);
@@ -62,7 +89,8 @@ function apiFacade() {
         const options = makeOptions("GET", addToken);
         try {
             const response = await fetch(URL + endpoint, options);
-            return await handleHttpErrors(response);
+            const data = await handleHttpErrors(response);
+            return processObject(data);
         } catch (error) {
             console.error("Fetch error:", error);
             throw error;

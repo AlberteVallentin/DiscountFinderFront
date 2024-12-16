@@ -24,5 +24,3 @@ export function useTheme() {
   }
   return context;
 }
-
-// comment to
