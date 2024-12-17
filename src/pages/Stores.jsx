@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useOutletContext } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Search, ChevronDown } from 'lucide-react';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
@@ -7,7 +7,9 @@ import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/Card/StoreCard';
 import CardGrid from '../components/Card/CardGrid';
-import StoreProductsModal from '../components/Modal/StoreProductsModal';
+import StoreProductsView from '../components/StoreProductsView';
+import SearchBar from '../components/SearchBar';
+import { useAuth } from '../context/AuthContext';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -24,35 +26,6 @@ const SearchSection = styled.div`
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 2rem;
-`;
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: 2rem;
-  padding: 0.5rem 1.5rem;
-  gap: 0.5rem;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-  flex: 1;
-  max-width: 600px;
-`;
-
-const SearchInput = styled.input`
-  border: none;
-  background: none;
-  padding: 0.5rem;
-  width: 100%;
-  color: ${({ theme }) => theme.colors.text};
-
-  &:focus {
-    outline: none;
-  }
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.text};
-    opacity: 0.7;
-  }
 `;
 
 const SelectWrapper = styled.div`
@@ -123,28 +96,28 @@ function Stores() {
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [selectedStore, setSelectedStore] = useState(null);
   const navigate = useNavigate();
-  const { loggedIn } = useOutletContext();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const data = await facade.fetchData('/stores', false);
-        setStores(data);
-        setFilteredStores(data);
-
-        const uniquePostalCodes = [
-          ...new Set(data.map((store) => store.address.postalCode.postalCode)),
-        ].sort();
-        setPostalCodes(uniquePostalCodes);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStores();
   }, []);
+
+  const fetchStores = async () => {
+    try {
+      const data = await facade.fetchData('/stores', false);
+      setStores(data);
+      setFilteredStores(data);
+
+      const uniquePostalCodes = [
+        ...new Set(data.map((store) => store.address.postalCode.postalCode)),
+      ].sort();
+      setPostalCodes(uniquePostalCodes);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (event) => {
     const term = event.target.value.toLowerCase();
@@ -222,15 +195,11 @@ function Stores() {
   return (
     <StoresContainer>
       <SearchSection>
-        <SearchBar>
-          <Search size={20} />
-          <SearchInput
-            type='text'
-            placeholder='Søg efter en butik...'
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </SearchBar>
+        <SearchBar
+          placeholder='Søg efter en butik...'
+          value={searchTerm}
+          onChange={handleSearch}
+        />
 
         <SelectWrapper>
           <PostalCodeSelect
@@ -280,11 +249,9 @@ function Stores() {
       </CardGrid>
 
       {selectedStore && (
-        <StoreProductsModal
-          isOpen={true}
+        <StoreProductsView
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
-          isLoggedIn={loggedIn}
           navigate={navigate}
         />
       )}

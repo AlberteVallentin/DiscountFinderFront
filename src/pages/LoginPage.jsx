@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import { useNavigate, useOutletContext } from 'react-router';
-import facade from '../util/apiFacade';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import facade from '../util/apiFacade';
 
 const Toast = styled.div`
   position: fixed;
@@ -42,13 +43,6 @@ const FormCard = styled.div`
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   width: 100%;
   max-width: 400px;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const Form = styled.form`
@@ -97,14 +91,6 @@ const Button = styled.button`
   }
 `;
 
-const ErrorContainer = styled.div`
-  height: 4rem;
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const ErrorMessage = styled.div`
   display: flex;
   align-items: center;
@@ -145,10 +131,10 @@ const ToggleButton = styled.button`
 `;
 
 const LoginPage = () => {
-  const { setLoggedIn } = useOutletContext();
-  const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [error, setError] = useState('');
   const [toast, setToast] = useState({
     visible: false,
     message: '',
@@ -175,9 +161,13 @@ const LoginPage = () => {
     try {
       const response = await facade.login(formData.email, formData.password);
       if (response.token) {
-        facade.setToken(response.token);
-        setLoggedIn(true);
-        showToast('Du er nu logget ind.');
+        const decodedToken = facade.decodeToken(response.token);
+        login(response.token, {
+          role: decodedToken.role,
+          email: decodedToken.email,
+          name: decodedToken.name,
+        });
+        showToast('Du er nu logget ind');
         setTimeout(() => {
           navigate('/stores');
         }, 1500);
@@ -193,12 +183,12 @@ const LoginPage = () => {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords matcher ikke');
       return;
     }
 
     try {
-      const response = await fetch(
+      const registerResponse = await fetch(
         'https://discountfinder.api.albertevallentin.dk/api/auth/register',
         {
           method: 'POST',
@@ -214,51 +204,51 @@ const LoginPage = () => {
         }
       );
 
-      const data = await response.json();
+      const data = await registerResponse.json();
 
-      if (!response.ok) {
-        // Håndter specifikt 422 status kode
-        if (response.status === 422) {
-          setError(
-            'User already exists. Please use a different email or login.'
-          );
+      if (!registerResponse.ok) {
+        if (registerResponse.status === 422) {
+          setError('Bruger eksisterer allerede. Brug venligst et andet email.');
           return;
         }
-        // Håndter 403 Forbidden
-        if (response.status === 403) {
-          setError(data.msg || 'Registration not allowed.');
-          return;
-        }
-        throw new Error(data.msg || 'Registration failed');
+        throw new Error(data.msg || 'Registrering fejlede');
       }
 
-      showToast('Registration successful! Logging you in...');
+      showToast('Registrering gennemført! Logger ind...');
 
-      // After successful registration, log the user in
-      await facade.login(formData.email, formData.password);
-      setLoggedIn(true);
+      // Log ind automatisk efter registrering
+      const loginResponse = await facade.login(
+        formData.email,
+        formData.password
+      );
+      if (loginResponse.token) {
+        const decodedToken = facade.decodeToken(loginResponse.token);
+        login(loginResponse.token, {
+          role: decodedToken.role,
+          email: decodedToken.email,
+          name: decodedToken.name,
+        });
 
-      setTimeout(() => {
-        navigate('/stores');
-      }, 1500);
+        setTimeout(() => {
+          navigate('/stores');
+        }, 1500);
+      }
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Registrering fejlede. Prøv igen.');
     }
   };
 
   const handleChange = (e) => {
-    // Clear errors when user starts typing
-    if (error) setError('');
-
+    setError('');
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const toggleForm = (formType) => {
-    setIsLogin(formType === 'login');
+  const toggleMode = (mode) => {
+    setIsLoginMode(mode === 'login');
     setError('');
     setFormData({
       name: '',
@@ -277,28 +267,31 @@ const LoginPage = () => {
 
       <FormCard>
         <ToggleContainer>
-          <ToggleButton onClick={() => toggleForm('login')} $active={isLogin}>
+          <ToggleButton
+            onClick={() => toggleMode('login')}
+            $active={isLoginMode}
+          >
             Login
           </ToggleButton>
           <ToggleButton
-            onClick={() => toggleForm('register')}
-            $active={!isLogin}
+            onClick={() => toggleMode('register')}
+            $active={!isLoginMode}
           >
-            Register
+            Opret bruger
           </ToggleButton>
         </ToggleContainer>
 
-        <Form onSubmit={isLogin ? handleLogin : handleRegister}>
-          {!isLogin && (
+        <Form onSubmit={isLoginMode ? handleLogin : handleRegister}>
+          {!isLoginMode && (
             <FormGroup>
-              <Label htmlFor='name'>Name</Label>
+              <Label htmlFor='name'>Navn</Label>
               <Input
                 type='text'
                 id='name'
                 name='name'
                 value={formData.name}
                 onChange={handleChange}
-                required={!isLogin}
+                required={!isLoginMode}
               />
             </FormGroup>
           )}
@@ -324,26 +317,29 @@ const LoginPage = () => {
               required
             />
           </FormGroup>
-          {!isLogin && (
+          {!isLoginMode && (
             <FormGroup>
-              <Label htmlFor='confirmPassword'>Confirm Password</Label>
+              <Label htmlFor='confirmPassword'>Gentag Password</Label>
               <Input
                 type='password'
                 id='confirmPassword'
                 name='confirmPassword'
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                required={!isLogin}
+                required={!isLoginMode}
               />
             </FormGroup>
           )}
-          <Button type='submit'>{isLogin ? 'Login' : 'Register'}</Button>
-          <ErrorContainer>
+          <Button type='submit'>
+            {isLoginMode ? 'Log ind' : 'Opret bruger'}
+          </Button>
+
+          {error && (
             <ErrorMessage $visible={!!error}>
               <AlertCircle size={16} />
               {error}
             </ErrorMessage>
-          </ErrorContainer>
+          )}
         </Form>
       </FormCard>
     </LoginContainer>

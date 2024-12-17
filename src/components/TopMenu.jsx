@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import styled from 'styled-components';
 import ThemeSwitcher from './ThemeSwitcher';
 import { Menu, X, Home, Eye, Terminal, Search, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const StyledNav = styled.nav`
   display: flex;
@@ -107,6 +108,13 @@ const StyledNavLink = styled(NavLink)`
 
 function TopMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -144,22 +152,23 @@ function TopMenu() {
             </NavLink>
           </MenuItem>
           <MenuItem>
-            <NavLink to='/login' onClick={closeMenu}>
-              <User />
-              Login / Opret
-            </NavLink>
-          </MenuItem>
-          <MenuItem>
-            <NavLink to='/vision' onClick={closeMenu}>
-              <Eye />
-              Vision
-            </NavLink>
-          </MenuItem>
-          <MenuItem>
-            <NavLink to='/endpoints' onClick={closeMenu}>
-              <Terminal />
-              Endpoints
-            </NavLink>
+            {isAuthenticated ? (
+              <NavLink
+                to='/'
+                onClick={() => {
+                  closeMenu();
+                  handleLogout();
+                }}
+              >
+                <User />
+                Log ud
+              </NavLink>
+            ) : (
+              <NavLink to='/login' onClick={closeMenu}>
+                <User />
+                Login / Opret
+              </NavLink>
+            )}
           </MenuItem>
         </StyledMenu>
       </SideMenu>

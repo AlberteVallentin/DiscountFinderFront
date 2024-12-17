@@ -1,4 +1,5 @@
-import { useTheme } from '../context/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '../context/ThemeContext';
 import Switch from './Switch';
 import { Sun, Moon } from 'lucide-react';
 import styled from 'styled-components';
@@ -19,7 +20,8 @@ const StyledIcon = styled.div`
 `;
 
 const ThemeSwitcher = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const isDark = theme.isDark;
 
   return (
     <ThemeToggle>
