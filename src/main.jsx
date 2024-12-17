@@ -10,6 +10,7 @@ import {
 } from 'react-router';
 import Stores from './pages/Stores.jsx';
 import LoginPage from './pages/LoginPage';
+import NotFound from './pages/NotFound.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
@@ -19,7 +20,8 @@ const router = createBrowserRouter(
     <Route path='/' element={<MainLayout />} errorElement={<ErrorBoundary />}>
       <Route index element={<Home />} />
       <Route path='stores' element={<Stores />} />
-      <Route path='/login' element={<LoginPage />} />
+      <Route path='login' element={<LoginPage />} />
+      <Route path='*' element={<NotFound />} />
     </Route>
   )
 );
