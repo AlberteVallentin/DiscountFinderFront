@@ -5,6 +5,7 @@ import Modal from './Modal/Modal';
 import LoginModal from './Modal/LoginModal';
 import LoadingSpinner from './LoadingSpinner';
 import facade from '../util/apiFacade';
+import { useAuth } from '../context/AuthContext';
 
 const Controls = styled.div`
   display: flex;
@@ -211,7 +212,8 @@ const Content = styled.div`
   width: 100%;
 `;
 
-const StoreProductsView = ({ store, onClose, isLoggedIn, navigate }) => {
+const StoreProductsView = ({ store, onClose, navigate }) => {
+  const { isAuthenticated } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -225,10 +227,10 @@ const StoreProductsView = ({ store, onClose, isLoggedIn, navigate }) => {
   const [sortOption, setSortOption] = useState('');
 
   useEffect(() => {
-    if (isLoggedIn && store?.id) {
+    if (isAuthenticated && store?.id) {
       fetchProducts();
     }
-  }, [store?.id, isLoggedIn]);
+  }, [store?.id, isAuthenticated]);
 
   const fetchProducts = async () => {
     try {
@@ -322,7 +324,7 @@ const StoreProductsView = ({ store, onClose, isLoggedIn, navigate }) => {
     }));
   };
 
-  if (!isLoggedIn) {
+  if (!isAuthenticated) {
     return (
       <LoginModal
         isOpen={true}

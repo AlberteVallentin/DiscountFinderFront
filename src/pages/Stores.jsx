@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useOutletContext } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Search, ChevronDown } from 'lucide-react';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import StoreCard from '../components/Card/StoreCard';
 import CardGrid from '../components/Card/CardGrid';
 import StoreProductsView from '../components/StoreProductsView';
 import SearchBar from '../components/SearchBar';
+import { useAuth } from '../context/AuthContext';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -95,7 +96,7 @@ function Stores() {
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [selectedStore, setSelectedStore] = useState(null);
   const navigate = useNavigate();
-  const { loggedIn } = useOutletContext();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     fetchStores();
@@ -251,7 +252,6 @@ function Stores() {
         <StoreProductsView
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
-          isLoggedIn={loggedIn}
           navigate={navigate}
         />
       )}
