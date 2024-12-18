@@ -11,11 +11,18 @@ const colors = {
 
 };
 
+const overlay = {
+    overlay: "rgba(0, 0, 0, 0.5)",
+    overlayLight: "rgba(0, 0, 0, 0.3)",
+    overlayDark: "rgba(0, 0, 0, 0.7)",
+};
+
 const tintedColors = {
     neutralDark50: `color-mix(in oklab, ${colors.neutralDark} 90%, ${colors.neutralBlue})`,
     neutralLight50: `color-mix(in oklab, ${colors.neutralLight} 50%, ${colors.black} 50%)`,
 
 };
+
 
 export const lightTheme = {
     isDark: false,
@@ -26,6 +33,7 @@ export const lightTheme = {
         header: colors.white,
         boxShadow: colors.boxShadowLight,
         border: colors.lightGray,
+        overlay: overlay.overlayLight,
     }
 };
 
@@ -38,5 +46,6 @@ export const darkTheme = {
         header: colors.neutralBlue,
         boxShadow: colors.boxShadowDark,
         border: colors.darkBlueGray,
+        overlay: overlay.overlayLight,
     }
 };

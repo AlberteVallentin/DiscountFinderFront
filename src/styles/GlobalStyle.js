@@ -60,6 +60,13 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Poppins', sans-serif;
   }
 
+    /* Icon sizes */
+    --icon-s: var(--fs-s);
+    --icon-n: var(--fs-n);
+    --icon-m: var(--fs-m);
+    --icon-l: var(--fs-l);
+    --icon-xl: var(--fs-xl);
+ 
   a {
     text-decoration: none;
     color: inherit;

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import styled from 'styled-components';
 import ThemeSwitcher from './ThemeSwitcher';
-import { Menu, X, Home, Eye, Terminal, Search, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Icon from './ui/Icon';
 
 const StyledNav = styled.nav`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  text-decoration: none;
   padding: 1rem;
   height: 10vh;
   position: fixed;
@@ -36,7 +37,7 @@ const MenuOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: ${({ theme }) => theme.colors.overlay};
   opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
   visibility: ${({ isOpen }) => (isOpen ? 'visible' : 'hidden')};
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -88,22 +89,12 @@ const RightSection = styled.div`
   gap: 1rem;
 `;
 
-const StyledIcon = styled.div`
-  svg {
-    width: var(--fs-m);
-    height: var(--fs-m);
-  }
-`;
-
 const StyledNavLink = styled(NavLink)`
+  text-decoration: none;
+  color: inherit;
   display: flex;
   align-items: center;
   gap: 6px;
-
-  svg {
-    width: var(--fs-m);
-    height: var(--fs-m);
-  }
 `;
 
 function TopMenu() {
@@ -128,7 +119,7 @@ function TopMenu() {
     <>
       <StyledNav>
         <MenuButton onClick={toggleMenu}>
-          <StyledIcon>{isMenuOpen ? <X /> : <Menu />}</StyledIcon>
+          <Icon name={isMenuOpen ? 'X' : 'Menu'} size='m' />
         </MenuButton>
         <RightSection>
           <ThemeSwitcher />
@@ -140,34 +131,34 @@ function TopMenu() {
       <SideMenu isOpen={isMenuOpen}>
         <StyledMenu>
           <MenuItem>
-            <NavLink to='/' onClick={closeMenu}>
-              <Home />
+            <StyledNavLink to='/' onClick={closeMenu}>
+              <Icon name='Home' />
               Home
-            </NavLink>
+            </StyledNavLink>
           </MenuItem>
           <MenuItem>
-            <NavLink to='/stores' onClick={closeMenu}>
-              <Search />
+            <StyledNavLink to='/stores' onClick={closeMenu}>
+              <Icon name='Search' />
               Find butikker
-            </NavLink>
+            </StyledNavLink>
           </MenuItem>
           <MenuItem>
             {isAuthenticated ? (
-              <NavLink
+              <StyledNavLink
                 to='/'
                 onClick={() => {
                   closeMenu();
                   handleLogout();
                 }}
               >
-                <User />
+                <Icon name='User' />
                 Log ud
-              </NavLink>
+              </StyledNavLink>
             ) : (
-              <NavLink to='/login' onClick={closeMenu}>
-                <User />
+              <StyledNavLink to='/login' onClick={closeMenu}>
+                <Icon name='User' />
                 Login / Opret
-              </NavLink>
+              </StyledNavLink>
             )}
           </MenuItem>
         </StyledMenu>
