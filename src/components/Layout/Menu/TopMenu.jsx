@@ -9,6 +9,7 @@ const Header = styled.header`
   top: 0;
   width: 100%;
   z-index: 1000;
+  background-color: ${({ theme }) => theme.colors.card};
 `;
 
 const Nav = styled.nav`
@@ -19,6 +20,8 @@ const Nav = styled.nav`
   height: 10vh;
   background-color: ${({ theme }) => theme.colors.header};
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
+  position: relative;
+  z-index: 100;
 `;
 
 const MenuButton = styled.button`
@@ -29,7 +32,8 @@ const MenuButton = styled.button`
   color: ${({ theme }) => theme.colors.text};
   display: flex;
   align-items: center;
-  z-index: 100;
+  position: relative;
+  z-index: 200;
 `;
 
 const RightSection = styled.div`

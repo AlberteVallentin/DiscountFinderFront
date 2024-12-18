@@ -15,7 +15,7 @@ const MenuOverlay = styled.div`
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  z-index: 40;
+  z-index: 90;
 `;
 
 const SideMenuContainer = styled.div`
@@ -27,7 +27,7 @@ const SideMenuContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.card};
   padding: 6rem 1rem 1rem;
   transition: left 0.4s ease;
-  z-index: 50;
+  z-index: 95;
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
 `;
 
