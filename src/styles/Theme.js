@@ -23,6 +23,17 @@ const tintedColors = {
 
 };
 
+export const borders = {
+    thin: '1px solid',
+    medium: '2px solid',
+    thick: '3px solid'
+};
+
+export const borderRadius = {
+    none: '0',
+    rounded: '12px',
+};
+
 
 export const lightTheme = {
     isDark: false,
@@ -34,7 +45,7 @@ export const lightTheme = {
         boxShadow: colors.boxShadowLight,
         border: colors.lightGray,
         overlay: overlay.overlayLight,
-    }
+    },
 };
 
 export const darkTheme = {
@@ -47,5 +58,5 @@ export const darkTheme = {
         boxShadow: colors.boxShadowDark,
         border: colors.darkBlueGray,
         overlay: overlay.overlayLight,
-    }
+    },
 };

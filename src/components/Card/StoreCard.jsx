@@ -24,7 +24,7 @@ const StoreAddress = styled.div`
 `;
 
 const StoreCard = ({ store, onClick }) => (
-  <StyledCard onClick={onClick}>
+  <BaseCard onClick={onClick} $clickable={!!onClick}>
     <StoreName>{store.name}</StoreName>
     <StoreAddress>
       <div>{store.address.addressLine}</div>
@@ -32,7 +32,7 @@ const StoreCard = ({ store, onClick }) => (
         {store.address.postalCode.postalCode} {store.address.postalCode.city}
       </div>
     </StoreAddress>
-  </StyledCard>
+  </BaseCard>
 );
 
 export default StoreCard;
