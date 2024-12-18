@@ -2,12 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 import * as LucideIcons from 'lucide-react';
 
+const iconSizes = {
+  s: 'var(--fs-s)',
+  n: 'var(--fs-n)',
+  m: 'var(--fs-m)',
+  l: 'var(--fs-l)',
+  xl: 'var(--fs-xl)',
+};
+
 const StyledIcon = styled.div`
   color: ${({ $color, theme }) => $color || theme.colors.text};
 
   svg {
-    width: ${({ $size }) => `var(--icon-size-${$size}, var(--icon-size-n))`};
-    height: ${({ $size }) => `var(--icon-size-${$size}, var(--icon-size-n))`};
+    width: ${({ $size }) => iconSizes[$size] || iconSizes.n};
+    height: ${({ $size }) => iconSizes[$size] || iconSizes.n};
   }
 `;
 
