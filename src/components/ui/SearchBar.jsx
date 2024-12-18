@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Search } from 'lucide-react';
+import Icon from './Icon';
+import { borderRadius } from '../../styles/Theme';
 
 const SearchBarContainer = styled.div`
   display: flex;
   align-items: center;
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: 12px;
+  background-color: ${({ theme }) => theme.searchBar.color};
+  border-radius: ${borderRadius.round};
   padding: 0.5rem 1rem;
   flex: 1;
   min-width: 250px;
@@ -18,23 +19,21 @@ const SearchInput = styled.input`
   background: none;
   padding: 0.5rem;
   width: 100%;
-  color: ${({ theme }) => theme.colors.text};
 
   &:focus {
     outline: none;
   }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.searchBar.text};
+    opacity: 0.8;
+  }
 `;
 
-const StyledSearchIcon = styled(Search)`
-  width: ${({ size }) => size || 'var(--fs-n)'};
-  height: ${({ size }) => size || 'var(--fs-n)'};
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const SearchBar = ({ placeholder, value, onChange, iconSize }) => {
+const SearchBar = ({ placeholder, value, onChange }) => {
   return (
     <SearchBarContainer>
-      <StyledSearchIcon size={iconSize} />
+      <Icon name='Search' color='searchBarIcon' />
       <SearchInput
         type='text'
         placeholder={placeholder || 'Søg...'}

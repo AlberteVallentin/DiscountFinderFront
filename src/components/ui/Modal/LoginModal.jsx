@@ -37,6 +37,17 @@ const LoginButton = styled.button`
 `;
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
+  const handleLoginClick = () => {
+    // Luk modalen først
+    if (onClose) {
+      onClose();
+    }
+    // Kald derefter onLogin hvis den findes
+    if (onLogin) {
+      onLogin();
+    }
+  };
+
   return (
     <BaseModal
       isOpen={isOpen}
@@ -48,7 +59,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
         <LoginDescription>
           Du skal være logget ind for at se tilbuddene i denne butik.
         </LoginDescription>
-        <LoginButton onClick={onLogin}>Log ind</LoginButton>
+        <LoginButton onClick={handleLoginClick}>Log ind</LoginButton>
       </LoginContainer>
     </BaseModal>
   );

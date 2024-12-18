@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
-import Modal from './Modal/Modal';
-import LoginModal from './Modal/LoginModal';
+import Modal from './ui/Modal/Modal';
+import LoginModal from './ui/Modal/LoginModal';
 import LoadingSpinner from './LoadingSpinner';
 import facade from '../util/apiFacade';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router';
 
 const Controls = styled.div`
   display: flex;
@@ -212,25 +213,26 @@ const Content = styled.div`
   width: 100%;
 `;
 
-const StoreProductsView = ({ store, onClose, navigate }) => {
-  const { isAuthenticated } = useAuth();
+const StoreProductsView = ({ store, onClose }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const { isAuthenticated } = useAuth();
   const [filterOptions, setFilterOptions] = useState({
     categories: new Set(),
     priceRange: { min: '', max: '' },
   });
   const [sortOption, setSortOption] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated && store?.id) {
+    if (store?.id) {
       fetchProducts();
     }
-  }, [store?.id, isAuthenticated]);
+  }, [store?.id]);
 
   const fetchProducts = async () => {
     try {
