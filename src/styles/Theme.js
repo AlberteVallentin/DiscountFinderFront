@@ -17,11 +17,7 @@ const overlay = {
     overlayDark: "rgba(0, 0, 0, 0.7)",
 };
 
-const tintedColors = {
-    neutralDark50: `color-mix(in oklab, ${colors.neutralDark} 90%, ${colors.neutralBlue})`,
-    neutralLight50: `color-mix(in oklab, ${colors.neutralLight} 50%, ${colors.black} 50%)`,
 
-};
 
 export const borders = {
     thin: '1px solid',
@@ -32,7 +28,10 @@ export const borders = {
 export const borderRadius = {
     none: '0',
     rounded: '12px',
+    round: '2rem',
 };
+
+
 
 
 export const lightTheme = {
@@ -45,6 +44,7 @@ export const lightTheme = {
         boxShadow: colors.boxShadowLight,
         border: colors.lightGray,
         overlay: overlay.overlayLight,
+        line: colors.lightGray
     },
 };
 
@@ -58,5 +58,6 @@ export const darkTheme = {
         boxShadow: colors.boxShadowDark,
         border: colors.darkBlueGray,
         overlay: overlay.overlayLight,
+        line: colors.neutralDark,
     },
 };

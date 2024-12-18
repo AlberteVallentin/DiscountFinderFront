@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { borderRadius } from '../styles/Theme';
 import { Search, ChevronDown } from 'lucide-react';
+import Icon from '../components/ui/Icon';
 import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
@@ -37,18 +39,15 @@ const SelectWrapper = styled.div`
     position: absolute;
     right: 1rem;
     pointer-events: none;
-    color: ${({ theme }) => theme.colors.text};
   }
 `;
 
 const PostalCodeSelect = styled.select`
   background: ${({ theme }) => theme.colors.card};
-  color: ${({ theme }) => theme.colors.text};
   border: none;
-  border-radius: 2rem;
+  border-radius: ${borderRadius.round};
   padding: 1rem 2rem;
   padding-right: 3rem;
-  font-size: var(--fs-n);
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   cursor: pointer;
   appearance: none;
