@@ -44,7 +44,14 @@ export const lightTheme = {
         boxShadow: colors.boxShadowLight,
         border: colors.lightGray,
         overlay: overlay.overlayLight,
-        line: colors.lightGray
+        line: colors.lightGray,
+        buttonColor: colors.neutralBlue,
+        buttonText: colors.neutralLight,
+        searchBarIcon: colors.neutralDark,
+    },
+    searchBar: {
+        text: colors.neutralDark,
+        color: colors.white,
     },
 };
 
@@ -59,5 +66,12 @@ export const darkTheme = {
         border: colors.darkBlueGray,
         overlay: overlay.overlayLight,
         line: colors.neutralDark,
+        buttonColor: colors.lightGray,
+        buttonText: colors.neutralDark,
+        searchBarIcon: colors.neutralDark,
+    },
+    searchBar: {
+        text: colors.neutralDark,
+        color: colors.lightGray,
     },
 };

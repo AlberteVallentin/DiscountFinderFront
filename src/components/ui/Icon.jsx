@@ -11,7 +11,7 @@ const iconSizes = {
 };
 
 const StyledIcon = styled.div`
-  color: ${({ $color, theme }) => $color || theme.colors.text};
+  color: ${({ $color, theme }) => theme.colors[$color] || theme.colors.text};
 
   svg {
     width: ${({ $size }) => iconSizes[$size] || iconSizes.n};
