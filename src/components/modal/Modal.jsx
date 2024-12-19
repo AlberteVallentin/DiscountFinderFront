@@ -8,9 +8,9 @@ const ModalDialog = styled.dialog`
   background: ${({ theme }) => theme.colors.background};
   border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
   border-radius: ${borderRadius.rounded};
-  max-width: ${({ $maxWidth }) => $maxWidth || '600px'};
   width: 90vw;
-  max-height: 90vh;
+  max-width: ${({ $maxWidth }) => $maxWidth || '600px'};
+  min-height: ${({ $minHeight }) => $minHeight || '600px'};
   overflow-y: auto;
   position: fixed;
   top: 50%;
@@ -48,7 +48,11 @@ const ModalHeader = styled.div`
 
 const ModalContent = styled.div`
   padding: 0 2rem 2rem 2rem;
+  gap: 1rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const CloseButton = styled.button`
@@ -76,6 +80,7 @@ const Modal = ({
   onClose,
   children,
   maxWidth,
+  minHeight,
   closeOnEscape = true,
   closeOnOutsideClick = true,
 }) => {
@@ -117,7 +122,7 @@ const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <ModalDialog ref={dialogRef} $maxWidth={maxWidth}>
+    <ModalDialog ref={dialogRef} $maxWidth={maxWidth} $minHeight={minHeight}>
       <ModalHeader>
         <CloseButton onClick={onClose}>
           <Icon name='X' size='l' />

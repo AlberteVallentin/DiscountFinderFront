@@ -11,14 +11,7 @@ import CardGrid from '../components/card/CardGrid';
 import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
 import BrandButton from '../components/button/BrandButton';
-
-const StoresContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  min-height: 80vh;
-`;
+import OutletContainer from '../components/layout/OutletContainer';
 
 const SearchSection = styled.div`
   display: flex;
@@ -174,7 +167,7 @@ function Stores() {
   }
 
   return (
-    <StoresContainer>
+    <OutletContainer>
       <SearchSection>
         <SearchBar
           placeholder='Søg efter en butik...'
@@ -238,7 +231,7 @@ function Stores() {
       )}
 
       <ScrollToTop />
-    </StoresContainer>
+    </OutletContainer>
   );
 }
 

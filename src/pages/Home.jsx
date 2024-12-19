@@ -2,16 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { Search, ShoppingBag, Percent } from 'lucide-react';
-import BaseCard from '../components/Card/BaseCard';
-
-const HomeContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  gap: 3rem;
-  min-height: 80vh;
-`;
+import OutletContainer from '../components/layout/OutletContainer';
+import BaseCard from '../components/card/BaseCard';
 
 const Hero = styled.section`
   text-align: center;
@@ -84,7 +76,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <HomeContainer>
+    <OutletContainer>
       <Hero>
         <Title>Find de bedste tilbud i din lokale butik</Title>
         <Subtitle>
@@ -124,7 +116,7 @@ const Home = () => {
           </FeatureDescription>
         </FeatureCard>
       </FeaturesGrid>
-    </HomeContainer>
+    </OutletContainer>
   );
 };
 
