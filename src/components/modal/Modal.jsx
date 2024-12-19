@@ -49,6 +49,9 @@ const ModalHeader = styled.div`
 const ModalContent = styled.div`
   padding: 0 2rem 2rem 2rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const CloseButton = styled.button`
