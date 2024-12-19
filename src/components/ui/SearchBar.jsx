@@ -11,6 +11,7 @@ const SearchBarContainer = styled.div`
   padding: 0.5rem 1rem;
   flex: 1;
   min-width: 200px;
+  max-width: 800px;
   border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
 `;
 
