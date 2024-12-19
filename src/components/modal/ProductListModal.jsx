@@ -190,7 +190,7 @@ const Content = styled.div`
   width: 100%;
 `;
 
-const StoreProductsView = ({ store, onClose }) => {
+const ProductListModal = ({ store, onClose }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -317,7 +317,7 @@ const StoreProductsView = ({ store, onClose }) => {
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} maxWidth='1200px'>
+    <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
       <Content>
         <Controls>
           <SearchBar
@@ -462,4 +462,4 @@ const StoreProductsView = ({ store, onClose }) => {
   );
 };
 
-export default StoreProductsView;
+export default ProductListModal;
