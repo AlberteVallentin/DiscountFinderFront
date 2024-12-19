@@ -218,32 +218,23 @@ function Stores() {
       </SearchSection>
 
       <BrandSection>
-        <BrandButton
-          onClick={() => handleBrandClick('Netto')}
-          active={selectedBrands.has('Netto')}
-        >
-          Netto
-        </BrandButton>
-        <BrandButton
-          onClick={() => handleBrandClick('Føtex')}
-          active={selectedBrands.has('Føtex')}
-        >
-          Føtex
-        </BrandButton>
-        <BrandButton
-          onClick={() => handleBrandClick('Bilka')}
-          active={selectedBrands.has('Bilka')}
-        >
-          Bilka
-        </BrandButton>
-
-        <Button onClick={console.log('hello')}>Klik her</Button>
-        <Button onClick={console.log('hello')}>og klik her</Button>
         <BrandsButton
           active={selectedBrands.has('Netto')}
           onClick={() => handleBrandClick('Netto')}
         >
           Netto
+        </BrandsButton>
+        <BrandsButton
+          onClick={() => handleBrandClick('Føtex')}
+          active={selectedBrands.has('Føtex')}
+        >
+          Føtex
+        </BrandsButton>
+        <BrandsButton
+          onClick={() => handleBrandClick('Bilka')}
+          active={selectedBrands.has('Bilka')}
+        >
+          Bilka
         </BrandsButton>
       </BrandSection>
 
