@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import { borderRadius } from '../../styles/Theme';
+import { borderRadius, borders } from '../../styles/Theme';
 
 const StyledButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
+  height: 3.5rem;
+  width: 9rem;
   font-size: var(--fs-n);
   border-radius: ${borderRadius.round};
   cursor: pointer;
@@ -14,7 +15,8 @@ const StyledButton = styled.button`
   background: ${({ theme }) => theme.colors.buttonColor};
   color: ${({ theme }) => theme.colors.buttonText};
 
-  border: none;
+  border: ${({ $active, theme }) =>
+    $active ? 'none' : `${borders.medium} solid ${theme.colors.text}`};
 
   &:hover {
     transform: translateY(-2px);
