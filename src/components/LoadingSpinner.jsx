@@ -17,7 +17,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: ${({ fullscreen }) => (fullscreen ? '100vh' : '200px')};
-  gap: 1rem;
+  gap: 1.2rem;
 `;
 
 const SpinnerIcon = styled(Loader2)`
