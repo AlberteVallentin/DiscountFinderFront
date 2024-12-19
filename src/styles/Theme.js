@@ -68,10 +68,10 @@ export const darkTheme = {
         line: colors.neutralDark,
         buttonColor: colors.lightGray,
         buttonText: colors.neutralDark,
-        searchBarIcon: colors.neutralDark,
+        searchBarIcon: colors.neutralLight,
     },
     searchBar: {
-        text: colors.neutralDark,
-        color: colors.lightGray,
+        text: colors.neutralLight,
+        color: colors.neutralBlue,
     },
 };

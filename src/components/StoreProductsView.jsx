@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
-import Modal from './ui/Modal/Modal';
-import LoginModal from './ui/Modal/LoginModal';
+import Modal from './ui/modal/Modal';
+import LoginModal from './ui/modal/LoginModal';
 import LoadingSpinner from './LoadingSpinner';
 import facade from '../util/apiFacade';
 import { useAuth } from '../context/AuthContext';

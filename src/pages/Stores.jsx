@@ -6,8 +6,8 @@ import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
-import StoreCard from '../components/Card/StoreCard';
-import CardGrid from '../components/Card/CardGrid';
+import StoreCard from '../components/card/StoreCard';
+import CardGrid from '../components/card/CardGrid';
 import StoreProductsView from '../components/StoreProductsView';
 import SearchBar from '../components/ui/SearchBar';
 
