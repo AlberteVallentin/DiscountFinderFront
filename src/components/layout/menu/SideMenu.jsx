@@ -74,7 +74,7 @@ const SideMenu = ({ isOpen, onClose }) => {
           <MenuItem>
             <StyledNavLink to='/' onClick={onClose}>
               <Icon name='Home' />
-              Home
+              Forside
             </StyledNavLink>
           </MenuItem>
           <MenuItem>
