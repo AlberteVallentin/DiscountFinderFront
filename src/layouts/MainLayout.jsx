@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router';
 import GlobalStyle from '../styles/GlobalStyle';
 import styled, { ThemeProvider } from 'styled-components';
-import TopMenu from '../components/Layout/Menu/TopMenu';
+import TopMenu from '../components/Layout/menu/TopMenu';
 import { useTheme } from '../context/ThemeContext';
 
 const Container = styled.div`
