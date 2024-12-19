@@ -11,6 +11,7 @@ import CardGrid from '../components/card/CardGrid';
 import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
 import Button from '../components/button/Button';
+import BrandsButton from '../components/button/BrandsButton';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -238,6 +239,12 @@ function Stores() {
 
         <Button onClick={console.log('hello')}>Klik her</Button>
         <Button onClick={console.log('hello')}>og klik her</Button>
+        <BrandsButton
+          active={selectedBrands.has('Netto')}
+          onClick={() => handleBrandClick('Netto')}
+        >
+          Netto
+        </BrandsButton>
       </BrandSection>
 
       <CardGrid>
