@@ -4,8 +4,7 @@ import Modal from './Modal';
 import Button from '../button/Button';
 
 const LoginDescription = styled.p`
-  margin-bottom: 2rem;
-  margin-top: 1rem;
+  margin-bottom: 1rem;
   max-width: 400px;
   text-align: center;
 `;
@@ -17,7 +16,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} maxWidth='500px'>
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth='600px' minHeight='400px'>
       <h2>Log ind for at se tilbud</h2>
       <LoginDescription>
         Du skal være logget ind for at se tilbuddene i denne butik.

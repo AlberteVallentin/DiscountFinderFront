@@ -7,6 +7,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../util/apiFacade';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
+import SearchBar from '../ui/SearchBar';
 
 const Controls = styled.div`
   display: flex;
@@ -16,30 +17,6 @@ const Controls = styled.div`
   margin-bottom: 2rem;
   width: 100%;
 `;
-
-const SearchBar = styled.div`
-  display: flex;
-  align-items: center;
-  background: ${({ theme }) => theme.colors.background};
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  flex: 1;
-  min-width: 250px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const SearchInput = styled.input`
-  border: none;
-  background: none;
-  padding: 0.5rem;
-  width: 100%;
-  color: ${({ theme }) => theme.colors.text};
-
-  &:focus {
-    outline: none;
-  }
-`;
-
 const ControlButton = styled.button`
   display: flex;
   align-items: center;
@@ -343,15 +320,11 @@ const StoreProductsView = ({ store, onClose }) => {
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px'>
       <Content>
         <Controls>
-          <SearchBar>
-            <Search size={20} />
-            <SearchInput
-              type='text'
-              placeholder='Søg efter varer...'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </SearchBar>
+          <SearchBar
+            placeholder='Søg efter en varer...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
           <ControlButton onClick={() => setIsFilterOpen(!isFilterOpen)}>
             <SlidersHorizontal size={20} />
