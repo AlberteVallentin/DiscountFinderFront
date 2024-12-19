@@ -10,6 +10,7 @@ import StoreCard from '../components/card/StoreCard';
 import CardGrid from '../components/card/CardGrid';
 import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
+import Button from '../components/button/Button';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -234,6 +235,9 @@ function Stores() {
         >
           Bilka
         </BrandButton>
+
+        <Button onClick={console.log('hello')}>Klik her</Button>
+        <Button onClick={console.log('hello')}>og klik her</Button>
       </BrandSection>
 
       <CardGrid>
