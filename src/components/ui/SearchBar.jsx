@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Icon from './Icon';
-import { borderRadius } from '../../styles/Theme';
+import { borderRadius, borders } from '../../styles/Theme';
 
 const SearchBarContainer = styled.div`
   display: flex;
@@ -10,8 +10,8 @@ const SearchBarContainer = styled.div`
   border-radius: ${borderRadius.round};
   padding: 0.5rem 1rem;
   flex: 1;
-  min-width: 250px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  min-width: 200px;
+  border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
 `;
 
 const SearchInput = styled.input`

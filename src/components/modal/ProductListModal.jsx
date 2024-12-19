@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
-import Modal from './ui/Modal/Modal';
-import LoginModal from './ui/Modal/LoginModal';
-import LoadingSpinner from './LoadingSpinner';
-import facade from '../util/apiFacade';
-import { useAuth } from '../context/AuthContext';
+import Modal from './Modal';
+import LoginModal from './LoginModal';
+import LoadingSpinner from '../LoadingSpinner';
+import facade from '../../util/apiFacade';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
 
 const Controls = styled.div`
@@ -140,7 +140,7 @@ const ProductsGrid = styled.div`
 `;
 
 const ProductCard = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.card};
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -340,12 +340,7 @@ const StoreProductsView = ({ store, onClose }) => {
   }
 
   return (
-    <Modal
-      isOpen={true}
-      onClose={onClose}
-      title={store?.name}
-      maxWidth='1200px'
-    >
+    <Modal isOpen={true} onClose={onClose} maxWidth='1200px'>
       <Content>
         <Controls>
           <SearchBar>

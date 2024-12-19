@@ -1,12 +1,13 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { X } from 'lucide-react';
+import Icon from '../ui/Icon';
+import { borderRadius, borders } from '../../styles/Theme';
 
-const StyledDialog = styled.dialog`
+const ModalDialog = styled.dialog`
   padding: 0;
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.background};
+  border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
+  border-radius: ${borderRadius.rounded};
   max-width: ${({ $maxWidth }) => $maxWidth || '600px'};
   width: 90vw;
   max-height: 90vh;
@@ -15,8 +16,8 @@ const StyledDialog = styled.dialog`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  margin: 0;
-
+  display: flex;
+  flex-direction: column;
   &::backdrop {
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
@@ -38,16 +39,20 @@ const StyledDialog = styled.dialog`
   }
 `;
 
+const ModalHeader = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+`;
+
 const ModalContent = styled.div`
-  padding: 2rem;
+  padding: 0 2rem 2rem 2rem;
+  flex: 1;
 `;
 
 const CloseButton = styled.button`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
   padding: 0.5rem;
-  border-radius: 50%;
   border: none;
   background: none;
   color: ${({ theme }) => theme.colors.text};
@@ -57,13 +62,12 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
 
-  &:hover {
-    background: ${({ theme }) => theme.colors.background};
+  &:focus {
+    outline: none;
   }
 
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.text};
-    outline-offset: 2px;
+  &:hover {
+    transform: scale(1.1);
   }
 `;
 
@@ -72,7 +76,6 @@ const Modal = ({
   onClose,
   children,
   maxWidth,
-  title,
   closeOnEscape = true,
   closeOnOutsideClick = true,
 }) => {
@@ -111,16 +114,17 @@ const Modal = ({
     };
   }, [closeOnEscape, closeOnOutsideClick, onClose]);
 
+  if (!isOpen) return null;
+
   return (
-    <StyledDialog ref={dialogRef} $maxWidth={maxWidth}>
-      <CloseButton onClick={onClose}>
-        <X size={24} />
-      </CloseButton>
-      <ModalContent>
-        {title && <h2>{title}</h2>}
-        {children}
-      </ModalContent>
-    </StyledDialog>
+    <ModalDialog ref={dialogRef} $maxWidth={maxWidth}>
+      <ModalHeader>
+        <CloseButton onClick={onClose}>
+          <Icon name='X' size='l' />
+        </CloseButton>
+      </ModalHeader>
+      <ModalContent>{children}</ModalContent>
+    </ModalDialog>
   );
 };
 

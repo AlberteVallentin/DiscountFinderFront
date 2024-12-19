@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronUp } from 'lucide-react';
 import styled from 'styled-components';
+import Icon from './ui/Icon';
+import { borderRadius } from '../styles/Theme';
 
 const ScrollButton = styled.button`
   position: fixed;
   bottom: 2rem;
   right: 2rem;
   padding: 0.75rem;
-  border-radius: 50%;
+  border-radius: ${borderRadius.round};
   background-color: ${({ theme }) => theme.colors.card};
   color: ${({ theme }) => theme.colors.text};
   border: none;
@@ -21,11 +22,6 @@ const ScrollButton = styled.button`
   &:hover {
     transform: translateY(-2px);
     opacity: 0.8;
-  }
-
-  svg {
-    width: 1.5rem;
-    height: 1.5rem;
   }
 `;
 
@@ -58,7 +54,7 @@ const ScrollToTop = () => {
       isVisible={isVisible}
       aria-label='Scroll to top'
     >
-      <ChevronUp />
+      <Icon name='ChevronUp' size='m' />
     </ScrollButton>
   );
 };

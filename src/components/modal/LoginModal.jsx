@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import BaseModal from './BaseModal';
+import Modal from './Modal';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -8,7 +8,6 @@ const LoginContainer = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 1rem;
 `;
 
 const LoginDescription = styled.p`
@@ -38,30 +37,20 @@ const LoginButton = styled.button`
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
   const handleLoginClick = () => {
-    // Luk modalen først
-    if (onClose) {
-      onClose();
-    }
-    // Kald derefter onLogin hvis den findes
-    if (onLogin) {
-      onLogin();
-    }
+    if (onClose) onClose();
+    if (onLogin) onLogin();
   };
 
   return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title='Log ind for at se tilbud'
-      maxWidth='500px'
-    >
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth='500px'>
       <LoginContainer>
+        <h2>Log ind for at se tilbud</h2>
         <LoginDescription>
           Du skal være logget ind for at se tilbuddene i denne butik.
         </LoginDescription>
         <LoginButton onClick={handleLoginClick}>Log ind</LoginButton>
       </LoginContainer>
-    </BaseModal>
+    </Modal>
   );
 };
 

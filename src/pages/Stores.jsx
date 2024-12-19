@@ -6,10 +6,11 @@ import facade from '../util/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
-import StoreCard from '../components/Card/StoreCard';
-import CardGrid from '../components/Card/CardGrid';
-import StoreProductsView from '../components/StoreProductsView';
+import StoreCard from '../components/card/StoreCard';
+import CardGrid from '../components/card/CardGrid';
+import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
+import BrandButton from '../components/button/BrandButton';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -64,24 +65,6 @@ const BrandSection = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap;
-`;
-
-const BrandButton = styled.button`
-  background: ${({ active, theme }) =>
-    active ? theme.colors.text : theme.colors.card};
-  color: ${({ active, theme }) =>
-    active ? theme.colors.card : theme.colors.text};
-  border: 2px solid ${({ theme }) => theme.colors.text};
-  border-radius: 2rem;
-  padding: 0.75rem 2rem;
-  cursor: pointer;
-  font-size: var(--fs-n);
-  transition: all 0.3s ease;
-
-  &:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-  }
 `;
 
 function Stores() {
@@ -217,8 +200,8 @@ function Stores() {
 
       <BrandSection>
         <BrandButton
-          onClick={() => handleBrandClick('Netto')}
           active={selectedBrands.has('Netto')}
+          onClick={() => handleBrandClick('Netto')}
         >
           Netto
         </BrandButton>
@@ -247,7 +230,7 @@ function Stores() {
       </CardGrid>
 
       {selectedStore && (
-        <StoreProductsView
+        <ProductListModal
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
           navigate={navigate}
