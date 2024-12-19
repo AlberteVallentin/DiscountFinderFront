@@ -19,7 +19,7 @@ const SearchSection = styled.div`
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 `;
 
 const SelectWrapper = styled.div`
