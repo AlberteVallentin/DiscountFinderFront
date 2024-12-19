@@ -10,8 +10,7 @@ import StoreCard from '../components/card/StoreCard';
 import CardGrid from '../components/card/CardGrid';
 import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
-import Button from '../components/button/Button';
-import BrandsButton from '../components/button/BrandsButton';
+import BrandButton from '../components/button/BrandButton';
 
 const StoresContainer = styled.div`
   display: flex;
@@ -66,24 +65,6 @@ const BrandSection = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap;
-`;
-
-const BrandButton = styled.button`
-  background: ${({ active, theme }) =>
-    active ? theme.colors.text : theme.colors.card};
-  color: ${({ active, theme }) =>
-    active ? theme.colors.card : theme.colors.text};
-  border: 2px solid ${({ theme }) => theme.colors.text};
-  border-radius: 2rem;
-  padding: 0.75rem 2rem;
-  cursor: pointer;
-  font-size: var(--fs-n);
-  transition: all 0.3s ease;
-
-  &:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-  }
 `;
 
 function Stores() {
@@ -218,24 +199,24 @@ function Stores() {
       </SearchSection>
 
       <BrandSection>
-        <BrandsButton
+        <BrandButton
           active={selectedBrands.has('Netto')}
           onClick={() => handleBrandClick('Netto')}
         >
           Netto
-        </BrandsButton>
-        <BrandsButton
+        </BrandButton>
+        <BrandButton
           onClick={() => handleBrandClick('Føtex')}
           active={selectedBrands.has('Føtex')}
         >
           Føtex
-        </BrandsButton>
-        <BrandsButton
+        </BrandButton>
+        <BrandButton
           onClick={() => handleBrandClick('Bilka')}
           active={selectedBrands.has('Bilka')}
         >
           Bilka
-        </BrandsButton>
+        </BrandButton>
       </BrandSection>
 
       <CardGrid>

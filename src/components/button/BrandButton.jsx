@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from './Button';
-import { borderRadius, borders } from '../../styles/Theme';
+import { borderRadius } from '../../styles/Theme';
 
-const BrandButton = styled(Button)`
+const StyledBrandButton = styled(Button)`
   background: ${({ $active, theme }) =>
     $active ? theme.colors.buttonColor : theme.colors.card};
   color: ${({ $active, theme }) =>
@@ -13,12 +13,12 @@ const BrandButton = styled(Button)`
     $active ? 'none' : `2px solid ${theme.colors.text}`};
 `;
 
-const BrandsButton = ({ children, active = false, ...props }) => {
+const BrandButton = ({ children, active = false, ...props }) => {
   return (
-    <BrandButton $active={active} {...props}>
+    <StyledBrandButton $active={active} {...props}>
       {children}
-    </BrandButton>
+    </StyledBrandButton>
   );
 };
 
-export default BrandsButton;
+export default BrandButton;
