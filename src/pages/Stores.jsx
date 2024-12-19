@@ -8,7 +8,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/card/StoreCard';
 import CardGrid from '../components/card/CardGrid';
-import StoreProductsView from '../components/StoreProductsView';
+import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
 
 const StoresContainer = styled.div`
@@ -247,7 +247,7 @@ function Stores() {
       </CardGrid>
 
       {selectedStore && (
-        <StoreProductsView
+        <ProductListModal
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
           navigate={navigate}

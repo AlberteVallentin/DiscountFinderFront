@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
-import Modal from './ui/modal/Modal';
-import LoginModal from './ui/modal/LoginModal';
-import LoadingSpinner from './LoadingSpinner';
-import facade from '../util/apiFacade';
-import { useAuth } from '../context/AuthContext';
+import Modal from './Modal';
+import LoginModal from './LoginModal';
+import LoadingSpinner from '../LoadingSpinner';
+import facade from '../../util/apiFacade';
+import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
 
 const Controls = styled.div`
