@@ -140,7 +140,7 @@ const ProductsGrid = styled.div`
 `;
 
 const ProductCard = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.card};
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -340,12 +340,7 @@ const StoreProductsView = ({ store, onClose }) => {
   }
 
   return (
-    <Modal
-      isOpen={true}
-      onClose={onClose}
-      title={store?.name}
-      maxWidth='1200px'
-    >
+    <Modal isOpen={true} onClose={onClose} maxWidth='1200px'>
       <Content>
         <Controls>
           <SearchBar>

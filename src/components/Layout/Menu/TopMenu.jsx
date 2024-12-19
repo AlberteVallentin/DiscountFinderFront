@@ -17,7 +17,7 @@ const Nav = styled.nav`
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  height: 6rem;
+  height: 5rem;
   background-color: ${({ theme }) => theme.colors.header};
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   position: relative;

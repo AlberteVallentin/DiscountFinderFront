@@ -5,9 +5,9 @@ import { borderRadius, borders } from '../../styles/Theme';
 
 const ModalDialog = styled.dialog`
   padding: 0;
-  background: ${({ theme }) => theme.colors.card};
+  background: ${({ theme }) => theme.colors.background};
   border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
-  border-radius: 12px;
+  border-radius: ${borderRadius.rounded};
   max-width: ${({ $maxWidth }) => $maxWidth || '600px'};
   width: 90vw;
   max-height: 90vh;
@@ -61,6 +61,10 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:focus {
+    outline: none;
+  }
 
   &:hover {
     transform: scale(1.1);

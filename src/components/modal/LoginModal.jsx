@@ -8,7 +8,6 @@ const LoginContainer = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 1rem;
 `;
 
 const LoginDescription = styled.p`
