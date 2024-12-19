@@ -138,7 +138,7 @@ function Stores() {
     filterStores(searchTerm, selectedPostalCode, newSelectedBrands);
   };
 
-  const filterStores = (search, postalCode, brands) => {
+  const filterStores = (search, brands) => {
     let filtered = stores;
 
     if (search) {

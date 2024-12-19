@@ -15,8 +15,7 @@ const StyledButton = styled.button`
   background: ${({ theme }) => theme.colors.buttonColor};
   color: ${({ theme }) => theme.colors.buttonText};
 
-  border: ${({ $active, theme }) =>
-    $active ? 'none' : `${borders.medium} solid ${theme.colors.text}`};
+  border: none;
 
   &:hover {
     transform: translateY(-2px);
