@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from './Modal';
 import Button from '../button/Button';
+import { useLocation } from 'react-router';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -24,9 +25,11 @@ const LoginModal = ({
   onLogin,
   message = 'Du skal logge ind først',
 }) => {
+  const location = useLocation();
+
   const handleLoginClick = () => {
     if (onClose) onClose();
-    if (onLogin) onLogin();
+    if (onLogin) onLogin(location.pathname);
   };
 
   return (

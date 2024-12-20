@@ -69,7 +69,11 @@ function Favorites() {
       <LoginModal
         isOpen={true}
         onClose={() => navigate('/stores')}
-        onLogin={() => navigate('/login')}
+        onLogin={() =>
+          navigate('/login', {
+            state: { returnPath: '/favorites' }, // Add return path here
+          })
+        }
         message='Du skal være logget ind for at se dine favoritbutikker.'
       />
     );
