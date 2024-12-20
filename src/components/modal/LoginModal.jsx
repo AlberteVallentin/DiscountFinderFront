@@ -18,28 +18,22 @@ const LoginDescription = styled.p`
   text-align: center;
 `;
 
-const LoginModal = ({ isOpen = false, onClose, onLogin }) => {
-  if (!isOpen) return null;
-
+const LoginModal = ({
+  isOpen,
+  onClose,
+  onLogin,
+  message = 'Du skal logge ind først',
+}) => {
   const handleLoginClick = () => {
     if (onClose) onClose();
     if (onLogin) onLogin();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      maxWidth='600px'
-      minHeight='400px'
-      closeOnEscape={true}
-      closeOnOutsideClick={true}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth='600px' minHeight='400px'>
       <ContentWrapper>
-        <h2>Log ind for at se tilbud</h2>
-        <LoginDescription>
-          Du skal være logget ind for at tilføje butikker til favoritter.
-        </LoginDescription>
+        <h2>Log ind</h2>
+        <LoginDescription>{message}</LoginDescription>
         <Button onClick={handleLoginClick}>Log ind</Button>
       </ContentWrapper>
     </Modal>

@@ -84,6 +84,12 @@ const SideMenu = ({ isOpen, onClose }) => {
             </StyledNavLink>
           </MenuItem>
           <MenuItem>
+            <StyledNavLink to='/favorites' onClick={onClose}>
+              <Icon name='Heart' />
+              Mine favoritter
+            </StyledNavLink>
+          </MenuItem>
+          <MenuItem>
             {isAuthenticated ? (
               <StyledNavLink to='/' onClick={handleLogout}>
                 <Icon name='User' />
@@ -91,7 +97,7 @@ const SideMenu = ({ isOpen, onClose }) => {
               </StyledNavLink>
             ) : (
               <StyledNavLink to='/login' onClick={onClose}>
-                <Icon name='User' size='s' />
+                <Icon name='User' />
                 Login / Opret
               </StyledNavLink>
             )}
