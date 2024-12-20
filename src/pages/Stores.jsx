@@ -12,6 +12,7 @@ import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
 import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/OutletContainer';
+import { useAuth } from '../context/AuthContext';
 
 const SearchSection = styled.div`
   display: flex;
@@ -71,25 +72,77 @@ function Stores() {
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [selectedStore, setSelectedStore] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    fetchStores();
-  }, []);
+  const { isAuthenticated } = useAuth();
 
   const fetchStores = async () => {
     try {
-      const data = await facade.fetchData('/stores', false);
-      setStores(data);
-      setFilteredStores(data);
+      setLoading(true);
 
+      // Hent butikker og favoritter parallelt hvis bruger er logget ind
+      const [storesData, favoritesData] = await Promise.all([
+        facade.fetchData('/stores', false),
+        isAuthenticated ? facade.getFavorites() : Promise.resolve([]),
+      ]);
+
+      // Lav et Set af favorit IDs for hurtig opslag
+      const favoriteIds = new Set(favoritesData.map((fav) => fav.id));
+
+      // Opdater alle butikker med deres favorit status
+      const storesWithFavorites = storesData.map((store) => ({
+        ...store,
+        isFavorite: favoriteIds.has(store.id),
+      }));
+
+      setStores(storesWithFavorites);
+      setFilteredStores(storesWithFavorites);
+
+      // Opdater postnumre
       const uniquePostalCodes = [
-        ...new Set(data.map((store) => store.address.postalCode.postalCode)),
+        ...new Set(
+          storesData.map((store) => store.address.postalCode.postalCode)
+        ),
       ].sort();
       setPostalCodes(uniquePostalCodes);
     } catch (err) {
+      console.error('Error fetching stores:', err);
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Sørg for at fetchStores bliver kaldt når auth status ændrer sig
+  useEffect(() => {
+    fetchStores();
+  }, [isAuthenticated]);
+
+  const handleFavoriteToggle = async (storeId, isFavorite) => {
+    try {
+      // Opdater UI først for bedre brugeroplevelse
+      const updateStores = (prevStores) =>
+        prevStores.map((store) =>
+          store.id === storeId ? { ...store, isFavorite } : store
+        );
+
+      setStores(updateStores);
+      setFilteredStores(updateStores);
+
+      // Hvis opdateringen fejler, vil vi få en error og kan rulle tilbage
+      if (isFavorite) {
+        await facade.addFavorite(storeId);
+      } else {
+        await facade.removeFavorite(storeId);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      // Hvis der sker en fejl, rul tilbage til tidligere state
+      const updateStores = (prevStores) =>
+        prevStores.map((store) =>
+          store.id === storeId ? { ...store, isFavorite: !isFavorite } : store
+        );
+
+      setStores(updateStores);
+      setFilteredStores(updateStores);
     }
   };
 
@@ -110,12 +163,24 @@ function Stores() {
           `/stores/postal_code/${postalCode}`,
           false
         );
+
+        // Bevar favorit status fra eksisterende stores
+        const storesWithFavorites = data.map((newStore) => {
+          const existingStore = stores.find(
+            (store) => store.id === newStore.id
+          );
+          return {
+            ...newStore,
+            isFavorite: existingStore ? existingStore.isFavorite : false,
+          };
+        });
+
         setFilteredStores(
           selectedBrands.size > 0
-            ? data.filter((store) =>
+            ? storesWithFavorites.filter((store) =>
                 selectedBrands.has(store.brand.displayName)
               )
-            : data
+            : storesWithFavorites
         );
       } else {
         filterStores(searchTerm, '', selectedBrands);
@@ -224,6 +289,7 @@ function Stores() {
             key={store.id}
             store={store}
             onClick={() => setSelectedStore(store)}
+            onFavoriteToggle={handleFavoriteToggle}
           />
         ))}
       </CardGrid>

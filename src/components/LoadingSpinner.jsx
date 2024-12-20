@@ -16,7 +16,7 @@ const LoadingContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: ${({ fullscreen }) => (fullscreen ? '100vh' : '200px')};
+  min-height: ${({ $fullscreen }) => ($fullscreen ? '100vh' : '200px')};
   gap: 1.2rem;
 `;
 
@@ -37,7 +37,7 @@ const LoadingSpinner = ({
   size = 40,
 }) => {
   return (
-    <LoadingContainer fullscreen={fullscreen}>
+    <LoadingContainer $fullscreen={fullscreen}>
       <SpinnerIcon size={size} />
       <LoadingText>{text}</LoadingText>
     </LoadingContainer>

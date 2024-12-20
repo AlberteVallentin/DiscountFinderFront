@@ -1,12 +1,5 @@
 const URL = "https://discountfinder.api.albertevallentin.dk/api";
 
-function handleHttpErrors(res) {
-    if (!res.ok) {
-        return Promise.reject({ status: res.status, fullError: res.json() });
-    }
-    return res.json();
-}
-
 function apiFacade() {
     const processProducts = (data) => {
         if (data?.products) {
@@ -102,6 +95,56 @@ function apiFacade() {
         }
     };
 
+    async function handleHttpErrors(res) {
+        if (!res.ok) {
+            return Promise.reject({ status: res.status, fullError: res.json() });
+        }
+        // Check if response has content
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return res.json();
+        }
+        // If no content or not JSON, return empty object
+        return {};
+    }
+
+    const addFavorite = async (storeId) => {
+        const options = makeOptions("POST", true);
+        try {
+            const response = await fetch(`${URL}/stores/${storeId}/favorite`, options);
+            await handleHttpErrors(response);
+            return true; // Return success boolean instead of trying to parse response
+        } catch (error) {
+            console.error("Add favorite error:", error);
+            throw error;
+        }
+    };
+
+    const removeFavorite = async (storeId) => {
+        const options = makeOptions("DELETE", true);
+        try {
+            const response = await fetch(`${URL}/stores/${storeId}/favorite`, options);
+            await handleHttpErrors(response);
+            return true; // Return success boolean instead of trying to parse response
+        } catch (error) {
+            console.error("Remove favorite error:", error);
+            throw error;
+        }
+    };
+
+    const getFavorites = async () => {
+        try {
+            const data = await fetchData('/stores/favorites', true);
+            return Array.isArray(data) ? data : [];
+        } catch (error) {
+            console.error("Get favorites error:", error);
+            if (error.status === 404) {
+                return []; // Return empty array if no favorites found
+            }
+            throw error;
+        }
+    };
+
     const makeOptions = (method, addToken, body) => {
         const opts = {
             method: method,
@@ -130,7 +173,10 @@ function apiFacade() {
         hasUserAccess,
         getUserRoles,
         decodeToken,
-        processProducts
+        processProducts,
+        addFavorite,
+        removeFavorite,
+        getFavorites,
     };
 }
 
