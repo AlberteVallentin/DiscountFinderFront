@@ -138,7 +138,7 @@ function Stores() {
     filterStores(searchTerm, selectedPostalCode, newSelectedBrands);
   };
 
-  const filterStores = (search, brands) => {
+  const filterStores = (search, postalCode, brands) => {
     let filtered = stores;
 
     if (search) {
@@ -149,7 +149,13 @@ function Stores() {
       );
     }
 
-    if (brands.size > 0) {
+    if (postalCode) {
+      filtered = filtered.filter(
+        (store) => store.address.postalCode.postalCode === parseInt(postalCode)
+      );
+    }
+
+    if (brands?.size > 0) {
       filtered = filtered.filter((store) =>
         brands.has(store.brand.displayName)
       );

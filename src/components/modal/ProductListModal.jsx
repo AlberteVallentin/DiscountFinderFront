@@ -202,6 +202,7 @@ const ProductListModal = ({ store, onClose }) => {
   });
   const [sortOption, setSortOption] = useState('');
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (store?.id) {
