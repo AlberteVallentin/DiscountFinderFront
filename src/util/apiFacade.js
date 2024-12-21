@@ -90,21 +90,23 @@ function apiFacade() {
             const data = await handleHttpErrors(response);
             return processProducts(data);
         } catch (error) {
-            console.error("Fetch error:", error);
+            console.error("Fetch error for endpoint:", endpoint, "Error details:", error);
             throw error;
         }
     };
 
     async function handleHttpErrors(res) {
         if (!res.ok) {
-            return Promise.reject({ status: res.status, fullError: res.json() });
+            // Prøv at parse JSON-data fra serverens fejlrespons
+            const errorJson = await res.json().catch(() => ({})); // Tomt objekt som fallback
+            console.error("HTTP error details:", { status: res.status, errorJson });
+            // Kaster et objekt med status og resolved JSON som fullError
+            throw { status: res.status, fullError: errorJson };
         }
-        // Check if response has content
         const contentType = res.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
             return res.json();
         }
-        // If no content or not JSON, return empty object
         return {};
     }
 
@@ -120,12 +122,13 @@ function apiFacade() {
         }
     };
 
+
     const removeFavorite = async (storeId) => {
         const options = makeOptions("DELETE", true);
         try {
             const response = await fetch(`${URL}/stores/${storeId}/favorite`, options);
             await handleHttpErrors(response);
-            return true; // Return success boolean instead of trying to parse response
+            return true;
         } catch (error) {
             console.error("Remove favorite error:", error);
             throw error;
@@ -178,7 +181,7 @@ function apiFacade() {
         removeFavorite,
         getFavorites,
     };
-}
+};
 
 const facade = apiFacade();
 export default facade;

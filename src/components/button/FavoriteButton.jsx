@@ -117,6 +117,7 @@ const FavoriteButton = ({
           visible={toast.visible}
           message={toast.message}
           type={toast.type}
+          duration={5000}
           onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
         />
       )}

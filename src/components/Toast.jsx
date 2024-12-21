@@ -16,7 +16,7 @@ const ToastContainer = styled.div`
   align-items: center;
   gap: 0.5rem;
   transition: top 0.3s ease;
-  z-index: 1000;
+  z-index: 9999; // Øger z-index for at sikre den er øverst
 
   svg {
     width: 20px;
@@ -29,7 +29,7 @@ const Toast = ({ visible, message, type = 'success', onClose }) => {
     if (visible) {
       const timer = setTimeout(() => {
         if (onClose) onClose();
-      }, 3000);
+      }, 3000); // Fast 5 sekunders duration
 
       return () => clearTimeout(timer);
     }
