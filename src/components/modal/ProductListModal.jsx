@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
-import LoginModal from './LoginModal';
 import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../util/apiFacade';
 import { useAuth } from '../../context/AuthContext';
@@ -197,13 +196,13 @@ const ProductListModal = ({ store, onClose }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const { isAuthenticated } = useAuth();
   const [filterOptions, setFilterOptions] = useState({
     categories: new Set(),
     priceRange: { min: '', max: '' },
   });
   const [sortOption, setSortOption] = useState('');
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (store?.id) {
@@ -302,19 +301,6 @@ const ProductListModal = ({ store, onClose }) => {
       categories: newCategories,
     }));
   };
-
-  if (!isAuthenticated) {
-    return (
-      <LoginModal
-        isOpen={true}
-        onClose={onClose}
-        onLogin={() => {
-          onClose();
-          navigate('/login');
-        }}
-      />
-    );
-  }
 
   return (
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>

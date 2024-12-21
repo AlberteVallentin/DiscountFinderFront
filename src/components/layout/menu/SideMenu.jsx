@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { NavLink } from 'react-router';
 import Icon from '../../ui/Icon';
 import { useAuth } from '../../../context/AuthContext';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 
 const MenuOverlay = styled.div`
   position: fixed;
@@ -59,11 +59,20 @@ const StyledNavLink = styled(NavLink)`
 const SideMenu = ({ isOpen, onClose }) => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     onClose();
     navigate('/login');
+  };
+
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    onClose();
+    navigate('/login', {
+      state: { returnPath: location.pathname },
+    });
   };
 
   return (
@@ -84,14 +93,20 @@ const SideMenu = ({ isOpen, onClose }) => {
             </StyledNavLink>
           </MenuItem>
           <MenuItem>
+            <StyledNavLink to='/favorites' onClick={onClose}>
+              <Icon name='Heart' />
+              Mine favoritter
+            </StyledNavLink>
+          </MenuItem>
+          <MenuItem>
             {isAuthenticated ? (
               <StyledNavLink to='/' onClick={handleLogout}>
                 <Icon name='User' />
                 Log ud
               </StyledNavLink>
             ) : (
-              <StyledNavLink to='/login' onClick={onClose}>
-                <Icon name='User' size='s' />
+              <StyledNavLink to='/login' onClick={handleLoginClick}>
+                <Icon name='User' />
                 Login / Opret
               </StyledNavLink>
             )}

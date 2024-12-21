@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -133,6 +133,7 @@ const ToggleButton = styled.button`
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState({
@@ -168,8 +169,11 @@ const LoginPage = () => {
           name: decodedToken.name,
         });
         showToast('Du er nu logget ind');
+
+        // Navigate to return path if it exists, otherwise go to stores
+        const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
-          navigate('/stores');
+          navigate(returnPath);
         }, 1500);
       }
     } catch (err) {
@@ -188,49 +192,29 @@ const LoginPage = () => {
     }
 
     try {
-      const registerResponse = await fetch(
-        'https://discountfinder.api.albertevallentin.dk/api/auth/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            roleType: 'USER',
-          }),
-        }
-      );
+      const registerResponse = await facade.fetchData('/auth/register', true, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          roleType: 'USER',
+        }),
+      });
 
-      const data = await registerResponse.json();
+      if (registerResponse.token) {
+        showToast('Registrering gennemført! Logger ind...');
 
-      if (!registerResponse.ok) {
-        if (registerResponse.status === 422) {
-          setError('Bruger eksisterer allerede. Brug venligst et andet email.');
-          return;
-        }
-        throw new Error(data.msg || 'Registrering fejlede');
-      }
-
-      showToast('Registrering gennemført! Logger ind...');
-
-      // Log ind automatisk efter registrering
-      const loginResponse = await facade.login(
-        formData.email,
-        formData.password
-      );
-      if (loginResponse.token) {
-        const decodedToken = facade.decodeToken(loginResponse.token);
-        login(loginResponse.token, {
+        const decodedToken = facade.decodeToken(registerResponse.token);
+        login(registerResponse.token, {
           role: decodedToken.role,
           email: decodedToken.email,
           name: decodedToken.name,
         });
 
+        const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
-          navigate('/stores');
+          navigate(returnPath);
         }, 1500);
       }
     } catch (err) {
@@ -270,12 +254,14 @@ const LoginPage = () => {
           <ToggleButton
             onClick={() => toggleMode('login')}
             $active={isLoginMode}
+            type='button'
           >
             Login
           </ToggleButton>
           <ToggleButton
             onClick={() => toggleMode('register')}
             $active={!isLoginMode}
+            type='button'
           >
             Opret bruger
           </ToggleButton>

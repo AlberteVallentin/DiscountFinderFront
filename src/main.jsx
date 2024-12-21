@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import Home from './pages/Home.jsx';
+import Favorites from './pages/Favorites.jsx';
 import MainLayout from './layouts/MainLayout.jsx';
 import {
   createBrowserRouter,
@@ -21,6 +22,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path='stores' element={<Stores />} />
       <Route path='login' element={<LoginPage />} />
+      <Route path='favorites' element={<Favorites />} />
       <Route path='*' element={<NotFound />} />
     </Route>
   )
