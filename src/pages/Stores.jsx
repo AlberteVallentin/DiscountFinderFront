@@ -13,6 +13,7 @@ import SearchBar from '../components/ui/SearchBar';
 import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/OutletContainer';
 import { useAuth } from '../context/AuthContext';
+import LoginModal from '../components/modal/LoginModal';
 
 const SearchSection = styled.div`
   display: flex;
@@ -73,6 +74,7 @@ function Stores() {
   const [selectedStore, setSelectedStore] = useState(null);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const fetchStores = async () => {
     try {
@@ -115,6 +117,10 @@ function Stores() {
   useEffect(() => {
     fetchStores();
   }, [isAuthenticated]);
+
+  const handleLoginRequired = () => {
+    setShowLoginModal(true);
+  };
 
   const handleFavoriteToggle = async (storeId, isFavorite) => {
     try {
@@ -290,6 +296,7 @@ function Stores() {
             store={store}
             onClick={() => setSelectedStore(store)}
             onFavoriteToggle={handleFavoriteToggle}
+            onLoginRequired={handleLoginRequired}
           />
         ))}
       </CardGrid>
@@ -299,6 +306,15 @@ function Stores() {
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
           navigate={navigate}
+        />
+      )}
+
+      {showLoginModal && (
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onLogin={() => navigate('/login')}
+          message='Du skal være logget ind for at tilføje butikker til favoritter.'
         />
       )}
 

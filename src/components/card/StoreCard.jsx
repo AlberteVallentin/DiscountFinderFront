@@ -1,10 +1,13 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import BaseCard from './BaseCard';
 import { borders } from '../../styles/Theme';
 import FavoriteButton from '../button/FavoriteButton';
+import LoginModal from '../modal/LoginModal';
+import { useNavigate } from 'react-router';
 
 const StoreCardWrapper = styled.div`
-  position: relative; // Dette er vigtigt for absolutte positionering af FavoriteButton
+  position: relative;
   width: 100%;
 `;
 
@@ -22,17 +25,25 @@ const StoreAddress = styled.div`
 `;
 
 const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigate = useNavigate(); // Tilføj denne hook
+
+  const handleLoginRequired = () => {
+    setShowLoginModal(true);
+  };
+
+  const handleLogin = () => {
+    setShowLoginModal(false);
+    navigate('/login');
+  };
+
   return (
     <StoreCardWrapper>
       <BaseCard onClick={onClick} $clickable={!!onClick}>
         <FavoriteButton
           storeId={store.id}
           initialFavorite={store.isFavorite}
-          onLoginRequired={() =>
-            navigate('/login', {
-              state: { returnPath: '/favorites' },
-            })
-          }
+          onLoginRequired={handleLoginRequired}
           onToggle={(isFavorite) => onFavoriteToggle?.(store.id, isFavorite)}
         />
         <StoreName>{store.name}</StoreName>
@@ -44,6 +55,14 @@ const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
           </div>
         </StoreAddress>
       </BaseCard>
+      {showLoginModal && (
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onLogin={handleLogin}
+          message='Du skal være logget ind for at tilføje butikker til favoritter.'
+        />
+      )}
     </StoreCardWrapper>
   );
 };
