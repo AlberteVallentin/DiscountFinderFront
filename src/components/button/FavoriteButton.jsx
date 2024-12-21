@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import facade from '../../util/apiFacade';
+import Toast from '../Toast';
 
 const FavoriteIcon = styled.button`
   position: absolute;
@@ -40,11 +41,14 @@ const FavoriteButton = ({
   const { isAuthenticated } = useAuth();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'success',
+  });
 
-  // Synkroniser med initialFavorite når den ændrer sig
   useEffect(() => {
     if (!isUpdating) {
-      // Kun opdater hvis vi ikke er midt i et API kald
       setIsFavorite(initialFavorite);
     }
   }, [initialFavorite]);
@@ -63,8 +67,18 @@ const FavoriteButton = ({
     try {
       if (newState) {
         await facade.addFavorite(storeId);
+        setToast({
+          visible: true,
+          message: 'Butik tilføjet til favoritter',
+          type: 'success',
+        });
       } else {
         await facade.removeFavorite(storeId);
+        setToast({
+          visible: true,
+          message: 'Butik fjernet fra favoritter',
+          type: 'success',
+        });
       }
 
       setIsFavorite(newState);
@@ -73,24 +87,40 @@ const FavoriteButton = ({
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      setIsFavorite(!newState); // Revert ved fejl
+      setToast({
+        visible: true,
+        message: 'Der skete en fejl. Prøv igen senere.',
+        type: 'error',
+      });
+      setIsFavorite(!newState);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  // Kun vis rød hvis både favorite OG authenticated
   const showAsFavorite = isFavorite && isAuthenticated;
 
   return (
-    <FavoriteIcon
-      onClick={handleClick}
-      $isFavorite={showAsFavorite}
-      aria-label={showAsFavorite ? 'Remove from favorites' : 'Add to favorites'}
-      disabled={isUpdating}
-    >
-      <Heart />
-    </FavoriteIcon>
+    <>
+      <FavoriteIcon
+        onClick={handleClick}
+        $isFavorite={showAsFavorite}
+        aria-label={
+          showAsFavorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'
+        }
+        disabled={isUpdating}
+      >
+        <Heart />
+      </FavoriteIcon>
+      {toast.visible && (
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+        />
+      )}
+    </>
   );
 };
 
