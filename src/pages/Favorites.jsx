@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import facade from '../util/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
 import Toast from '../components/Toast';
+import EmptyState from '../components/EmptyState';
 
 const Title = styled.h1`
   margin-bottom: 2rem;
@@ -110,16 +111,20 @@ function Favorites() {
     <OutletContainer>
       <Title>Mine favoritbutikker</Title>
 
-      <CardGrid>
-        {favoriteStores.map((store) => (
-          <StoreCard
-            key={store.id}
-            store={store}
-            onClick={() => setSelectedStore(store)}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
-        ))}
-      </CardGrid>
+      {favoriteStores.length === 0 ? (
+        <EmptyState type='NO_FAVORITES' />
+      ) : (
+        <CardGrid>
+          {favoriteStores.map((store) => (
+            <StoreCard
+              key={store.id}
+              store={store}
+              onClick={() => setSelectedStore(store)}
+              onFavoriteToggle={handleFavoriteToggle}
+            />
+          ))}
+        </CardGrid>
+      )}
 
       {selectedStore && (
         <ProductListModal

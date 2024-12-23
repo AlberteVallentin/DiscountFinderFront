@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
+import { SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
 import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../util/apiFacade';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router';
 import SearchBar from '../ui/SearchBar';
 import Toast from '../Toast';
 import { useMemo } from 'react';
+import EmptyState from '../EmptyState';
 
 const StoreHeader = styled.div`
   display: flex;
@@ -433,6 +432,8 @@ const ProductListModal = ({ store, onClose }) => {
 
         {loading ? (
           <LoadingSpinner text='Henter tilbud...' />
+        ) : filteredProducts.length === 0 ? (
+          <EmptyState type='NO_SEARCH_RESULTS' />
         ) : (
           <ProductsGrid>
             {filteredProducts.map((product) => (
