@@ -14,7 +14,9 @@ import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/OutletContainer';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from '../components/modal/LoginModal';
+import Toast from '../components/Toast';
 
+// Styled components
 const SearchSection = styled.div`
   display: flex;
   gap: 1rem;
@@ -63,33 +65,42 @@ const BrandSection = styled.div`
 `;
 
 function Stores() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  // States
   const [stores, setStores] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPostalCode, setSelectedPostalCode] = useState('');
   const [postalCodes, setPostalCodes] = useState([]);
   const [filteredStores, setFilteredStores] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [selectedStore, setSelectedStore] = useState(null);
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'success',
+  });
 
+  // Fetch stores
   const fetchStores = async () => {
     try {
       setLoading(true);
 
-      // Hent butikker og favoritter parallelt hvis bruger er logget ind
+      // Hent butikker og favoritter parallelt
       const [storesData, favoritesData] = await Promise.all([
         facade.fetchData('/stores', false),
-        isAuthenticated ? facade.getFavorites() : Promise.resolve([]),
+        isAuthenticated
+          ? facade.fetchData('/stores/favorites', true)
+          : Promise.resolve([]),
       ]);
 
-      // Lav et Set af favorit IDs for hurtig opslag
+      // Opret Set af favorit IDs
       const favoriteIds = new Set(favoritesData.map((fav) => fav.id));
 
-      // Opdater alle butikker med deres favorit status
+      // Map stores med favorit status
       const storesWithFavorites = storesData.map((store) => ({
         ...store,
         isFavorite: favoriteIds.has(store.id),
@@ -98,33 +109,40 @@ function Stores() {
       setStores(storesWithFavorites);
       setFilteredStores(storesWithFavorites);
 
-      // Opdater postnumre
+      // Udregn unikke postnumre
       const uniquePostalCodes = [
         ...new Set(
           storesData.map((store) => store.address.postalCode.postalCode)
         ),
       ].sort();
+
       setPostalCodes(uniquePostalCodes);
     } catch (err) {
       console.error('Error fetching stores:', err);
-      setError(err.message);
+      setToast({
+        visible: true,
+        message:
+          err.userMessage || 'Der skete en fejl ved hentning af butikker',
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Sørg for at fetchStores bliver kaldt når auth status ændrer sig
+  // Initial fetch
   useEffect(() => {
     fetchStores();
   }, [isAuthenticated]);
 
+  // Event handlers
   const handleLoginRequired = () => {
     setShowLoginModal(true);
   };
 
   const handleFavoriteToggle = async (storeId, isFavorite) => {
     try {
-      // Opdater UI først for bedre brugeroplevelse
+      // Optimistisk UI update
       const updateStores = (prevStores) =>
         prevStores.map((store) =>
           store.id === storeId ? { ...store, isFavorite } : store
@@ -133,15 +151,31 @@ function Stores() {
       setStores(updateStores);
       setFilteredStores(updateStores);
 
-      // Hvis opdateringen fejler, vil vi få en error og kan rulle tilbage
+      // API kald
       if (isFavorite) {
         await facade.addFavorite(storeId);
+        setToast({
+          visible: true,
+          message: 'Butik tilføjet til favoritter',
+          type: 'success',
+        });
       } else {
         await facade.removeFavorite(storeId);
+        setToast({
+          visible: true,
+          message: 'Butik fjernet fra favoritter',
+          type: 'success',
+        });
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      // Hvis der sker en fejl, rul tilbage til tidligere state
+      setToast({
+        visible: true,
+        message: error.userMessage || 'Der skete en fejl. Prøv igen senere.',
+        type: 'error',
+      });
+
+      // Rul tilbage ved fejl
       const updateStores = (prevStores) =>
         prevStores.map((store) =>
           store.id === storeId ? { ...store, isFavorite: !isFavorite } : store
@@ -169,8 +203,6 @@ function Stores() {
           `/stores/postal_code/${postalCode}`,
           false
         );
-
-        // Bevar favorit status fra eksisterende stores
         const storesWithFavorites = data.map((newStore) => {
           const existingStore = stores.find(
             (store) => store.id === newStore.id
@@ -192,7 +224,12 @@ function Stores() {
         filterStores(searchTerm, '', selectedBrands);
       }
     } catch (err) {
-      setError(err.message);
+      setToast({
+        visible: true,
+        message:
+          err.userMessage || 'Der skete en fejl ved søgning på postnummer',
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -239,10 +276,6 @@ function Stores() {
     return <LoadingSpinner text='Henter butikker...' fullscreen={true} />;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <OutletContainer>
       <SearchSection>
@@ -251,7 +284,6 @@ function Stores() {
           value={searchTerm}
           onChange={handleSearch}
         />
-
         <SelectWrapper>
           <PostalCodeSelect
             value={selectedPostalCode}
@@ -317,6 +349,13 @@ function Stores() {
           message='Du skal være logget ind for at tilføje butikker til favoritter.'
         />
       )}
+
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
 
       <ScrollToTop />
     </OutletContainer>

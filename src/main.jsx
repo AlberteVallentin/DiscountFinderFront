@@ -12,6 +12,7 @@ import {
 import Stores from './pages/Stores.jsx';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound.jsx';
+import EmptyStateDemo from './pages/EmptyStateDemo.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
       <Route path='stores' element={<Stores />} />
       <Route path='login' element={<LoginPage />} />
       <Route path='favorites' element={<Favorites />} />
+      <Route path='empty-state-demo' element={<EmptyStateDemo />} />
       <Route path='*' element={<NotFound />} />
     </Route>
   )

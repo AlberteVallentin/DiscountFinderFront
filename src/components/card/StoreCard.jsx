@@ -26,7 +26,7 @@ const StoreAddress = styled.div`
 
 const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const navigate = useNavigate(); // Tilføj denne hook
+  const navigate = useNavigate();
 
   const handleLoginRequired = () => {
     setShowLoginModal(true);

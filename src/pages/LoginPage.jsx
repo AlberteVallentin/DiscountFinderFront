@@ -1,30 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import styled from 'styled-components';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import facade from '../util/apiFacade';
-
-const Toast = styled.div`
-  position: fixed;
-  top: ${({ $visible }) => ($visible ? '20px' : '-100px')};
-  right: 20px;
-  background: ${({ $type }) => ($type === 'success' ? '#10B981' : '#EF4444')};
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: top 0.3s ease;
-  z-index: 1000;
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-`;
+import Toast from '../components/Toast';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -131,7 +110,7 @@ const ToggleButton = styled.button`
 `;
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -157,69 +136,78 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
-
     try {
-      const response = await facade.login(formData.email, formData.password);
-      if (response.token) {
-        const decodedToken = facade.decodeToken(response.token);
-        login(response.token, {
-          role: decodedToken.role,
-          email: decodedToken.email,
-          name: decodedToken.name,
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        setToast({
+          visible: true,
+          message: 'Du er nu logget ind',
+          type: 'success',
         });
-        showToast('Du er nu logget ind');
 
-        // Navigate to return path if it exists, otherwise go to stores
+        // Navigate til return path hvis det findes, ellers til stores
         const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
           navigate(returnPath);
         }, 1500);
+      } else {
+        setToast({
+          visible: true,
+          message: result.error,
+          type: 'error',
+        });
       }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Forkert email eller password. Prøv igen.');
+    } catch (error) {
+      setToast({
+        visible: true,
+        message: 'Der skete en fejl under login',
+        type: 'error',
+      });
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
-
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords matcher ikke');
+      setToast({
+        visible: true,
+        message: 'Passwords matcher ikke',
+        type: 'error',
+      });
       return;
     }
 
     try {
-      const registerResponse = await facade.fetchData('/auth/register', true, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          roleType: 'USER',
-        }),
-      });
-
-      if (registerResponse.token) {
-        showToast('Registrering gennemført! Logger ind...');
-
-        const decodedToken = facade.decodeToken(registerResponse.token);
-        login(registerResponse.token, {
-          role: decodedToken.role,
-          email: decodedToken.email,
-          name: decodedToken.name,
+      const result = await register(
+        formData.name,
+        formData.email,
+        formData.password
+      );
+      if (result?.success) {
+        setToast({
+          visible: true,
+          message: 'Registrering gennemført! Logger ind...',
+          type: 'success',
         });
 
         const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
           navigate(returnPath);
         }, 1500);
+      } else {
+        setToast({
+          visible: true,
+          message: result.error || 'Registrering fejlede.',
+          type: 'error',
+        });
       }
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Registrering fejlede. Prøv igen.');
+    } catch (error) {
+      console.error('Register error:', error);
+      setToast({
+        visible: true,
+        message: 'Der skete en fejl under registrering',
+        type: 'error',
+      });
     }
   };
 
@@ -244,10 +232,12 @@ const LoginPage = () => {
 
   return (
     <LoginContainer>
-      <Toast $visible={toast.visible} $type={toast.type}>
-        {toast.type === 'success' ? <CheckCircle2 /> : <AlertCircle />}
-        {toast.message}
-      </Toast>
+      <Toast
+        visible={toast.visible}
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+      />
 
       <FormCard>
         <ToggleContainer>

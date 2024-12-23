@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Search, SlidersHorizontal, ArrowDownUp } from 'lucide-react';
+import { SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
 import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../util/apiFacade';
-import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router';
 import SearchBar from '../ui/SearchBar';
+import Toast from '../Toast';
+import { useMemo } from 'react';
+import EmptyState from '../EmptyState';
+
+const StoreHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const StoreName = styled.h2`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: var(--fs-l);
+  font-weight: var(--fw-medium);
+`;
 
 const Controls = styled.div`
   display: flex;
@@ -16,6 +32,7 @@ const Controls = styled.div`
   margin-bottom: 2rem;
   width: 100%;
 `;
+
 const ControlButton = styled.button`
   display: flex;
   align-items: center;
@@ -195,14 +212,16 @@ const ProductListModal = ({ store, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     categories: new Set(),
     priceRange: { min: '', max: '' },
   });
   const [sortOption, setSortOption] = useState('');
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'success',
+  });
 
   useEffect(() => {
     if (store?.id) {
@@ -215,37 +234,38 @@ const ProductListModal = ({ store, onClose }) => {
       setLoading(true);
       const data = await facade.fetchData(`/stores/${store.id}`);
       setProducts(data.products || []);
-      setFilteredProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
+      setToast({
+        visible: true,
+        message:
+          error.userMessage || 'Der skete en fejl ved hentning af produkter',
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Get unique categories from products
-  const getCategories = () => {
-    const categories = new Set();
+  const categories = useMemo(() => {
+    const categorySet = new Set();
     products.forEach((product) => {
       product.categories.forEach((category) => {
-        categories.add(category.nameDa);
+        categorySet.add(category.nameDa);
       });
     });
-    return Array.from(categories).sort();
-  };
+    return Array.from(categorySet).sort();
+  }, [products]);
 
-  // Apply filters and sorting
-  useEffect(() => {
+  const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Apply category filter
     if (filterOptions.categories.size > 0) {
       filtered = filtered.filter((product) =>
         product.categories.some((cat) =>
@@ -254,7 +274,6 @@ const ProductListModal = ({ store, onClose }) => {
       );
     }
 
-    // Apply price range filter
     if (filterOptions.priceRange.min || filterOptions.priceRange.max) {
       filtered = filtered.filter((product) => {
         const price = product.price.newPrice;
@@ -268,7 +287,6 @@ const ProductListModal = ({ store, onClose }) => {
       });
     }
 
-    // Apply sorting
     if (sortOption) {
       filtered.sort((a, b) => {
         switch (sortOption) {
@@ -286,7 +304,7 @@ const ProductListModal = ({ store, onClose }) => {
       });
     }
 
-    setFilteredProducts(filtered);
+    return filtered;
   }, [products, searchTerm, filterOptions, sortOption]);
 
   const handleCategoryToggle = (category) => {
@@ -306,6 +324,9 @@ const ProductListModal = ({ store, onClose }) => {
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
       <Content>
         <Controls>
+          <StoreHeader>
+            <StoreName>{store.name}</StoreName>
+          </StoreHeader>
           <SearchBar
             placeholder='Søg efter en varer...'
             value={searchTerm}
@@ -366,7 +387,7 @@ const ProductListModal = ({ store, onClose }) => {
           <FilterPanel>
             <FilterSection>
               <FilterTitle>Kategorier</FilterTitle>
-              {getCategories().map((category) => (
+              {categories.map((category) => (
                 <CheckboxLabel key={category}>
                   <input
                     type='checkbox'
@@ -411,16 +432,18 @@ const ProductListModal = ({ store, onClose }) => {
 
         {loading ? (
           <LoadingSpinner text='Henter tilbud...' />
+        ) : filteredProducts.length === 0 ? (
+          <EmptyState type='NO_SEARCH_RESULTS' />
         ) : (
           <ProductsGrid>
             {filteredProducts.map((product) => (
               <ProductCard key={product.ean}>
                 <ProductTitle>{product.productName}</ProductTitle>
                 <CategoriesContainer>
-                  {product.categories.map((category) => (
-                    <CategoryTag key={category.nameDa}>
-                      {category.nameDa}
-                    </CategoryTag>
+                  {[
+                    ...new Set(product.categories.map((cat) => cat.nameDa)),
+                  ].map((categoryName) => (
+                    <CategoryTag key={categoryName}>{categoryName}</CategoryTag>
                   ))}
                 </CategoriesContainer>
                 <PriceInfo>
@@ -443,6 +466,13 @@ const ProductListModal = ({ store, onClose }) => {
             ))}
           </ProductsGrid>
         )}
+
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+        />
       </Content>
     </Modal>
   );
