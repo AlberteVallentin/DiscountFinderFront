@@ -66,14 +66,14 @@ const FavoriteButton = ({
 
     try {
       if (newState) {
-        await facade.addFavorite(storeId);
+        await facade.favoriteAPI.addFavorite(storeId);
         setToast({
           visible: true,
           message: 'Butik tilføjet til favoritter',
           type: 'success',
         });
       } else {
-        await facade.removeFavorite(storeId);
+        await facade.favoriteAPI.removeFavorite(storeId);
         setToast({
           visible: true,
           message: 'Butik fjernet fra favoritter',

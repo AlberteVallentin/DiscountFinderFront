@@ -1,46 +1,65 @@
-const URL = "https://discountfinder.api.albertevallentin.dk/api";
+// Basisopsætning
+const BASE_URL = "https://discountfinder.api.albertevallentin.dk/api";
 
-function apiFacade() {
-    const logResponseDetails = async (res) => {
-        console.group('Response Details');
-        console.log('Status:', res.status);
-        console.log('Status Text:', res.statusText);
-        console.log('Headers:', Object.fromEntries([...res.headers]));
-        console.log('Type:', res.type);
-        try {
-            const clone = res.clone();
-            const text = await clone.text();
-            console.log('Body:', text);
-        } catch (e) {
-            console.log('Could not log body:', e);
+// Hjælpefunktioner
+const handleHttpErrors = async (res) => {
+    if (!res.ok) {
+        const errorJson = await res.json().catch(() => ({}));
+        const error = new Error();
+        error.status = res.status;
+        error.fullError = errorJson;
+
+        // Map HTTP status til brugervenlige beskeder som defineret i API docs
+        switch (res.status) {
+            case 401:
+                error.userMessage = "Du skal være logget ind for at udføre denne handling";
+                break;
+            case 403:
+                error.userMessage = "Du har ikke rettigheder til at udføre denne handling";
+                break;
+            case 404:
+                error.userMessage = "Den ønskede ressource blev ikke fundet";
+                break;
+            default:
+                error.userMessage = "Der skete en fejl - prøv igen senere";
         }
-        console.groupEnd();
-    };
 
-    const processProducts = (data) => {
-        try {
-            if (data?.products) {
-                data.products = data.products.map(product => ({
-                    ...product,
-                    productName: product.productName ? product.productName.replace(/#/g, 'Ø') : product.productName
-                }));
-            }
-            return data;
-        } catch (error) {
-            console.error("Error processing products:", error);
-            return data;
+        throw error;
+    }
+
+    // Check content type
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        return res.json();
+    }
+    return {};
+};
+
+const makeOptions = (method, addToken, body) => {
+    const opts = {
+        method: method,
+        headers: {
+            "Content-type": "application/json",
+            'Accept': 'application/json',
         }
     };
 
-    const setToken = (token) => {
-        localStorage.setItem('jwtToken', token);
-    };
+    if (addToken && tokenMethods.loggedIn()) {
+        opts.headers["Authorization"] = `Bearer ${tokenMethods.getToken()}`;
+    }
 
-    const getToken = () => {
-        return localStorage.getItem('jwtToken');
-    };
+    if (body) {
+        opts.body = JSON.stringify(body);
+    }
 
-    const decodeToken = (token) => {
+    return opts;
+};
+
+// Token håndtering
+const tokenMethods = {
+    setToken: (token) => localStorage.setItem('jwtToken', token),
+    getToken: () => localStorage.getItem('jwtToken'),
+    decodeToken: (token) => {
         try {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -55,184 +74,168 @@ function apiFacade() {
             console.error('Token decode error:', error);
             return null;
         }
-    };
-
-    const loggedIn = () => {
-        const token = getToken();
+    },
+    loggedIn: () => {
+        const token = tokenMethods.getToken();
         if (token) {
-            const decodedToken = decodeToken(token);
+            const decodedToken = tokenMethods.decodeToken(token);
             const currentTime = Date.now() / 1000;
             return decodedToken && decodedToken.exp > currentTime;
         }
         return false;
-    };
-
-    const logout = () => {
-        localStorage.removeItem("jwtToken");
-    };
-
-    const getUserRoles = () => {
-        const token = getToken();
-        if (token != null) {
+    },
+    logout: () => localStorage.removeItem("jwtToken"),
+    getUserRoles: () => {
+        const token = tokenMethods.getToken();
+        if (token) {
             try {
-                const payloadBase64 = getToken().split('.')[1];
-                const decodedClaims = JSON.parse(window.atob(payloadBase64));
-                const role = decodedClaims.role;
-                return role;
+                const decodedToken = tokenMethods.decodeToken(token);
+                return decodedToken.role;
             } catch (error) {
-                console.error("Error decoding token:", error);
+                console.error("Error getting user roles:", error);
                 return "";
             }
-        } else return "";
-    };
+        }
+        return "";
+    },
+};
 
-    const hasUserAccess = (neededRole, loggedIn) => {
-        const role = getUserRoles();
-        return loggedIn && role === neededRole;
-    };
-
-    const login = async (email, password) => {
+// Auth relaterede endpoints
+const authAPI = {
+    login: async (email, password) => {
         const options = makeOptions("POST", false, { email, password });
         try {
-            const response = await fetch(URL + "/auth/login", options);
+            const response = await fetch(`${BASE_URL}/auth/login`, options);
             const data = await handleHttpErrors(response);
-            setToken(data.token);
+            tokenMethods.setToken(data.token);
             return data;
         } catch (error) {
             console.error("Login error:", error);
             throw error;
         }
-    };
+    },
 
-    const fetchData = async (endpoint, addToken = true) => {
-        const options = makeOptions("GET", addToken);
+    register: async (name, email, password) => {
+        const options = makeOptions("POST", false, {
+            name,
+            email,
+            password,
+            roleType: "USER" // Default role ved registrering
+        });
         try {
-            const response = await fetch(URL + endpoint, options);
+            const response = await fetch(`${BASE_URL}/auth/register`, options);
             const data = await handleHttpErrors(response);
-            return data ? processProducts(data) : data;
+            tokenMethods.setToken(data.token);
+            return data;
         } catch (error) {
-            console.error("Fetch error for endpoint:", endpoint, "Error details:", error);
+            console.error("Register error:", error);
             throw error;
         }
-    };
+    }
+};
 
-    async function handleHttpErrors(res) {
-        const contentType = res.headers.get("content-type");
-
+// Store relaterede endpoints
+const storeAPI = {
+    getAllStores: async () => {
         try {
-            if (!res.ok) {
-                await logResponseDetails(res);
-                let errorData = {};
-
-                if (contentType?.includes('application/json')) {
-                    try {
-                        errorData = await res.json();
-                    } catch (e) {
-                        errorData = { message: "Could not parse error response" };
-                    }
-                }
-
-                console.error("HTTP error details:", {
-                    status: res.status,
-                    statusText: res.statusText,
-                    errorData
-                });
-
-                throw { status: res.status, fullError: errorData };
-            }
-
-            if (contentType?.includes('application/json')) {
-                return await res.json();
-            }
-
-            console.warn("Response was not JSON, contentType:", contentType);
-            return {};
-
+            return await fetchData('/stores', false);
         } catch (error) {
-            if (error.status) {
-                throw error;
-            }
-            throw {
-                status: 500,
-                fullError: {
-                    message: "Error processing response",
-                    originalError: error.message
-                }
-            };
+            console.error("Error fetching stores:", error);
+            throw error;
+        }
+    },
+
+    getStoreById: async (id) => {
+        try {
+            return await fetchData(`/stores/${id}`, false);
+        } catch (error) {
+            console.error("Error fetching store:", error);
+            throw error;
+        }
+    },
+
+    getStoresByPostalCode: async (postalCode) => {
+        try {
+            return await fetchData(`/stores/postal_code/${postalCode}`, false);
+        } catch (error) {
+            console.error("Error fetching stores by postal code:", error);
+            throw error;
         }
     }
+};
 
-    const addFavorite = async (storeId) => {
+// Favorit relaterede endpoints
+const favoriteAPI = {
+    addFavorite: async (storeId) => {
         const options = makeOptions("POST", true);
         try {
-            const response = await fetch(`${URL}/stores/${storeId}/favorite`, options);
+            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
             await handleHttpErrors(response);
             return true;
         } catch (error) {
             console.error("Add favorite error:", error);
             throw error;
         }
-    };
+    },
 
-    const removeFavorite = async (storeId) => {
+    removeFavorite: async (storeId) => {
         const options = makeOptions("DELETE", true);
         try {
-            const response = await fetch(`${URL}/stores/${storeId}/favorite`, options);
+            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
             await handleHttpErrors(response);
             return true;
         } catch (error) {
             console.error("Remove favorite error:", error);
             throw error;
         }
-    };
+    },
 
-    const getFavorites = async () => {
+    getFavorites: async () => {
         try {
             const data = await fetchData('/stores/favorites', true);
             return Array.isArray(data) ? data : [];
         } catch (error) {
-            console.error("Get favorites error:", error);
             if (error.status === 404) {
                 return [];
             }
+            console.error("Get favorites error:", error);
             throw error;
         }
-    };
+    }
+};
 
-    const makeOptions = (method, addToken, body) => {
-        const opts = {
-            method: method,
-            headers: {
-                "Content-type": "application/json",
-                'Accept': 'application/json',
-            }
-        };
-        if (addToken && loggedIn()) {
-            opts.headers["Authorization"] = `Bearer ${getToken()}`;
-        }
-        if (body) {
-            opts.body = JSON.stringify(body);
-        }
-        return opts;
-    };
+// Generel fetch metode
+const fetchData = async (endpoint, addToken = true) => {
+    const options = makeOptions("GET", addToken);
+    try {
+        const response = await fetch(`${BASE_URL}${endpoint}`, options);
+        const data = await handleHttpErrors(response);
+        return processProducts(data);
+    } catch (error) {
+        console.error("Fetch error:", error);
+        throw error;
+    }
+};
 
-    return {
-        makeOptions,
-        setToken,
-        getToken,
-        loggedIn,
-        login,
-        logout,
-        fetchData,
-        hasUserAccess,
-        getUserRoles,
-        decodeToken,
-        processProducts,
-        addFavorite,
-        removeFavorite,
-        getFavorites,
-    };
-}
+// Produkt processering
+const processProducts = (data) => {
+    if (data?.products) {
+        data.products = data.products.map(product => ({
+            ...product,
+            productName: product.productName?.replace(/#/g, 'Ø')
+        }));
+    }
+    return data;
+};
 
-const facade = apiFacade();
+// Eksporter facade med alle metoder
+const facade = {
+    ...tokenMethods,
+    ...authAPI,
+    ...storeAPI,
+    ...favoriteAPI,
+    fetchData,
+    processProducts,
+};
+
 export default facade;

@@ -137,69 +137,77 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
-
     try {
-      const response = await facade.login(formData.email, formData.password);
-      if (response.token) {
-        const decodedToken = facade.decodeToken(response.token);
-        login(response.token, {
-          role: decodedToken.role,
-          email: decodedToken.email,
-          name: decodedToken.name,
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        setToast({
+          visible: true,
+          message: 'Du er nu logget ind',
+          type: 'success',
         });
-        showToast('Du er nu logget ind');
 
-        // Navigate to return path if it exists, otherwise go to stores
+        // Navigate til return path hvis det findes, ellers til stores
         const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
           navigate(returnPath);
         }, 1500);
+      } else {
+        setToast({
+          visible: true,
+          message: result.error,
+          type: 'error',
+        });
       }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Forkert email eller password. Prøv igen.');
+    } catch (error) {
+      setToast({
+        visible: true,
+        message: 'Der skete en fejl under login',
+        type: 'error',
+      });
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
-
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords matcher ikke');
+      setToast({
+        visible: true,
+        message: 'Passwords matcher ikke',
+        type: 'error',
+      });
       return;
     }
 
     try {
-      const registerResponse = await facade.fetchData('/auth/register', true, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          roleType: 'USER',
-        }),
-      });
-
-      if (registerResponse.token) {
-        showToast('Registrering gennemført! Logger ind...');
-
-        const decodedToken = facade.decodeToken(registerResponse.token);
-        login(registerResponse.token, {
-          role: decodedToken.role,
-          email: decodedToken.email,
-          name: decodedToken.name,
+      const result = await register(
+        formData.name,
+        formData.email,
+        formData.password
+      );
+      if (result.success) {
+        setToast({
+          visible: true,
+          message: 'Registrering gennemført! Logger ind...',
+          type: 'success',
         });
 
         const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
           navigate(returnPath);
         }, 1500);
+      } else {
+        setToast({
+          visible: true,
+          message: result.error,
+          type: 'error',
+        });
       }
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError(err.message || 'Registrering fejlede. Prøv igen.');
+    } catch (error) {
+      setToast({
+        visible: true,
+        message: 'Der skete en fejl under registrering',
+        type: 'error',
+      });
     }
   };
 

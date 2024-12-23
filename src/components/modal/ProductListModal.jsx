@@ -7,6 +7,7 @@ import facade from '../../util/apiFacade';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
 import SearchBar from '../ui/SearchBar';
+import Toast from '../Toast';
 
 const Controls = styled.div`
   display: flex;
@@ -16,6 +17,7 @@ const Controls = styled.div`
   margin-bottom: 2rem;
   width: 100%;
 `;
+
 const ControlButton = styled.button`
   display: flex;
   align-items: center;
@@ -201,7 +203,11 @@ const ProductListModal = ({ store, onClose }) => {
     priceRange: { min: '', max: '' },
   });
   const [sortOption, setSortOption] = useState('');
-  const navigate = useNavigate();
+  const [toast, setToast] = useState({
+    visible: false,
+    message: '',
+    type: 'success',
+  });
 
   useEffect(() => {
     if (store?.id) {
@@ -212,17 +218,23 @@ const ProductListModal = ({ store, onClose }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
+      // Brug den oprindelige facade.fetchData i stedet for storeAPI
       const data = await facade.fetchData(`/stores/${store.id}`);
       setProducts(data.products || []);
       setFilteredProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
+      setToast({
+        visible: true,
+        message:
+          error.userMessage || 'Der skete en fejl ved hentning af produkter',
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Get unique categories from products
   const getCategories = () => {
     const categories = new Set();
     products.forEach((product) => {
@@ -233,18 +245,15 @@ const ProductListModal = ({ store, onClose }) => {
     return Array.from(categories).sort();
   };
 
-  // Apply filters and sorting
   useEffect(() => {
     let filtered = [...products];
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Apply category filter
     if (filterOptions.categories.size > 0) {
       filtered = filtered.filter((product) =>
         product.categories.some((cat) =>
@@ -253,7 +262,6 @@ const ProductListModal = ({ store, onClose }) => {
       );
     }
 
-    // Apply price range filter
     if (filterOptions.priceRange.min || filterOptions.priceRange.max) {
       filtered = filtered.filter((product) => {
         const price = product.price.newPrice;
@@ -267,7 +275,6 @@ const ProductListModal = ({ store, onClose }) => {
       });
     }
 
-    // Apply sorting
     if (sortOption) {
       filtered.sort((a, b) => {
         switch (sortOption) {
@@ -442,6 +449,13 @@ const ProductListModal = ({ store, onClose }) => {
             ))}
           </ProductsGrid>
         )}
+
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+        />
       </Content>
     </Modal>
   );
