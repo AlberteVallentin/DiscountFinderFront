@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('jwtToken');
         if (token) {
-          const decodedToken = facade.tokenMethods.decodeToken(token);
+          const decodedToken = facade.decodeToken(token);
           const currentTime = Date.now() / 1000;
 
           if (decodedToken && decodedToken.exp > currentTime) {
@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }) => {
               name: decodedToken.name,
             });
           } else {
-            // Token er udløbet
             handleLogout();
           }
         }
@@ -38,18 +37,20 @@ export const AuthProvider = ({ children }) => {
         console.error('Token validation failed:', error);
         handleLogout();
       } finally {
-        setLoading(false);
+        setLoading(false); // Opdater loading status
       }
     };
 
     initializeAuth();
   }, []);
 
+  // AuthContext.jsx
   const handleLogin = async (email, password) => {
     try {
-      const response = await facade.authAPI.login(email, password);
+      // Change from facade.authAPI.login to facade.login
+      const response = await facade.login(email, password);
       if (response.token) {
-        const decodedToken = facade.tokenMethods.decodeToken(response.token);
+        const decodedToken = facade.decodeToken(response.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,
@@ -69,9 +70,9 @@ export const AuthProvider = ({ children }) => {
 
   const handleRegister = async (name, email, password) => {
     try {
-      const response = await facade.authAPI.register(name, email, password);
+      const response = await facade.register(name, email, password);
       if (response.token) {
-        const decodedToken = facade.tokenMethods.decodeToken(response.token);
+        const decodedToken = facade.decodeToken(response.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,

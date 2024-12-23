@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import facade from '../util/apiFacade';
 import Toast from '../components/Toast';
 
 const LoginContainer = styled.div`
@@ -111,7 +110,7 @@ const ToggleButton = styled.button`
 `;
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -184,7 +183,7 @@ const LoginPage = () => {
         formData.email,
         formData.password
       );
-      if (result.success) {
+      if (result?.success) {
         setToast({
           visible: true,
           message: 'Registrering gennemført! Logger ind...',
@@ -198,11 +197,12 @@ const LoginPage = () => {
       } else {
         setToast({
           visible: true,
-          message: result.error,
+          message: result.error || 'Registrering fejlede.',
           type: 'error',
         });
       }
     } catch (error) {
+      console.error('Register error:', error);
       setToast({
         visible: true,
         message: 'Der skete en fejl under registrering',

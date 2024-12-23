@@ -66,14 +66,15 @@ const FavoriteButton = ({
 
     try {
       if (newState) {
-        await facade.favoriteAPI.addFavorite(storeId);
+        // Change from facade.favoriteAPI.addFavorite to facade.addFavorite
+        await facade.addFavorite(storeId);
         setToast({
           visible: true,
           message: 'Butik tilføjet til favoritter',
           type: 'success',
         });
       } else {
-        await facade.favoriteAPI.removeFavorite(storeId);
+        await facade.removeFavorite(storeId);
         setToast({
           visible: true,
           message: 'Butik fjernet fra favoritter',
@@ -82,9 +83,7 @@ const FavoriteButton = ({
       }
 
       setIsFavorite(newState);
-      if (onToggle) {
-        onToggle(newState);
-      }
+      if (onToggle) onToggle(newState);
     } catch (error) {
       console.error('Error toggling favorite:', error);
       setToast({

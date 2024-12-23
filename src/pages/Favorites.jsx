@@ -39,7 +39,7 @@ function Favorites() {
   const fetchFavoriteStores = async () => {
     try {
       setLoading(true);
-      const favorites = await facade.favoriteAPI.getFavorites();
+      const favorites = await facade.getFavorites();
       setFavoriteStores(
         favorites.map((store) => ({ ...store, isFavorite: true }))
       );
