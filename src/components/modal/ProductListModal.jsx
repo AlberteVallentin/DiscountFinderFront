@@ -10,6 +10,21 @@ import SearchBar from '../ui/SearchBar';
 import Toast from '../Toast';
 import { useMemo } from 'react';
 
+const StoreHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const StoreName = styled.h2`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: var(--fs-l);
+  font-weight: var(--fw-medium);
+`;
+
 const Controls = styled.div`
   display: flex;
   gap: 1rem;
@@ -310,6 +325,9 @@ const ProductListModal = ({ store, onClose }) => {
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
       <Content>
         <Controls>
+          <StoreHeader>
+            <StoreName>{store.name}</StoreName>
+          </StoreHeader>
           <SearchBar
             placeholder='Søg efter en varer...'
             value={searchTerm}
@@ -419,13 +437,12 @@ const ProductListModal = ({ store, onClose }) => {
           <ProductsGrid>
             {filteredProducts.map((product) => (
               <ProductCard key={product.ean}>
+                <ProductTitle>{product.productName}</ProductTitle>
                 <CategoriesContainer>
-                  {product.categories.map((category) => (
-                    <CategoryTag
-                      key={`${product.ean}-${category.nameDa}-${product.timing.endTime}`}
-                    >
-                      {category.nameDa}
-                    </CategoryTag>
+                  {[
+                    ...new Set(product.categories.map((cat) => cat.nameDa)),
+                  ].map((categoryName) => (
+                    <CategoryTag key={categoryName}>{categoryName}</CategoryTag>
                   ))}
                 </CategoriesContainer>
                 <PriceInfo>

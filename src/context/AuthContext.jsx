@@ -44,10 +44,8 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // AuthContext.jsx
   const handleLogin = async (email, password) => {
     try {
-      // Change from facade.authAPI.login to facade.login
       const response = await facade.login(email, password);
       if (response.token) {
         const decodedToken = facade.decodeToken(response.token);
