@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
 import SearchBar from '../ui/SearchBar';
 import Toast from '../Toast';
+import { useMemo } from 'react';
 
 const Controls = styled.div`
   display: flex;
@@ -197,7 +198,6 @@ const ProductListModal = ({ store, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [filterOptions, setFilterOptions] = useState({
     categories: new Set(),
     priceRange: { min: '', max: '' },
@@ -218,10 +218,8 @@ const ProductListModal = ({ store, onClose }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // Brug den oprindelige facade.fetchData i stedet for storeAPI
       const data = await facade.fetchData(`/stores/${store.id}`);
       setProducts(data.products || []);
-      setFilteredProducts(data.products || []);
     } catch (error) {
       console.error('Error fetching products:', error);
       setToast({
@@ -235,17 +233,17 @@ const ProductListModal = ({ store, onClose }) => {
     }
   };
 
-  const getCategories = () => {
-    const categories = new Set();
+  const categories = useMemo(() => {
+    const categorySet = new Set();
     products.forEach((product) => {
       product.categories.forEach((category) => {
-        categories.add(category.nameDa);
+        categorySet.add(category.nameDa);
       });
     });
-    return Array.from(categories).sort();
-  };
+    return Array.from(categorySet).sort();
+  }, [products]);
 
-  useEffect(() => {
+  const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
     if (searchTerm) {
@@ -292,7 +290,7 @@ const ProductListModal = ({ store, onClose }) => {
       });
     }
 
-    setFilteredProducts(filtered);
+    return filtered;
   }, [products, searchTerm, filterOptions, sortOption]);
 
   const handleCategoryToggle = (category) => {
@@ -372,7 +370,7 @@ const ProductListModal = ({ store, onClose }) => {
           <FilterPanel>
             <FilterSection>
               <FilterTitle>Kategorier</FilterTitle>
-              {getCategories().map((category) => (
+              {categories.map((category) => (
                 <CheckboxLabel key={category}>
                   <input
                     type='checkbox'
@@ -421,10 +419,11 @@ const ProductListModal = ({ store, onClose }) => {
           <ProductsGrid>
             {filteredProducts.map((product) => (
               <ProductCard key={product.ean}>
-                <ProductTitle>{product.productName}</ProductTitle>
                 <CategoriesContainer>
                   {product.categories.map((category) => (
-                    <CategoryTag key={category.nameDa}>
+                    <CategoryTag
+                      key={`${product.ean}-${category.nameDa}-${product.timing.endTime}`}
+                    >
                       {category.nameDa}
                     </CategoryTag>
                   ))}
