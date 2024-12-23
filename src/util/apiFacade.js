@@ -1,14 +1,35 @@
 const URL = "https://discountfinder.api.albertevallentin.dk/api";
 
 function apiFacade() {
-    const processProducts = (data) => {
-        if (data?.products) {
-            data.products = data.products.map(product => ({
-                ...product,
-                productName: product.productName?.replace(/#/g, 'Ø')
-            }));
+    const logResponseDetails = async (res) => {
+        console.group('Response Details');
+        console.log('Status:', res.status);
+        console.log('Status Text:', res.statusText);
+        console.log('Headers:', Object.fromEntries([...res.headers]));
+        console.log('Type:', res.type);
+        try {
+            const clone = res.clone();
+            const text = await clone.text();
+            console.log('Body:', text);
+        } catch (e) {
+            console.log('Could not log body:', e);
         }
-        return data;
+        console.groupEnd();
+    };
+
+    const processProducts = (data) => {
+        try {
+            if (data?.products) {
+                data.products = data.products.map(product => ({
+                    ...product,
+                    productName: product.productName ? product.productName.replace(/#/g, 'Ø') : product.productName
+                }));
+            }
+            return data;
+        } catch (error) {
+            console.error("Error processing products:", error);
+            return data;
+        }
     };
 
     const setToken = (token) => {
@@ -88,7 +109,7 @@ function apiFacade() {
         try {
             const response = await fetch(URL + endpoint, options);
             const data = await handleHttpErrors(response);
-            return processProducts(data);
+            return data ? processProducts(data) : data;
         } catch (error) {
             console.error("Fetch error for endpoint:", endpoint, "Error details:", error);
             throw error;
@@ -96,18 +117,49 @@ function apiFacade() {
     };
 
     async function handleHttpErrors(res) {
-        if (!res.ok) {
-            // Prøv at parse JSON-data fra serverens fejlrespons
-            const errorJson = await res.json().catch(() => ({})); // Tomt objekt som fallback
-            console.error("HTTP error details:", { status: res.status, errorJson });
-            // Kaster et objekt med status og resolved JSON som fullError
-            throw { status: res.status, fullError: errorJson };
-        }
         const contentType = res.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            return res.json();
+
+        try {
+            if (!res.ok) {
+                await logResponseDetails(res);
+                let errorData = {};
+
+                if (contentType?.includes('application/json')) {
+                    try {
+                        errorData = await res.json();
+                    } catch (e) {
+                        errorData = { message: "Could not parse error response" };
+                    }
+                }
+
+                console.error("HTTP error details:", {
+                    status: res.status,
+                    statusText: res.statusText,
+                    errorData
+                });
+
+                throw { status: res.status, fullError: errorData };
+            }
+
+            if (contentType?.includes('application/json')) {
+                return await res.json();
+            }
+
+            console.warn("Response was not JSON, contentType:", contentType);
+            return {};
+
+        } catch (error) {
+            if (error.status) {
+                throw error;
+            }
+            throw {
+                status: 500,
+                fullError: {
+                    message: "Error processing response",
+                    originalError: error.message
+                }
+            };
         }
-        return {};
     }
 
     const addFavorite = async (storeId) => {
@@ -115,13 +167,12 @@ function apiFacade() {
         try {
             const response = await fetch(`${URL}/stores/${storeId}/favorite`, options);
             await handleHttpErrors(response);
-            return true; // Return success boolean instead of trying to parse response
+            return true;
         } catch (error) {
             console.error("Add favorite error:", error);
             throw error;
         }
     };
-
 
     const removeFavorite = async (storeId) => {
         const options = makeOptions("DELETE", true);
@@ -142,7 +193,7 @@ function apiFacade() {
         } catch (error) {
             console.error("Get favorites error:", error);
             if (error.status === 404) {
-                return []; // Return empty array if no favorites found
+                return [];
             }
             throw error;
         }
@@ -181,7 +232,7 @@ function apiFacade() {
         removeFavorite,
         getFavorites,
     };
-};
+}
 
 const facade = apiFacade();
 export default facade;
