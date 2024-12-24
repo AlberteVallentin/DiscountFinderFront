@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { lightTheme, darkTheme } from '../styles/Theme';
-import facade from '../util/apiFacade';
+import facade from '../utils/apiFacade';
 
 export const ThemeContext = createContext();
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import facade from '../../util/apiFacade';
+import facade from '../../utils/apiFacade';
 import Toast from '../Toast';
 
 const FavoriteIcon = styled.button`

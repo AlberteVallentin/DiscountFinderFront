@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
 import LoadingSpinner from '../LoadingSpinner';
-import facade from '../../util/apiFacade';
+import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
 import Toast from '../Toast';
 import { useMemo } from 'react';
