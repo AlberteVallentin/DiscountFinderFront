@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import facade from '../../utils/apiFacade';
 import Toast from '../Toast';
+import { useToast } from '../../hooks/useToast';
 
 const FavoriteIcon = styled.button`
   position: absolute;
@@ -37,82 +38,54 @@ const FavoriteButton = ({
   initialFavorite,
   onLoginRequired,
   onToggle,
+  showToast,
 }) => {
   const { isAuthenticated } = useAuth();
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success',
-  });
-
-  useEffect(() => {
-    if (!isUpdating) {
-      setIsFavorite(initialFavorite);
-    }
-  }, [initialFavorite]);
 
   const handleClick = async (e) => {
     e.stopPropagation();
+    e.preventDefault(); // Tilføj dette for at være sikker
 
     if (!isAuthenticated) {
       onLoginRequired();
       return;
     }
 
+    if (isUpdating) return; // Forhindrer multiple requests
+
     setIsUpdating(true);
     const newState = !isFavorite;
 
     try {
-      const result = newState
-        ? await facade.addFavorite(storeId)
-        : await facade.removeFavorite(storeId);
+      const result = await facade.removeFavorite(storeId);
 
       if (result.success) {
         setIsFavorite(newState);
-        if (onToggle) onToggle(newState);
-        showToast(
-          newState
-            ? 'Butik tilføjet til favoritter'
-            : 'Butik fjernet fra favoritter',
-          'success'
-        );
+        if (onToggle) onToggle(storeId, newState);
+        showToast('Butik fjernet fra favoritter', 'success');
       } else {
+        setIsFavorite(!newState); // Reset state
         showToast(result.error, 'error');
       }
     } catch (error) {
+      setIsFavorite(!newState); // Reset state
       showToast('Der opstod en fejl', 'error');
-      setIsFavorite(!newState);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const showAsFavorite = isFavorite && isAuthenticated;
-
   return (
-    <>
-      <FavoriteIcon
-        onClick={handleClick}
-        $isFavorite={showAsFavorite}
-        aria-label={
-          showAsFavorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'
-        }
-        disabled={isUpdating}
-      >
-        <Heart />
-      </FavoriteIcon>
-      {toast.visible && (
-        <Toast
-          visible={toast.visible}
-          message={toast.message}
-          type={toast.type}
-          duration={5000}
-          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
-        />
-      )}
-    </>
+    <FavoriteIcon
+      onClick={handleClick}
+      $isFavorite={isFavorite}
+      aria-label={isFavorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'}
+      disabled={isUpdating}
+    >
+      <Heart />
+    </FavoriteIcon>
   );
 };
 

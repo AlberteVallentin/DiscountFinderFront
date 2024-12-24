@@ -24,7 +24,13 @@ const StoreAddress = styled.div`
   font-size: var(--fs-n);
 `;
 
-const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
+const StoreCard = ({
+  store,
+  onClick,
+  onFavoriteToggle,
+  onLoginRequired,
+  showToast,
+}) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
@@ -45,6 +51,7 @@ const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
           initialFavorite={store.isFavorite}
           onLoginRequired={handleLoginRequired}
           onToggle={(isFavorite) => onFavoriteToggle?.(store.id, isFavorite)}
+          showToast={showToast}
         />
         <StoreName>{store.name}</StoreName>
         <StoreAddress>

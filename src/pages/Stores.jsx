@@ -302,6 +302,7 @@ function Stores() {
             onClick={() => setSelectedStore(store)}
             onFavoriteToggle={handleFavoriteToggle}
             onLoginRequired={handleLoginRequired}
+            showToast={showToast}
           />
         ))}
       </CardGrid>

@@ -141,12 +141,38 @@ const favoriteAPI = {
     },
 
     removeFavorite: async (storeId) => {
-        const response = await fetch(
-            `${BASE_URL}/stores/${storeId}/favorite`,
-            makeOptions("DELETE", true)
-        );
-        return handleHttpErrors(response);
+        try {
+            const response = await fetch(
+                `${BASE_URL}/stores/${storeId}/favorite`,
+                makeOptions("DELETE", true)
+            );
+
+            // Hvis der er en fejl, prøv at parse error beskeden
+            if (!response.ok) {
+                const errorData = await response.json();
+                // Hvis fejlen indikerer at favoriten allerede er fjernet
+                if (errorData.error && errorData.error.includes('No result found')) {
+                    return {
+                        success: true // Betragt det som en succes hvis den allerede er fjernet
+                    };
+                }
+                return {
+                    success: false,
+                    error: errorData.error || 'Der opstod en fejl ved fjernelse af favorit'
+                };
+            }
+
+            return {
+                success: true
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: 'Der opstod en fejl ved fjernelse af favorit'
+            };
+        }
     },
+
 
     getFavorites: async () => {
         const response = await fetch(

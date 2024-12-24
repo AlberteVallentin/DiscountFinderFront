@@ -11,7 +11,6 @@ import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
 import Toast from '../components/Toast';
 import EmptyState from '../components/EmptyState';
-import { useErrorHandler } from '../utils/errorHandler';
 import { useToast } from '../hooks/useToast';
 
 const Title = styled.h1`
@@ -57,17 +56,30 @@ function Favorites() {
   };
 
   const handleFavoriteToggle = async (storeId) => {
+    // Gem den nuværende state før vi laver ændringer
+    const currentStores = [...favoriteStores];
+    const storeToRemove = currentStores.find((store) => store.id === storeId);
+
+    if (!storeToRemove) return;
+
     try {
+      // Optimistisk UI opdatering - fjern med det samme
+      setFavoriteStores((prevStores) =>
+        prevStores.filter((store) => store.id !== storeId)
+      );
+
       const result = await facade.removeFavorite(storeId);
+
       if (result.success) {
-        setFavoriteStores((prevStores) =>
-          prevStores.filter((store) => store.id !== storeId)
-        );
         showToast('Butik fjernet fra favoritter', 'success');
       } else {
+        // Hvis der er fejl, gendan den tidligere state
+        setFavoriteStores(currentStores);
         showToast(result.error, 'error');
       }
     } catch (error) {
+      // Ved uventet fejl, gendan den tidligere state
+      setFavoriteStores(currentStores);
       showToast('Der opstod en fejl ved fjernelse af favorit', 'error');
     }
   };
@@ -107,6 +119,7 @@ function Favorites() {
               store={store}
               onClick={() => setSelectedStore(store)}
               onFavoriteToggle={handleFavoriteToggle}
+              showToast={showToast}
             />
           ))}
         </CardGrid>
