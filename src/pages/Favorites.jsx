@@ -19,16 +19,13 @@ const Title = styled.h1`
 `;
 
 function Favorites() {
-  // States
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
 
-  // Hooks
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast, showToast, hideToast } = useToast();
-  const handleError = useErrorHandler(showToast);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -41,10 +38,19 @@ function Favorites() {
   const fetchFavoriteStores = async () => {
     try {
       setLoading(true);
-      const favorites = await handleError(facade.getFavorites());
-      setFavoriteStores(
-        favorites.map((store) => ({ ...store, isFavorite: true }))
-      );
+      const result = await facade.getFavorites();
+
+      if (result.success) {
+        const favoriteStores = result.data.map((store) => ({
+          ...store,
+          isFavorite: true,
+        }));
+        setFavoriteStores(favoriteStores);
+      } else {
+        showToast(result.error, 'error');
+      }
+    } catch (error) {
+      showToast(error.message, 'error');
     } finally {
       setLoading(false);
     }
