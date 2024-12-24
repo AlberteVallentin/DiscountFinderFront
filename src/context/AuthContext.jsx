@@ -73,9 +73,9 @@ export const AuthProvider = ({ children }) => {
   const handleRegister = async (name, email, password) => {
     try {
       const response = await facade.register(name, email, password);
-      if (response?.token) {
-        // Tjek at vi faktisk fik en token
-        const decodedToken = facade.decodeToken(response.token);
+      if (response.success) {
+        // Hvis registrering lykkedes
+        const decodedToken = facade.decodeToken(response.data.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,
@@ -84,22 +84,16 @@ export const AuthProvider = ({ children }) => {
         });
         return { success: true };
       } else {
+        // Her sender vi den præcise fejlbesked videre
         return {
           success: false,
-          error: 'Registrering fejlede - prøv igen',
+          error: response.error,
         };
       }
     } catch (error) {
-      // Her håndterer vi specifikt hvis emailen allerede findes
-      if (error.status === 422) {
-        return {
-          success: false,
-          error: 'Email er allerede registreret',
-        };
-      }
       return {
         success: false,
-        error: error.userMessage || 'Registrering fejlede - prøv igen',
+        error: error.message || 'Der skete en fejl ved registrering',
       };
     }
   };

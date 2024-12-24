@@ -1,43 +1,12 @@
-// apiFacade.js
 const BASE_URL = "https://discountfinder.api.albertevallentin.dk/api";
 
-// Hjælpefunktioner
 const handleHttpErrors = async (res) => {
     if (!res.ok) {
         const errorJson = await res.json().catch(() => ({}));
         const error = new Error();
         error.status = res.status;
-        error.fullError = errorJson;
-
-
-        if (res.status === 401 && res.url.includes('/auth/login')) {
-            error.userMessage = "Email eller password er forkert";
-        } else {
-
-            switch (res.status) {
-                case 401:
-                    error.userMessage = errorJson.message || "Du skal være logget ind for at udføre denne handling";
-                    break;
-                case 403:
-                    error.userMessage = errorJson.message || "Du har ikke rettigheder til at udføre denne handling";
-                    break;
-                case 404:
-                    error.userMessage = errorJson.message || "Den ønskede ressource blev ikke fundet";
-                    break;
-                case 422:
-                    error.userMessage = errorJson.message || "Bruger findes allerede";
-                    break;
-                case 400:
-                    error.userMessage = errorJson.message || "Ugyldig anmodning";
-                    break;
-                case 500:
-                    error.userMessage = errorJson.message || "Der opstod en serverfejl - prøv igen senere";
-                    break;
-                default:
-                    error.userMessage = errorJson.message || "Der skete en fejl - prøv igen senere";
-            }
-        }
-
+        // Her sørger vi for at fange både 'msg' og 'message' felter
+        error.userMessage = errorJson.msg || errorJson.message || "Der skete en fejl";
         throw error;
     }
 
@@ -142,20 +111,30 @@ const authAPI = {
         });
         try {
             const response = await fetch(`${BASE_URL}/auth/register`, options);
-            const data = await handleHttpErrors(response);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                // Vi returnerer error objektet med success: false og den præcise fejlbesked
+                return {
+                    success: false,
+                    error: errorData.msg  // Her bruger vi den præcise besked fra API'et
+                };
+            }
+
+            const data = await response.json();
             if (data.token) {
                 tokenMethods.setToken(data.token);
-                return data;
-            } else {
-                throw new Error('Invalid registration response');
+                return { success: true, data };
             }
+            return {
+                success: false,
+                error: 'Ingen token modtaget'
+            };
         } catch (error) {
-            if (error.status === 403) {
-                error.userMessage = "Denne email er allerede registreret";
-            } else {
-                error.userMessage = error.userMessage || "Registrering fejlede - prøv igen";
-            }
-            throw error;
+            return {
+                success: false,
+                error: error.message || 'Der skete en fejl ved registrering'
+            };
         }
     }
 };

@@ -146,9 +146,13 @@ const LoginPage = () => {
     }
 
     try {
-      const result = await handleError(
-        register(formData.name, formData.email, formData.password)
+      const result = await register(
+        formData.name,
+        formData.email,
+        formData.password
       );
+      console.log('Register result:', result); // Debug log
+
       if (result.success) {
         showToast('Registrering gennemført! Logger ind...', 'success');
         const returnPath = location.state?.returnPath || '/stores';
@@ -156,11 +160,12 @@ const LoginPage = () => {
           navigate(returnPath);
         }, 1500);
       } else {
-        // Hvis registrering fejlede, vis fejlbesked
-        showToast(result.error || 'Registrering fejlede - prøv igen', 'error');
+        // Vis den specifikke fejlbesked
+        showToast(result.error, 'error');
       }
     } catch (error) {
-      // Error håndteres automatisk via handleError
+      console.log('Register error:', error); // Debug log
+      showToast(error.message || 'Der skete en fejl ved registrering', 'error');
     }
   };
 
