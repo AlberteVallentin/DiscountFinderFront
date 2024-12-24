@@ -56,12 +56,16 @@ export const AuthProvider = ({ children }) => {
           name: decodedToken.name,
         });
         return { success: true };
+      } else {
+        return {
+          success: false,
+          error: 'Login fejlede - tjek email og password',
+        };
       }
     } catch (error) {
-      console.error('Login failed:', error);
       return {
         success: false,
-        error: error.userMessage || 'Login fejlede. Prøv igen.',
+        error: error.userMessage || 'Login fejlede - tjek email og password',
       };
     }
   };
@@ -69,7 +73,8 @@ export const AuthProvider = ({ children }) => {
   const handleRegister = async (name, email, password) => {
     try {
       const response = await facade.register(name, email, password);
-      if (response.token) {
+      if (response?.token) {
+        // Tjek at vi faktisk fik en token
         const decodedToken = facade.decodeToken(response.token);
         setIsAuthenticated(true);
         setUser({
@@ -78,12 +83,23 @@ export const AuthProvider = ({ children }) => {
           name: decodedToken.name,
         });
         return { success: true };
+      } else {
+        return {
+          success: false,
+          error: 'Registrering fejlede - prøv igen',
+        };
       }
     } catch (error) {
-      console.error('Registration failed:', error);
+      // Her håndterer vi specifikt hvis emailen allerede findes
+      if (error.status === 422) {
+        return {
+          success: false,
+          error: 'Email er allerede registreret',
+        };
+      }
       return {
         success: false,
-        error: error.userMessage || 'Registrering fejlede. Prøv igen.',
+        error: error.userMessage || 'Registrering fejlede - prøv igen',
       };
     }
   };

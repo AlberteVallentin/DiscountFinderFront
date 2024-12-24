@@ -1,4 +1,4 @@
-// Basisopsætning
+// apiFacade.js
 const BASE_URL = "https://discountfinder.api.albertevallentin.dk/api";
 
 // Hjælpefunktioner
@@ -9,25 +9,38 @@ const handleHttpErrors = async (res) => {
         error.status = res.status;
         error.fullError = errorJson;
 
-        // Map HTTP status til brugervenlige beskeder som defineret i API docs
-        switch (res.status) {
-            case 401:
-                error.userMessage = "Du skal være logget ind for at udføre denne handling";
-                break;
-            case 403:
-                error.userMessage = "Du har ikke rettigheder til at udføre denne handling";
-                break;
-            case 404:
-                error.userMessage = "Den ønskede ressource blev ikke fundet";
-                break;
-            default:
-                error.userMessage = "Der skete en fejl - prøv igen senere";
+
+        if (res.status === 401 && res.url.includes('/auth/login')) {
+            error.userMessage = "Email eller password er forkert";
+        } else {
+
+            switch (res.status) {
+                case 401:
+                    error.userMessage = errorJson.message || "Du skal være logget ind for at udføre denne handling";
+                    break;
+                case 403:
+                    error.userMessage = errorJson.message || "Du har ikke rettigheder til at udføre denne handling";
+                    break;
+                case 404:
+                    error.userMessage = errorJson.message || "Den ønskede ressource blev ikke fundet";
+                    break;
+                case 422:
+                    error.userMessage = errorJson.message || "Bruger findes allerede";
+                    break;
+                case 400:
+                    error.userMessage = errorJson.message || "Ugyldig anmodning";
+                    break;
+                case 500:
+                    error.userMessage = errorJson.message || "Der opstod en serverfejl - prøv igen senere";
+                    break;
+                default:
+                    error.userMessage = errorJson.message || "Der skete en fejl - prøv igen senere";
+            }
         }
 
         throw error;
     }
 
-    // Check content type
     const contentType = res.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
         return res.json();
@@ -107,10 +120,15 @@ const authAPI = {
         try {
             const response = await fetch(`${BASE_URL}/auth/login`, options);
             const data = await handleHttpErrors(response);
-            tokenMethods.setToken(data.token);
-            return data;
+            // Kun sæt token hvis vi faktisk fik en token tilbage
+            if (data.token) {
+                tokenMethods.setToken(data.token);
+                return data;
+            } else {
+                throw new Error('Invalid login response');
+            }
         } catch (error) {
-            console.error("Login error:", error);
+            error.userMessage = error.userMessage || "Login fejlede - tjek email og password";
             throw error;
         }
     },
@@ -120,15 +138,23 @@ const authAPI = {
             name,
             email,
             password,
-            roleType: "USER" // Default role ved registrering
+            roleType: "USER"
         });
         try {
             const response = await fetch(`${BASE_URL}/auth/register`, options);
             const data = await handleHttpErrors(response);
-            tokenMethods.setToken(data.token);
-            return data;
+            if (data.token) {
+                tokenMethods.setToken(data.token);
+                return data;
+            } else {
+                throw new Error('Invalid registration response');
+            }
         } catch (error) {
-            console.error("Register error:", error);
+            if (error.status === 403) {
+                error.userMessage = "Denne email er allerede registreret";
+            } else {
+                error.userMessage = error.userMessage || "Registrering fejlede - prøv igen";
+            }
             throw error;
         }
     }
@@ -140,7 +166,7 @@ const storeAPI = {
         try {
             return await fetchData('/stores', false);
         } catch (error) {
-            console.error("Error fetching stores:", error);
+            error.userMessage = error.userMessage || "Kunne ikke hente butikker";
             throw error;
         }
     },
@@ -149,7 +175,7 @@ const storeAPI = {
         try {
             return await fetchData(`/stores/${id}`, false);
         } catch (error) {
-            console.error("Error fetching store:", error);
+            error.userMessage = error.userMessage || "Kunne ikke hente butik";
             throw error;
         }
     },
@@ -158,7 +184,7 @@ const storeAPI = {
         try {
             return await fetchData(`/stores/postal_code/${postalCode}`, false);
         } catch (error) {
-            console.error("Error fetching stores by postal code:", error);
+            error.userMessage = error.userMessage || "Kunne ikke hente butikker for dette postnummer";
             throw error;
         }
     }
@@ -173,7 +199,7 @@ const favoriteAPI = {
             await handleHttpErrors(response);
             return true;
         } catch (error) {
-            console.error("Add favorite error:", error);
+            error.userMessage = error.userMessage || "Kunne ikke tilføje butik til favoritter";
             throw error;
         }
     },
@@ -185,7 +211,7 @@ const favoriteAPI = {
             await handleHttpErrors(response);
             return true;
         } catch (error) {
-            console.error("Remove favorite error:", error);
+            error.userMessage = error.userMessage || "Kunne ikke fjerne butik fra favoritter";
             throw error;
         }
     },
@@ -198,7 +224,7 @@ const favoriteAPI = {
             if (error.status === 404) {
                 return [];
             }
-            console.error("Get favorites error:", error);
+            error.userMessage = error.userMessage || "Kunne ikke hente favoritter";
             throw error;
         }
     }
@@ -212,7 +238,7 @@ const fetchData = async (endpoint, addToken = true) => {
         const data = await handleHttpErrors(response);
         return processProducts(data);
     } catch (error) {
-        console.error("Fetch error:", error);
+        error.userMessage = error.userMessage || "Der opstod en fejl ved hentning af data";
         throw error;
     }
 };

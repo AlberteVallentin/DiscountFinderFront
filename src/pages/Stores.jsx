@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { borderRadius } from '../styles/Theme';
 import Icon from '../components/ui/Icon';
-import facade from '../util/apiFacade';
+import facade from '../utils/apiFacade';
 import styled from 'styled-components';
 import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -15,8 +15,9 @@ import OutletContainer from '../components/layout/OutletContainer';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from '../components/modal/LoginModal';
 import Toast from '../components/Toast';
+import { useErrorHandler } from '../utils/errorHandler';
+import { useToast } from '../hooks/useToast';
 
-// Styled components
 const SearchSection = styled.div`
   display: flex;
   gap: 1rem;
@@ -67,6 +68,8 @@ const BrandSection = styled.div`
 function Stores() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { toast, showToast, hideToast } = useToast();
+  const handleError = useErrorHandler(showToast);
 
   // States
   const [stores, setStores] = useState([]);
@@ -78,11 +81,6 @@ function Stores() {
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [selectedStore, setSelectedStore] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success',
-  });
 
   // Fetch stores
   const fetchStores = async () => {
@@ -91,9 +89,9 @@ function Stores() {
 
       // Hent butikker og favoritter parallelt
       const [storesData, favoritesData] = await Promise.all([
-        facade.fetchData('/stores', false),
+        handleError(facade.fetchData('/stores', false)),
         isAuthenticated
-          ? facade.fetchData('/stores/favorites', true)
+          ? handleError(facade.fetchData('/stores/favorites', true))
           : Promise.resolve([]),
       ]);
 
@@ -117,14 +115,6 @@ function Stores() {
       ].sort();
 
       setPostalCodes(uniquePostalCodes);
-    } catch (err) {
-      console.error('Error fetching stores:', err);
-      setToast({
-        visible: true,
-        message:
-          err.userMessage || 'Der skete en fejl ved hentning af butikker',
-        type: 'error',
-      });
     } finally {
       setLoading(false);
     }
@@ -153,28 +143,13 @@ function Stores() {
 
       // API kald
       if (isFavorite) {
-        await facade.addFavorite(storeId);
-        setToast({
-          visible: true,
-          message: 'Butik tilføjet til favoritter',
-          type: 'success',
-        });
+        await handleError(facade.addFavorite(storeId));
+        showToast('Butik tilføjet til favoritter', 'success');
       } else {
-        await facade.removeFavorite(storeId);
-        setToast({
-          visible: true,
-          message: 'Butik fjernet fra favoritter',
-          type: 'success',
-        });
+        await handleError(facade.removeFavorite(storeId));
+        showToast('Butik fjernet fra favoritter', 'success');
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
-      setToast({
-        visible: true,
-        message: error.userMessage || 'Der skete en fejl. Prøv igen senere.',
-        type: 'error',
-      });
-
       // Rul tilbage ved fejl
       const updateStores = (prevStores) =>
         prevStores.map((store) =>
@@ -199,9 +174,8 @@ function Stores() {
 
     try {
       if (postalCode) {
-        const data = await facade.fetchData(
-          `/stores/postal_code/${postalCode}`,
-          false
+        const data = await handleError(
+          facade.fetchData(`/stores/postal_code/${postalCode}`, false)
         );
         const storesWithFavorites = data.map((newStore) => {
           const existingStore = stores.find(
@@ -223,13 +197,6 @@ function Stores() {
       } else {
         filterStores(searchTerm, '', selectedBrands);
       }
-    } catch (err) {
-      setToast({
-        visible: true,
-        message:
-          err.userMessage || 'Der skete en fejl ved søgning på postnummer',
-        type: 'error',
-      });
     } finally {
       setLoading(false);
     }
@@ -354,7 +321,7 @@ function Stores() {
         visible={toast.visible}
         message={toast.message}
         type={toast.type}
-        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+        onClose={hideToast}
       />
 
       <ScrollToTop />

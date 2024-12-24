@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
+import { useErrorHandler } from '../utils/errorHandler';
+import { useToast } from '../hooks/useToast';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -70,21 +72,6 @@ const Button = styled.button`
   }
 `;
 
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #e11d48;
-  font-size: 0.9rem;
-  padding: 0.75rem;
-  background: #fef2f2;
-  border-radius: 8px;
-  opacity: ${({ $visible }) => ($visible ? '1' : '0')};
-  visibility: ${({ $visible }) => ($visible ? 'visible' : 'hidden')};
-  transition: opacity 0.3s ease;
-  width: 100%;
-`;
-
 const ToggleContainer = styled.div`
   display: flex;
   gap: 1rem;
@@ -114,12 +101,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [error, setError] = useState('');
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success',
-  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -127,23 +108,18 @@ const LoginPage = () => {
     confirmPassword: '',
   });
 
-  const showToast = (message, type = 'success') => {
-    setToast({ visible: true, message, type });
-    setTimeout(() => {
-      setToast((prev) => ({ ...prev, visible: false }));
-    }, 3000);
-  };
+  const { toast, showToast, hideToast } = useToast();
+  const handleError = useErrorHandler(showToast);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await handleError(
+        login(formData.email, formData.password)
+      );
       if (result.success) {
-        setToast({
-          visible: true,
-          message: 'Du er nu logget ind',
-          type: 'success',
-        });
+        // Vi tjekker om login var succesfuld
+        showToast('Du er nu logget ind', 'success');
 
         // Navigate til return path hvis det findes, ellers til stores
         const returnPath = location.state?.returnPath || '/stores';
@@ -151,68 +127,44 @@ const LoginPage = () => {
           navigate(returnPath);
         }, 1500);
       } else {
-        setToast({
-          visible: true,
-          message: result.error,
-          type: 'error',
-        });
+        // Hvis login ikke var succesfuld, vis fejlbesked
+        showToast(
+          result.error || 'Login fejlede - tjek email og password',
+          'error'
+        );
       }
     } catch (error) {
-      setToast({
-        visible: true,
-        message: 'Der skete en fejl under login',
-        type: 'error',
-      });
+      // Error håndteres automatisk via handleError
     }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      setToast({
-        visible: true,
-        message: 'Passwords matcher ikke',
-        type: 'error',
-      });
+      showToast('Passwords matcher ikke', 'error');
       return;
     }
 
     try {
-      const result = await register(
-        formData.name,
-        formData.email,
-        formData.password
+      const result = await handleError(
+        register(formData.name, formData.email, formData.password)
       );
-      if (result?.success) {
-        setToast({
-          visible: true,
-          message: 'Registrering gennemført! Logger ind...',
-          type: 'success',
-        });
-
+      if (result.success) {
+        showToast('Registrering gennemført! Logger ind...', 'success');
         const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
           navigate(returnPath);
         }, 1500);
       } else {
-        setToast({
-          visible: true,
-          message: result.error || 'Registrering fejlede.',
-          type: 'error',
-        });
+        // Hvis registrering fejlede, vis fejlbesked
+        showToast(result.error || 'Registrering fejlede - prøv igen', 'error');
       }
     } catch (error) {
-      console.error('Register error:', error);
-      setToast({
-        visible: true,
-        message: 'Der skete en fejl under registrering',
-        type: 'error',
-      });
+      // Error håndteres automatisk via handleError
     }
   };
 
   const handleChange = (e) => {
-    setError('');
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -221,7 +173,6 @@ const LoginPage = () => {
 
   const toggleMode = (mode) => {
     setIsLoginMode(mode === 'login');
-    setError('');
     setFormData({
       name: '',
       email: '',
@@ -232,13 +183,6 @@ const LoginPage = () => {
 
   return (
     <LoginContainer>
-      <Toast
-        visible={toast.visible}
-        type={toast.type}
-        message={toast.message}
-        onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
-      />
-
       <FormCard>
         <ToggleContainer>
           <ToggleButton
@@ -309,15 +253,15 @@ const LoginPage = () => {
           <Button type='submit'>
             {isLoginMode ? 'Log ind' : 'Opret bruger'}
           </Button>
-
-          {error && (
-            <ErrorMessage $visible={!!error}>
-              <AlertCircle size={16} />
-              {error}
-            </ErrorMessage>
-          )}
         </Form>
       </FormCard>
+
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onClose={hideToast}
+      />
     </LoginContainer>
   );
 };

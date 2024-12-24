@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { SlidersHorizontal, ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
@@ -6,8 +6,9 @@ import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
 import Toast from '../Toast';
-import { useMemo } from 'react';
 import EmptyState from '../EmptyState';
+import { useErrorHandler } from '../../utils/errorHandler';
+import { useToast } from '../../hooks/useToast';
 
 const StoreHeader = styled.div`
   display: flex;
@@ -217,11 +218,9 @@ const ProductListModal = ({ store, onClose }) => {
     priceRange: { min: '', max: '' },
   });
   const [sortOption, setSortOption] = useState('');
-  const [toast, setToast] = useState({
-    visible: false,
-    message: '',
-    type: 'success',
-  });
+
+  const { toast, showToast, hideToast } = useToast();
+  const handleError = useErrorHandler(showToast);
 
   useEffect(() => {
     if (store?.id) {
@@ -232,16 +231,8 @@ const ProductListModal = ({ store, onClose }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const data = await facade.fetchData(`/stores/${store.id}`);
+      const data = await handleError(facade.fetchData(`/stores/${store.id}`));
       setProducts(data.products || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setToast({
-        visible: true,
-        message:
-          error.userMessage || 'Der skete en fejl ved hentning af produkter',
-        type: 'error',
-      });
     } finally {
       setLoading(false);
     }
@@ -328,7 +319,7 @@ const ProductListModal = ({ store, onClose }) => {
             <StoreName>{store.name}</StoreName>
           </StoreHeader>
           <SearchBar
-            placeholder='Søg efter en varer...'
+            placeholder='Søg efter varer...'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -471,7 +462,7 @@ const ProductListModal = ({ store, onClose }) => {
           visible={toast.visible}
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast((prev) => ({ ...prev, visible: false }))}
+          onClose={hideToast}
         />
       </Content>
     </Modal>
