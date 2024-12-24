@@ -46,9 +46,9 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await facade.login(email, password);
-      if (response.token) {
-        const decodedToken = facade.decodeToken(response.token);
+      const result = await facade.login(email, password);
+      if (result.success) {
+        const decodedToken = facade.decodeToken(result.data.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,
@@ -56,26 +56,18 @@ export const AuthProvider = ({ children }) => {
           name: decodedToken.name,
         });
         return { success: true };
-      } else {
-        return {
-          success: false,
-          error: 'Login fejlede - tjek email og password',
-        };
       }
+      return { success: false, error: result.error };
     } catch (error) {
-      return {
-        success: false,
-        error: error.userMessage || 'Login fejlede - tjek email og password',
-      };
+      return { success: false, error: error.message };
     }
   };
 
   const handleRegister = async (name, email, password) => {
     try {
-      const response = await facade.register(name, email, password);
-      if (response.success) {
-        // Hvis registrering lykkedes
-        const decodedToken = facade.decodeToken(response.data.token);
+      const result = await facade.register(name, email, password);
+      if (result.success) {
+        const decodedToken = facade.decodeToken(result.data.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,
@@ -83,18 +75,10 @@ export const AuthProvider = ({ children }) => {
           name: decodedToken.name,
         });
         return { success: true };
-      } else {
-        // Her sender vi den præcise fejlbesked videre
-        return {
-          success: false,
-          error: response.error,
-        };
       }
+      return { success: false, error: result.error };
     } catch (error) {
-      return {
-        success: false,
-        error: error.message || 'Der skete en fejl ved registrering',
-      };
+      return { success: false, error: error.message };
     }
   };
 

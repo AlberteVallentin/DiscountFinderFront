@@ -52,17 +52,17 @@ function Favorites() {
 
   const handleFavoriteToggle = async (storeId) => {
     try {
-      await handleError(facade.removeFavorite(storeId));
-
-      // Update UI optimistically
-      setFavoriteStores((prevStores) =>
-        prevStores.filter((store) => store.id !== storeId)
-      );
-
-      showToast('Butik fjernet fra favoritter', 'success');
+      const result = await facade.removeFavorite(storeId);
+      if (result.success) {
+        setFavoriteStores((prevStores) =>
+          prevStores.filter((store) => store.id !== storeId)
+        );
+        showToast('Butik fjernet fra favoritter', 'success');
+      } else {
+        showToast(result.error, 'error');
+      }
     } catch (error) {
-      // Reload favorites to ensure correct state
-      await fetchFavoriteStores();
+      showToast('Der opstod en fejl ved fjernelse af favorit', 'error');
     }
   };
 

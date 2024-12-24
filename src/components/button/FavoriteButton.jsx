@@ -65,32 +65,24 @@ const FavoriteButton = ({
     const newState = !isFavorite;
 
     try {
-      if (newState) {
-        // Change from facade.favoriteAPI.addFavorite to facade.addFavorite
-        await facade.addFavorite(storeId);
-        setToast({
-          visible: true,
-          message: 'Butik tilføjet til favoritter',
-          type: 'success',
-        });
-      } else {
-        await facade.removeFavorite(storeId);
-        setToast({
-          visible: true,
-          message: 'Butik fjernet fra favoritter',
-          type: 'success',
-        });
-      }
+      const result = newState
+        ? await facade.addFavorite(storeId)
+        : await facade.removeFavorite(storeId);
 
-      setIsFavorite(newState);
-      if (onToggle) onToggle(newState);
+      if (result.success) {
+        setIsFavorite(newState);
+        if (onToggle) onToggle(newState);
+        showToast(
+          newState
+            ? 'Butik tilføjet til favoritter'
+            : 'Butik fjernet fra favoritter',
+          'success'
+        );
+      } else {
+        showToast(result.error, 'error');
+      }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
-      setToast({
-        visible: true,
-        message: 'Der skete en fejl. Prøv igen senere.',
-        type: 'error',
-      });
+      showToast('Der opstod en fejl', 'error');
       setIsFavorite(!newState);
     } finally {
       setIsUpdating(false);

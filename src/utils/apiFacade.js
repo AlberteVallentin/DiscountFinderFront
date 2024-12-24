@@ -2,19 +2,25 @@ const BASE_URL = "https://discountfinder.api.albertevallentin.dk/api";
 
 const handleHttpErrors = async (res) => {
     if (!res.ok) {
-        const errorJson = await res.json().catch(() => ({}));
-        const error = new Error();
-        error.status = res.status;
-        // Her sørger vi for at fange både 'msg' og 'message' felter
-        error.userMessage = errorJson.msg || errorJson.message || "Der skete en fejl";
-        throw error;
+        const errorData = await res.json();
+        return {
+            success: false,
+            error: errorData.msg || errorData.message
+        };
     }
 
     const contentType = res.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
-        return res.json();
+        const data = await res.json();
+        return {
+            success: true,
+            data
+        };
     }
-    return {};
+    return {
+        success: true,
+        data: {}
+    };
 };
 
 const makeOptions = (method, addToken, body) => {
@@ -37,7 +43,6 @@ const makeOptions = (method, addToken, body) => {
     return opts;
 };
 
-// Token håndtering
 const tokenMethods = {
     setToken: (token) => localStorage.setItem('jwtToken', token),
     getToken: () => localStorage.getItem('jwtToken'),
@@ -53,7 +58,6 @@ const tokenMethods = {
             );
             return JSON.parse(jsonPayload);
         } catch (error) {
-            console.error('Token decode error:', error);
             return null;
         }
     },
@@ -66,40 +70,19 @@ const tokenMethods = {
         }
         return false;
     },
-    logout: () => localStorage.removeItem("jwtToken"),
-    getUserRoles: () => {
-        const token = tokenMethods.getToken();
-        if (token) {
-            try {
-                const decodedToken = tokenMethods.decodeToken(token);
-                return decodedToken.role;
-            } catch (error) {
-                console.error("Error getting user roles:", error);
-                return "";
-            }
-        }
-        return "";
-    },
+    logout: () => localStorage.removeItem("jwtToken")
 };
 
-// Auth relaterede endpoints
 const authAPI = {
     login: async (email, password) => {
         const options = makeOptions("POST", false, { email, password });
-        try {
-            const response = await fetch(`${BASE_URL}/auth/login`, options);
-            const data = await handleHttpErrors(response);
-            // Kun sæt token hvis vi faktisk fik en token tilbage
-            if (data.token) {
-                tokenMethods.setToken(data.token);
-                return data;
-            } else {
-                throw new Error('Invalid login response');
-            }
-        } catch (error) {
-            error.userMessage = error.userMessage || "Login fejlede - tjek email og password";
-            throw error;
+        const response = await fetch(`${BASE_URL}/auth/login`, options);
+        const result = await handleHttpErrors(response);
+
+        if (result.success && result.data.token) {
+            tokenMethods.setToken(result.data.token);
         }
+        return result;
     },
 
     register: async (name, email, password) => {
@@ -109,120 +92,87 @@ const authAPI = {
             password,
             roleType: "USER"
         });
-        try {
-            const response = await fetch(`${BASE_URL}/auth/register`, options);
+        const response = await fetch(`${BASE_URL}/auth/register`, options);
+        const result = await handleHttpErrors(response);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                // Vi returnerer error objektet med success: false og den præcise fejlbesked
-                return {
-                    success: false,
-                    error: errorData.msg  // Her bruger vi den præcise besked fra API'et
-                };
-            }
-
-            const data = await response.json();
-            if (data.token) {
-                tokenMethods.setToken(data.token);
-                return { success: true, data };
-            }
-            return {
-                success: false,
-                error: 'Ingen token modtaget'
-            };
-        } catch (error) {
-            return {
-                success: false,
-                error: error.message || 'Der skete en fejl ved registrering'
-            };
+        if (result.success && result.data.token) {
+            tokenMethods.setToken(result.data.token);
         }
+        return result;
     }
 };
 
-// Store relaterede endpoints
 const storeAPI = {
     getAllStores: async () => {
-        try {
-            return await fetchData('/stores', false);
-        } catch (error) {
-            error.userMessage = error.userMessage || "Kunne ikke hente butikker";
-            throw error;
+        const response = await fetch(`${BASE_URL}/stores`, makeOptions("GET", false));
+        const result = await handleHttpErrors(response);
+        if (result.success) {
+            result.data = processProducts(result.data);
         }
+        return result;
     },
 
     getStoreById: async (id) => {
-        try {
-            return await fetchData(`/stores/${id}`, false);
-        } catch (error) {
-            error.userMessage = error.userMessage || "Kunne ikke hente butik";
-            throw error;
+        const response = await fetch(`${BASE_URL}/stores/${id}`, makeOptions("GET", false));
+        const result = await handleHttpErrors(response);
+        if (result.success) {
+            result.data = processProducts(result.data);
         }
+        return result;
     },
 
     getStoresByPostalCode: async (postalCode) => {
-        try {
-            return await fetchData(`/stores/postal_code/${postalCode}`, false);
-        } catch (error) {
-            error.userMessage = error.userMessage || "Kunne ikke hente butikker for dette postnummer";
-            throw error;
+        const response = await fetch(`${BASE_URL}/stores/postal_code/${postalCode}`, makeOptions("GET", false));
+        const result = await handleHttpErrors(response);
+        if (result.success) {
+            result.data = processProducts(result.data);
         }
+        return result;
     }
 };
 
-// Favorit relaterede endpoints
 const favoriteAPI = {
     addFavorite: async (storeId) => {
-        const options = makeOptions("POST", true);
-        try {
-            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
-            await handleHttpErrors(response);
-            return true;
-        } catch (error) {
-            error.userMessage = error.userMessage || "Kunne ikke tilføje butik til favoritter";
-            throw error;
-        }
+        const response = await fetch(
+            `${BASE_URL}/stores/${storeId}/favorite`,
+            makeOptions("POST", true)
+        );
+        return handleHttpErrors(response);
     },
 
     removeFavorite: async (storeId) => {
-        const options = makeOptions("DELETE", true);
-        try {
-            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
-            await handleHttpErrors(response);
-            return true;
-        } catch (error) {
-            error.userMessage = error.userMessage || "Kunne ikke fjerne butik fra favoritter";
-            throw error;
-        }
+        const response = await fetch(
+            `${BASE_URL}/stores/${storeId}/favorite`,
+            makeOptions("DELETE", true)
+        );
+        return handleHttpErrors(response);
     },
 
     getFavorites: async () => {
-        try {
-            const data = await fetchData('/stores/favorites', true);
-            return Array.isArray(data) ? data : [];
-        } catch (error) {
-            if (error.status === 404) {
-                return [];
-            }
-            error.userMessage = error.userMessage || "Kunne ikke hente favoritter";
-            throw error;
+        const response = await fetch(
+            `${BASE_URL}/stores/favorites`,
+            makeOptions("GET", true)
+        );
+        const result = await handleHttpErrors(response);
+        if (result.success) {
+            result.data = processProducts(result.data);
         }
+        return result;
     }
 };
 
-// Generel fetch metode
 const fetchData = async (endpoint, addToken = true) => {
-    const options = makeOptions("GET", addToken);
-    try {
-        const response = await fetch(`${BASE_URL}${endpoint}`, options);
-        const data = await handleHttpErrors(response);
-        return processProducts(data);
-    } catch (error) {
-        error.userMessage = error.userMessage || "Der opstod en fejl ved hentning af data";
-        throw error;
+    const response = await fetch(
+        `${BASE_URL}${endpoint}`,
+        makeOptions("GET", addToken)
+    );
+    const result = await handleHttpErrors(response);
+    if (result.success) {
+        result.data = processProducts(result.data);
     }
+    return result;
 };
 
-// Produkt processering
 const processProducts = (data) => {
     if (data?.products) {
         data.products = data.products.map(product => ({
@@ -233,7 +183,6 @@ const processProducts = (data) => {
     return data;
 };
 
-// Eksporter facade med alle metoder
 const facade = {
     ...tokenMethods,
     ...authAPI,

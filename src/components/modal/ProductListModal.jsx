@@ -231,8 +231,15 @@ const ProductListModal = ({ store, onClose }) => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const data = await handleError(facade.fetchData(`/stores/${store.id}`));
-      setProducts(data.products || []);
+      const result = await facade.getStoreById(store.id);
+
+      if (result.success) {
+        setProducts(result.data.products || []);
+      } else {
+        showToast(result.error, 'error');
+      }
+    } catch (error) {
+      showToast(error.message, 'error');
     } finally {
       setLoading(false);
     }
