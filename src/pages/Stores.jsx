@@ -133,25 +133,25 @@ function Stores() {
   const handleFavoriteToggle = async (storeId, isFavorite) => {
     try {
       const result = isFavorite
-        ? await facade.addFavorite(storeId)
-        : await facade.removeFavorite(storeId);
+        ? await facade.removeFavorite(storeId)
+        : await facade.addFavorite(storeId);
 
       if (result.success) {
         showToast(
           isFavorite
-            ? 'Butik tilføjet til favoritter'
-            : 'Butik fjernet fra favoritter',
+            ? 'Butik fjernet fra favoritter'
+            : 'Butik tilføjet til favoritter',
           'success'
         );
 
         setStores((prev) =>
           prev.map((store) =>
-            store.id === storeId ? { ...store, isFavorite } : store
+            store.id === storeId ? { ...store, isFavorite: !isFavorite } : store
           )
         );
         setFilteredStores((prev) =>
           prev.map((store) =>
-            store.id === storeId ? { ...store, isFavorite } : store
+            store.id === storeId ? { ...store, isFavorite: !isFavorite } : store
           )
         );
       } else {

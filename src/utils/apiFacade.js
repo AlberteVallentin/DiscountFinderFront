@@ -133,57 +133,40 @@ const storeAPI = {
 
 const favoriteAPI = {
     addFavorite: async (storeId) => {
-        const response = await fetch(
-            `${BASE_URL}/stores/${storeId}/favorite`,
-            makeOptions("POST", true)
-        );
-        return handleHttpErrors(response);
+        const options = makeOptions("POST", true);
+        try {
+            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
+            await handleHttpErrors(response);
+            return true;
+        } catch (error) {
+            console.error("Add favorite error:", error);
+            throw error;
+        }
     },
 
     removeFavorite: async (storeId) => {
+        const options = makeOptions("DELETE", true);
         try {
-            const response = await fetch(
-                `${BASE_URL}/stores/${storeId}/favorite`,
-                makeOptions("DELETE", true)
-            );
-
-            // Hvis der er en fejl, prøv at parse error beskeden
-            if (!response.ok) {
-                const errorData = await response.json();
-                // Hvis fejlen indikerer at favoriten allerede er fjernet
-                if (errorData.error && errorData.error.includes('No result found')) {
-                    return {
-                        success: true // Betragt det som en succes hvis den allerede er fjernet
-                    };
-                }
-                return {
-                    success: false,
-                    error: errorData.error || 'Der opstod en fejl ved fjernelse af favorit'
-                };
-            }
-
-            return {
-                success: true
-            };
+            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
+            await handleHttpErrors(response);
+            return true;
         } catch (error) {
-            return {
-                success: false,
-                error: 'Der opstod en fejl ved fjernelse af favorit'
-            };
+            console.error("Remove favorite error:", error);
+            throw error;
         }
     },
 
-
     getFavorites: async () => {
-        const response = await fetch(
-            `${BASE_URL}/stores/favorites`,
-            makeOptions("GET", true)
-        );
-        const result = await handleHttpErrors(response);
-        if (result.success) {
-            result.data = processProducts(result.data);
+        try {
+            const data = await fetchData('/stores/favorites', true);
+            return Array.isArray(data) ? data : [];
+        } catch (error) {
+            if (error.status === 404) {
+                return [];
+            }
+            console.error("Get favorites error:", error);
+            throw error;
         }
-        return result;
     }
 };
 
