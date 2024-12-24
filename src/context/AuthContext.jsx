@@ -6,17 +6,23 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    setIsAuthenticated(false);
+    setUser(null);
+  };
 
   useEffect(() => {
-    // Check token on mount and validate it
     const initializeAuth = () => {
-      const token = facade.getToken();
-      if (token) {
-        try {
+      try {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
           const decodedToken = facade.decodeToken(token);
           const currentTime = Date.now() / 1000;
 
-          if (decodedToken.exp > currentTime) {
+          if (decodedToken && decodedToken.exp > currentTime) {
             setIsAuthenticated(true);
             setUser({
               role: decodedToken.role,
@@ -24,40 +30,78 @@ export const AuthProvider = ({ children }) => {
               name: decodedToken.name,
             });
           } else {
-            // Token er udløbet
-            facade.logout();
-            setIsAuthenticated(false);
-            setUser(null);
+            handleLogout();
           }
-        } catch (error) {
-          console.error('Token validation failed:', error);
-          facade.logout();
-          setIsAuthenticated(false);
-          setUser(null);
         }
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        handleLogout();
+      } finally {
+        setLoading(false); // Opdater loading status
       }
     };
 
     initializeAuth();
   }, []);
 
-  const login = (token, userData) => {
-    facade.setToken(token);
-    setIsAuthenticated(true);
-    setUser(userData);
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await facade.login(email, password);
+      if (response.token) {
+        const decodedToken = facade.decodeToken(response.token);
+        setIsAuthenticated(true);
+        setUser({
+          role: decodedToken.role,
+          email: decodedToken.email,
+          name: decodedToken.name,
+        });
+        return { success: true };
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      return {
+        success: false,
+        error: error.userMessage || 'Login fejlede. Prøv igen.',
+      };
+    }
   };
 
-  const logout = () => {
-    facade.logout();
-    setIsAuthenticated(false);
-    setUser(null);
+  const handleRegister = async (name, email, password) => {
+    try {
+      const response = await facade.register(name, email, password);
+      if (response.token) {
+        const decodedToken = facade.decodeToken(response.token);
+        setIsAuthenticated(true);
+        setUser({
+          role: decodedToken.role,
+          email: decodedToken.email,
+          name: decodedToken.name,
+        });
+        return { success: true };
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
+      return {
+        success: false,
+        error: error.userMessage || 'Registrering fejlede. Prøv igen.',
+      };
+    }
   };
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  // If we're still loading initial auth state, show nothing
+  if (loading) {
+    return null;
+  }
+
+  const value = {
+    isAuthenticated,
+    user,
+    login: handleLogin,
+    logout: handleLogout,
+    register: handleRegister,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

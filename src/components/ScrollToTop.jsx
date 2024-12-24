@@ -15,8 +15,8 @@ const ScrollButton = styled.button`
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   cursor: pointer;
   transition: all 0.3s ease;
-  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
-  pointer-events: ${({ isVisible }) => (isVisible ? 'all' : 'none')};
+  visibility: ${({ $visible }) => ($visible ? 'visible' : 'hidden')};
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
   z-index: 10;
 
   &:hover {
@@ -26,13 +26,13 @@ const ScrollButton = styled.button`
 `;
 
 const ScrollToTop = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
-      setIsVisible(true);
+      setVisible(true);
     } else {
-      setIsVisible(false);
+      setVisible(false);
     }
   };
 
@@ -51,8 +51,9 @@ const ScrollToTop = () => {
   return (
     <ScrollButton
       onClick={scrollToTop}
-      isVisible={isVisible}
+      $visible={visible}
       aria-label='Scroll to top'
+      aria-hidden={!visible}
     >
       <Icon name='ChevronUp' size='m' />
     </ScrollButton>
