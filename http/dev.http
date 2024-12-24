@@ -30,7 +30,7 @@ Accept: application/json
 Authorization: Bearer {{jwt_token}}
 
 ###
-GET {{url}}/stores/19
+GET {{url}}/stores/59
 Accept: application/json
 Authorization: Bearer {{jwt_token}}
 
