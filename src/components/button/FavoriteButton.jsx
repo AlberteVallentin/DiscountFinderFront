@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import facade from '../../utils/apiFacade';
-import Toast from '../Toast';
-import { useToast } from '../../hooks/useToast';
 
 const FavoriteIcon = styled.button`
   position: absolute;
@@ -46,31 +44,33 @@ const FavoriteButton = ({
 
   const handleClick = async (e) => {
     e.stopPropagation();
-    e.preventDefault(); // Tilføj dette for at være sikker
+    e.preventDefault();
 
     if (!isAuthenticated) {
       onLoginRequired();
       return;
     }
 
-    if (isUpdating) return; // Forhindrer multiple requests
+    if (isUpdating) return;
 
     setIsUpdating(true);
     const newState = !isFavorite;
 
     try {
-      const result = await facade.removeFavorite(storeId);
-
-      if (result.success) {
-        setIsFavorite(newState);
-        if (onToggle) onToggle(storeId, newState);
-        showToast('Butik fjernet fra favoritter', 'success');
+      if (newState) {
+        // Tilføj til favoritter
+        await facade.addFavorite(storeId);
+        showToast('Butik tilføjet til favoritter', 'success');
       } else {
-        setIsFavorite(!newState); // Reset state
-        showToast(result.error, 'error');
+        // Fjern fra favoritter
+        await facade.removeFavorite(storeId);
+        showToast('Butik fjernet fra favoritter', 'success');
       }
+
+      setIsFavorite(newState);
+      if (onToggle) onToggle(storeId, newState);
     } catch (error) {
-      setIsFavorite(!newState); // Reset state
+      setIsFavorite(!newState); // Reset state ved fejl
       showToast('Der opstod en fejl', 'error');
     } finally {
       setIsUpdating(false);

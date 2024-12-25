@@ -134,39 +134,26 @@ const storeAPI = {
 const favoriteAPI = {
     addFavorite: async (storeId) => {
         const options = makeOptions("POST", true);
-        try {
-            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
-            await handleHttpErrors(response);
-            return true;
-        } catch (error) {
-            console.error("Add favorite error:", error);
-            throw error;
-        }
+        const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
+        return handleHttpErrors(response);
     },
 
     removeFavorite: async (storeId) => {
         const options = makeOptions("DELETE", true);
-        try {
-            const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
-            await handleHttpErrors(response);
-            return true;
-        } catch (error) {
-            console.error("Remove favorite error:", error);
-            throw error;
-        }
+        const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
+        return handleHttpErrors(response);
     },
 
     getFavorites: async () => {
-        try {
-            const data = await fetchData('/stores/favorites', true);
-            return Array.isArray(data) ? data : [];
-        } catch (error) {
-            if (error.status === 404) {
-                return [];
-            }
-            console.error("Get favorites error:", error);
-            throw error;
+        const response = await fetch(
+            `${BASE_URL}/stores/favorites`,
+            makeOptions("GET", true)
+        );
+        const result = await handleHttpErrors(response);
+        if (result.success) {
+            result.data = Array.isArray(result.data) ? result.data : [];
         }
+        return result;
     }
 };
 

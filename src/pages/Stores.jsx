@@ -130,33 +130,31 @@ function Stores() {
     setShowLoginModal(true);
   };
 
-  const handleFavoriteToggle = async (storeId, isFavorite) => {
+  const handleFavoriteToggle = async (storeId, newFavoriteState) => {
     try {
-      const result = isFavorite
-        ? await facade.removeFavorite(storeId)
-        : await facade.addFavorite(storeId);
+      // newFavoriteState er den NYE tilstand vi ønsker
+      const apiCall = newFavoriteState
+        ? facade.addFavorite
+        : facade.removeFavorite;
+      await apiCall(storeId);
 
-      if (result.success) {
-        showToast(
-          isFavorite
-            ? 'Butik fjernet fra favoritter'
-            : 'Butik tilføjet til favoritter',
-          'success'
+      // Opdater stores og filteredStores med den nye tilstand
+      const updateStores = (prev) =>
+        prev.map((store) =>
+          store.id === storeId
+            ? { ...store, isFavorite: newFavoriteState }
+            : store
         );
 
-        setStores((prev) =>
-          prev.map((store) =>
-            store.id === storeId ? { ...store, isFavorite: !isFavorite } : store
-          )
-        );
-        setFilteredStores((prev) =>
-          prev.map((store) =>
-            store.id === storeId ? { ...store, isFavorite: !isFavorite } : store
-          )
-        );
-      } else {
-        showToast(result.error, 'error');
-      }
+      setStores(updateStores);
+      setFilteredStores(updateStores);
+
+      showToast(
+        newFavoriteState
+          ? 'Butik tilføjet til favoritter'
+          : 'Butik fjernet fra favoritter',
+        'success'
+      );
     } catch (error) {
       showToast('Der opstod en fejl', 'error');
     }

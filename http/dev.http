@@ -1,5 +1,5 @@
 @url = https://discountfinder.api.albertevallentin.dk/api
-@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGJlcnRlIFZhbGxlbnRpbiIsInN1YiI6InRlc3RAYWRtaW4uZGsiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTczMzk1MDE5OSwiZW1haWwiOiJ0ZXN0QGFkbWluLmRrIn0.1kOJ3FkM8P4_6-8BWyeyiv2hp9VoQQXYd4SHJGwyUTI
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGJlcnRlIFZhbGxlbnRpbiIsInN1YiI6InRlc3RAYWRtaW4uZGsiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTczNTA4NzE4OSwiZW1haWwiOiJ0ZXN0QGFkbWluLmRrIn0.R140IgIknhDAzHefvYEVQTvPH_O5o224mGW0t-EK8zQ
 
 ### 
 POST {{url}}/auth/register/
@@ -40,3 +40,26 @@ Accept: application/json
 Authorization: Bearer {{jwt_token}}
 
 
+### Get all stores
+GET {{url}}/stores
+Authorization: Bearer {{jwt_token}}
+
+### Get specific store (id: 59)
+GET {{url}}/stores/59
+Authorization: Bearer {{jwt_token}}
+
+### Get stores by postal code
+GET {{url}}/stores/postal_code/2800
+Authorization: Bearer {{jwt_token}}
+
+### Add store to favorites
+POST {{url}}/stores/16/favorite
+Authorization: Bearer {{jwt_token}}
+
+### Remove store from favorites
+DELETE {{url}}/stores/16/favorite
+Authorization: Bearer {{jwt_token}}
+
+### Get all favorites
+GET {{url}}/stores/favorites
+Authorization: Bearer {{jwt_token}}
