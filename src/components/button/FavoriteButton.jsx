@@ -21,6 +21,12 @@ const FavoriteIcon = styled.button`
     transform: scale(1.1);
   }
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: none;
+  }
+
   svg {
     fill: ${({ $isFavorite }) => ($isFavorite ? '#dc2626' : 'none')};
     stroke: ${({ $isFavorite }) => ($isFavorite ? '#dc2626' : 'currentColor')};
@@ -49,12 +55,12 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
     setIsUpdating(true);
     try {
       const result = await toggleFavorite(storeId);
-      if (result.success) {
-        showToast(result.message, 'success');
-        if (onToggle) {
-          onToggle(storeId); // Kalder parent komponentens onToggle for at opdatere UI
-        }
+      showToast(result.message, result.success ? 'success' : 'error');
+      if (result.success && onToggle) {
+        onToggle(storeId);
       }
+    } catch (error) {
+      showToast(error.message, 'error');
     } finally {
       setIsUpdating(false);
     }
@@ -66,6 +72,7 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
       $isFavorite={favorite}
       aria-label={favorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'}
       disabled={isUpdating}
+      type='button'
     >
       <Heart />
     </FavoriteIcon>

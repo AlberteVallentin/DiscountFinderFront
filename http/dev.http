@@ -1,5 +1,5 @@
 @url = https://discountfinder.api.albertevallentin.dk/api
-@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGJlcnRlIFZhbGxlbnRpbiIsInN1YiI6ImFAYS5kayIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzM1MTIzMTA0LCJlbWFpbCI6ImFAYS5kayJ9.KREKniknVdvjHaa6DXHZpvIYza4-gc09E_dptr6aiSk
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGJlcnRlIFZhbGxlbnRpbiIsInN1YiI6ImFAYS5kayIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzM1MTQ5NTM1LCJlbWFpbCI6ImFAYS5kayJ9.T51ilElI_WNmByBqhLiTeooxxNjoPD7D25w1taEwaIo
 
 ### 
 POST {{url}}/auth/register/

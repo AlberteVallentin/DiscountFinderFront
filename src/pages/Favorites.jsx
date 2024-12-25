@@ -9,16 +9,27 @@ import { useAuth } from '../context/AuthContext';
 import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
 import EmptyState from '../components/EmptyState';
+import { useErrorHandler } from '../utils/errorHandler';
 import { useOutletContext } from 'react-router';
 
 function Favorites() {
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
-  const { isAuthenticated, favorites, toggleFavorite } = useAuth();
+  const { isAuthenticated, toggleFavorite } = useAuth();
+  const handleError = useErrorHandler(showToast);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
+
+  const fetchFavoriteStores = async () => {
+    const result = await handleError(facade.getFavorites());
+    if (result.success) {
+      setFavoriteStores(result.data);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -28,33 +39,18 @@ function Favorites() {
     }
   }, [isAuthenticated]);
 
-  const fetchFavoriteStores = async () => {
-    try {
-      setLoading(true);
-      const result = await facade.getFavorites();
-      if (result.success) {
-        setFavoriteStores(result.data);
-      } else {
-        showToast('Der opstod en fejl ved hentning af favoritter', 'error');
-      }
-    } catch (error) {
-      showToast('Der opstod en fejl ved hentning af favoritter', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleFavoriteToggle = async (storeId) => {
+    console.log('Handle favorite toggle called with storeId:', storeId);
+    if (!storeId) {
+      console.error('Store ID is missing or undefined');
+      return;
+    }
+
     try {
-      const result = await toggleFavorite(storeId);
-      if (result.success) {
-        setFavoriteStores((prevStores) =>
-          prevStores.filter((store) => store.id !== storeId)
-        );
-        showToast(result.message, 'success');
-      }
+      const result = await handleError(toggleFavorite(storeId));
+      console.log('Toggle favorite result:', result);
     } catch (error) {
-      showToast('Der opstod en fejl ved opdatering', 'error');
+      console.error('Error in handleFavoriteToggle:', error);
     }
   };
 
@@ -80,7 +76,6 @@ function Favorites() {
   return (
     <OutletContainer>
       <h1>Mine favoritbutikker</h1>
-
       {favoriteStores.length === 0 ? (
         <EmptyState type='NO_FAVORITES' />
       ) : (
@@ -93,11 +88,11 @@ function Favorites() {
               onLoginRequired={() => {}}
               showToast={showToast}
               onFavoriteToggle={handleFavoriteToggle}
+              disabled={isUpdating}
             />
           ))}
         </CardGrid>
       )}
-
       {selectedStore && (
         <ProductListModal
           store={selectedStore}

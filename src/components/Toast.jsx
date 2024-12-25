@@ -5,8 +5,9 @@ import { createPortal } from 'react-dom';
 
 const ToastContainer = styled.div`
   position: fixed;
-  top: ${({ $visible }) => ($visible ? '20px' : '-100px')};
   right: 20px;
+  transform: translateX(${({ $visible }) => ($visible ? '0' : '120%')});
+  top: 20px;
   background: ${({ $type }) => ($type === 'success' ? '#10B981' : '#EF4444')};
   color: white;
   padding: 1rem 1.5rem;
@@ -15,7 +16,7 @@ const ToastContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: top 0.3s ease;
+  transition: transform 1s ease-in-out;
   z-index: 9999;
 
   svg {
@@ -26,13 +27,8 @@ const ToastContainer = styled.div`
 
 const Toast = ({ visible, message, type = 'success', onClose }) => {
   useEffect(() => {
-    console.log('Toast mounted, visible:', visible); // Debugging
     if (visible) {
-      const timer = setTimeout(() => {
-        console.log('Toast auto-closing');
-        if (onClose) onClose();
-      }, 3000);
-
+      const timer = setTimeout(onClose, 3000);
       return () => clearTimeout(timer);
     }
   }, [visible, onClose]);

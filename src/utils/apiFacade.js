@@ -141,8 +141,11 @@ const favoriteAPI = {
     removeFavorite: async (storeId) => {
         const options = makeOptions("DELETE", true);
         const response = await fetch(`${BASE_URL}/stores/${storeId}/favorite`, options);
-        return handleHttpErrors(response);
+        const result = await handleHttpErrors(response);
+        console.log('Remove favorite response:', result); // Debug
+        return result;
     },
+
 
     getFavorites: async () => {
         const response = await fetch(
