@@ -8,23 +8,19 @@ import OutletContainer from '../components/layout/OutletContainer';
 import { useAuth } from '../context/AuthContext';
 import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
-import Toast from '../components/Toast';
 import EmptyState from '../components/EmptyState';
-import { useToast } from '../hooks/useToast';
 import { useOutletContext } from 'react-router';
 
 function Favorites() {
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const { isAuthenticated, favorites, toggleFavorite } = useAuth();
-  //const { toast, showToast, hideToast } = useToast();
 
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
 
   useEffect(() => {
-    console.log('useEffect running - isAuthenticated:', isAuthenticated);
     if (isAuthenticated) {
       fetchFavoriteStores();
     } else {
@@ -39,7 +35,7 @@ function Favorites() {
       if (result.success) {
         setFavoriteStores(result.data);
       } else {
-        showToast(result.error, 'error');
+        showToast('Der opstod en fejl ved hentning af favoritter', 'error');
       }
     } catch (error) {
       showToast('Der opstod en fejl ved hentning af favoritter', 'error');
@@ -52,13 +48,10 @@ function Favorites() {
     try {
       const result = await toggleFavorite(storeId);
       if (result.success) {
-        // Fjern butikken fra favoriteStores
         setFavoriteStores((prevStores) =>
           prevStores.filter((store) => store.id !== storeId)
         );
         showToast(result.message, 'success');
-      } else {
-        showToast('Der opstod en fejl', 'error');
       }
     } catch (error) {
       showToast('Der opstod en fejl ved opdatering', 'error');

@@ -129,10 +129,42 @@ function Stores() {
 
         setPostalCodes(uniquePostalCodes);
       } else {
-        showToast(result.error, 'error');
+        showToast('Der opstod en fejl ved hentning af butikker', 'error');
       }
     } catch (error) {
       showToast('Der opstod en fejl ved hentning af butikker', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePostalCodeChange = async (event) => {
+    const postalCode = event.target.value;
+    setSelectedPostalCode(postalCode);
+    setLoading(true);
+
+    try {
+      if (postalCode) {
+        const result = await facade.getStoresByPostalCode(postalCode);
+        if (result.success) {
+          const storesWithFavorites = result.data.map((store) => ({
+            ...store,
+            isFavorite: isFavorite(store.id),
+          }));
+
+          setFilteredStores(
+            selectedBrands.size > 0
+              ? storesWithFavorites.filter((store) =>
+                  selectedBrands.has(store.brand.displayName)
+                )
+              : storesWithFavorites
+          );
+        }
+      } else {
+        filterStores(searchTerm, '', selectedBrands);
+      }
+    } catch (error) {
+      showToast(error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -169,41 +201,6 @@ function Stores() {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
     filterStores(term, selectedPostalCode, selectedBrands);
-  };
-
-  const handlePostalCodeChange = async (event) => {
-    const postalCode = event.target.value;
-    setSelectedPostalCode(postalCode);
-    setLoading(true);
-
-    try {
-      if (postalCode) {
-        const result = await facade.getStoresByPostalCode(postalCode);
-        if (!result.success) {
-          showToast(result.error, 'error');
-          return;
-        }
-
-        const storesWithFavorites = result.data.map((store) => ({
-          ...store,
-          isFavorite: isFavorite(store.id),
-        }));
-
-        setFilteredStores(
-          selectedBrands.size > 0
-            ? storesWithFavorites.filter((store) =>
-                selectedBrands.has(store.brand.displayName)
-              )
-            : storesWithFavorites
-        );
-      } else {
-        filterStores(searchTerm, '', selectedBrands);
-      }
-    } catch (error) {
-      showToast(error.message, 'error');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleBrandClick = (brand) => {
