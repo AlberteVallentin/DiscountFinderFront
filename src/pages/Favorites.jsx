@@ -15,7 +15,7 @@ import { useOutletContext } from 'react-router';
 function Favorites() {
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
-  const { isAuthenticated, toggleFavorite } = useAuth();
+  const { isAuthenticated, isFavorite, loadFavorites } = useAuth();
   const handleError = useErrorHandler(showToast);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -37,7 +37,7 @@ function Favorites() {
     } else {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loadFavorites, handleError, showToast]);
 
   const handleFavoriteToggle = async (storeId) => {
     console.log('Handle favorite toggle called with storeId:', storeId);
