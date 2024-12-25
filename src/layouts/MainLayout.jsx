@@ -3,9 +3,8 @@ import GlobalStyle from '../styles/GlobalStyle';
 import styled, { ThemeProvider } from 'styled-components';
 import TopMenu from '../components/layout/menu/TopMenu';
 import { useTheme } from '../context/ThemeContext';
-import Toast from '../components/Toast'; // Tilføj denne import
-import { useToast } from '../hooks/useToast'; // Tilføj denne import
-import { useEffect } from 'react';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 const Container = styled.div`
   display: flex;
@@ -16,15 +15,7 @@ const Container = styled.div`
 
 function MainLayout() {
   const { theme } = useTheme();
-  const { toast, showToast, hideToast } = useToast();
-
-  // Sikrer at kun én toast vises ad gangen
-  useEffect(() => {
-    if (toast.visible) {
-      const timer = setTimeout(hideToast, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast.visible, hideToast]);
+  const { toast, showToast } = useToast();
 
   return (
     <ThemeProvider theme={theme}>
@@ -37,12 +28,12 @@ function MainLayout() {
           <Outlet context={{ showToast }} />
         </main>
         <footer></footer>
-        {toast.visible && (
+        {(toast.visible || toast.message) && (
           <Toast
             visible={toast.visible}
             message={toast.message}
             type={toast.type}
-            onClose={hideToast}
+            onClose={() => {}}
           />
         )}
       </Container>

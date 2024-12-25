@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
@@ -38,9 +38,9 @@ const ToastContainer = styled.div`
   align-items: center;
   gap: 0.5rem;
   z-index: 9999;
-  animation: ${({ $visible }) => ($visible ? slideInDown : slideOutUp)}
-    ${({ $visible }) => ($visible ? '0.3s' : '0.5s')} ease-in-out forwards;
-  visibility: ${({ $visible }) => ($visible ? 'visible' : 'hidden')};
+  animation: ${({ $visible }) => ($visible ? slideInDown : slideOutUp)} 0.5s
+    ease-in-out forwards;
+  pointer-events: none;
 
   svg {
     width: 20px;
@@ -49,12 +49,18 @@ const ToastContainer = styled.div`
 `;
 
 const Toast = ({ visible, message, type = 'success', onClose }) => {
+  const [isVisible, setIsVisible] = useState(visible);
+
   useEffect(() => {
     if (visible) {
-      const timer = setTimeout(onClose, 3000);
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => setIsVisible(false), 500);
       return () => clearTimeout(timer);
     }
-  }, [visible, onClose]);
+  }, [visible]);
+
+  if (!isVisible && !visible) return null;
 
   return createPortal(
     <ToastContainer $visible={visible} $type={type}>
