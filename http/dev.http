@@ -45,7 +45,7 @@ GET {{url}}/stores
 Authorization: Bearer {{jwt_token}}
 
 ### Get specific store (id: 59)
-GET {{url}}/stores/59
+GET {{url}}/stores/10
 Authorization: Bearer {{jwt_token}}
 
 ### Get stores by postal code
