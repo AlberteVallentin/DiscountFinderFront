@@ -15,7 +15,7 @@ import { useOutletContext } from 'react-router';
 function Favorites() {
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
-  const { isAuthenticated, isFavorite, loadFavorites } = useAuth();
+  const { isAuthenticated, isFavorite, favorites } = useAuth();
   const handleError = useErrorHandler(showToast);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -23,35 +23,18 @@ function Favorites() {
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchFavoriteStores();
+    }
+  }, [isAuthenticated, favorites]);
+
   const fetchFavoriteStores = async () => {
     const result = await handleError(facade.getFavorites());
     if (result.success) {
       setFavoriteStores(result.data);
     }
     setLoading(false);
-  };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchFavoriteStores();
-    } else {
-      setLoading(false);
-    }
-  }, [isAuthenticated, loadFavorites, handleError, showToast]);
-
-  const handleFavoriteToggle = async (storeId) => {
-    console.log('Handle favorite toggle called with storeId:', storeId);
-    if (!storeId) {
-      console.error('Store ID is missing or undefined');
-      return;
-    }
-
-    try {
-      const result = await handleError(toggleFavorite(storeId));
-      console.log('Toggle favorite result:', result);
-    } catch (error) {
-      console.error('Error in handleFavoriteToggle:', error);
-    }
   };
 
   if (loading) {
@@ -85,10 +68,8 @@ function Favorites() {
               key={store.id}
               store={store}
               onClick={() => setSelectedStore(store)}
-              onLoginRequired={() => {}}
+              onLoginRequired={() => navigate('/login')}
               showToast={showToast}
-              onFavoriteToggle={handleFavoriteToggle}
-              disabled={isUpdating}
             />
           ))}
         </CardGrid>
