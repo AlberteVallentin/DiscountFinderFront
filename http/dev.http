@@ -1,5 +1,5 @@
 @url = https://discountfinder.api.albertevallentin.dk/api
-@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGJlcnRlIFZhbGxlbnRpbiIsInN1YiI6InRlc3RAYWRtaW4uZGsiLCJyb2xlIjoiVVNFUiIsImV4cCI6MTczNTA4NzE4OSwiZW1haWwiOiJ0ZXN0QGFkbWluLmRrIn0.R140IgIknhDAzHefvYEVQTvPH_O5o224mGW0t-EK8zQ
+@jwt_token = eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBbGJlcnRlIFZhbGxlbnRpbiIsInN1YiI6ImFAYS5kayIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzM1MTIzMTA0LCJlbWFpbCI6ImFAYS5kayJ9.KREKniknVdvjHaa6DXHZpvIYza4-gc09E_dptr6aiSk
 
 ### 
 POST {{url}}/auth/register/
@@ -7,8 +7,8 @@ Accept: application/json
 Content-Type: application/json
 
 {
-    "email": "test@admin.dk",
-    "password": "test123"
+    "email": "a@a.dk",
+    "password": "a"
 }
 
 
@@ -19,8 +19,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "email": "test@admin.dk",
-  "password": "test123"
+  "email": "a@a.dk",
+  "password": "a"
 }
 
 
