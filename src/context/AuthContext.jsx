@@ -1,21 +1,24 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import facade from '../util/apiFacade';
+import facade from '../utils/apiFacade';
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [favorites, setFavorites] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
     setIsAuthenticated(false);
     setUser(null);
+    setFavorites(new Set()); // Clear favorites on logout
   };
 
+  // Initialize auth state when app starts
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
         const token = localStorage.getItem('jwtToken');
         if (token) {
@@ -29,6 +32,7 @@ export const AuthProvider = ({ children }) => {
               email: decodedToken.email,
               name: decodedToken.name,
             });
+            await loadFavorites(); // Load favorites if user is authenticated
           } else {
             handleLogout();
           }
@@ -37,58 +41,99 @@ export const AuthProvider = ({ children }) => {
         console.error('Token validation failed:', error);
         handleLogout();
       } finally {
-        setLoading(false); // Opdater loading status
+        setLoading(false);
       }
     };
 
     initializeAuth();
   }, []);
 
+  const loadFavorites = async () => {
+    try {
+      const result = await facade.getFavorites();
+      if (result.success) {
+        const favoriteIds = new Set(result.data.map((store) => store.id));
+        setFavorites(favoriteIds);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+      return false;
+    }
+  };
+
   const handleLogin = async (email, password) => {
     try {
-      const response = await facade.login(email, password);
-      if (response.token) {
-        const decodedToken = facade.decodeToken(response.token);
+      const result = await facade.login(email, password);
+      if (result.success) {
+        const decodedToken = facade.decodeToken(result.data.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,
           email: decodedToken.email,
           name: decodedToken.name,
         });
+        await loadFavorites();
         return { success: true };
       }
+      return { success: false, error: result.error };
     } catch (error) {
-      console.error('Login failed:', error);
-      return {
-        success: false,
-        error: error.userMessage || 'Login fejlede. Prøv igen.',
-      };
+      return { success: false, error: error.message };
     }
   };
 
   const handleRegister = async (name, email, password) => {
     try {
-      const response = await facade.register(name, email, password);
-      if (response.token) {
-        const decodedToken = facade.decodeToken(response.token);
+      const result = await facade.register(name, email, password);
+      if (result.success) {
+        const decodedToken = facade.decodeToken(result.data.token);
         setIsAuthenticated(true);
         setUser({
           role: decodedToken.role,
           email: decodedToken.email,
           name: decodedToken.name,
         });
+        await loadFavorites();
         return { success: true };
       }
+      return { success: false, error: result.error };
     } catch (error) {
-      console.error('Registration failed:', error);
-      return {
-        success: false,
-        error: error.userMessage || 'Registrering fejlede. Prøv igen.',
-      };
+      return { success: false, error: error.message };
     }
   };
 
-  // If we're still loading initial auth state, show nothing
+  const toggleFavorite = async (storeId) => {
+    if (!isAuthenticated) return { success: false, error: 'Not authenticated' };
+
+    try {
+      const isFavorite = favorites.has(storeId);
+      const newFavorites = new Set(favorites);
+
+      if (isFavorite) {
+        await facade.removeFavorite(storeId);
+        newFavorites.delete(storeId);
+      } else {
+        await facade.addFavorite(storeId);
+        newFavorites.add(storeId);
+      }
+
+      setFavorites(newFavorites);
+      return {
+        success: true,
+        isFavorite: !isFavorite,
+        message: !isFavorite
+          ? 'Butik tilføjet til favoritter'
+          : 'Butik fjernet fra favoritter',
+      };
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const isFavorite = (storeId) => favorites.has(storeId);
+
   if (loading) {
     return null;
   }
@@ -96,14 +141,20 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isAuthenticated,
     user,
+    loading,
     login: handleLogin,
     logout: handleLogout,
     register: handleRegister,
+    toggleFavorite,
+    isFavorite,
+    favorites,
+    loadFavorites, // Expose this in case we need to reload favorites
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// Custom hook for using AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

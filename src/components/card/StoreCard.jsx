@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import BaseCard from './BaseCard';
-import { borders } from '../../styles/Theme';
 import FavoriteButton from '../button/FavoriteButton';
 import LoginModal from '../modal/LoginModal';
 import { useNavigate } from 'react-router';
+import { borders } from '../../styles/Theme'; // Tilføjet denne import
 
 const StoreCardWrapper = styled.div`
   position: relative;
@@ -24,7 +24,13 @@ const StoreAddress = styled.div`
   font-size: var(--fs-n);
 `;
 
-const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
+const StoreCard = ({
+  store,
+  onClick,
+  onFavoriteToggle,
+  onLoginRequired,
+  showToast,
+}) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
@@ -37,14 +43,20 @@ const StoreCard = ({ store, onClick, onFavoriteToggle }) => {
     navigate('/login');
   };
 
+  const handleFavoriteToggle = async (storeId, newFavoriteState) => {
+    if (onFavoriteToggle) {
+      onFavoriteToggle(storeId, newFavoriteState);
+    }
+  };
+
   return (
     <StoreCardWrapper>
       <BaseCard onClick={onClick} $clickable={!!onClick}>
         <FavoriteButton
           storeId={store.id}
-          initialFavorite={store.isFavorite}
           onLoginRequired={handleLoginRequired}
-          onToggle={(isFavorite) => onFavoriteToggle?.(store.id, isFavorite)}
+          onToggle={handleFavoriteToggle}
+          showToast={showToast}
         />
         <StoreName>{store.name}</StoreName>
         <StoreAddress>
