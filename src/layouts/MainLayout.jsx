@@ -5,6 +5,7 @@ import TopMenu from '../components/layout/menu/TopMenu';
 import { useTheme } from '../context/ThemeContext';
 import Toast from '../components/Toast'; // Tilføj denne import
 import { useToast } from '../hooks/useToast'; // Tilføj denne import
+import { useEffect } from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -15,7 +16,15 @@ const Container = styled.div`
 
 function MainLayout() {
   const { theme } = useTheme();
-  const { toast, showToast, hideToast } = useToast(); // Tilføj dette
+  const { toast, showToast, hideToast } = useToast();
+
+  // Sikrer at kun én toast vises ad gangen
+  useEffect(() => {
+    if (toast.visible) {
+      const timer = setTimeout(hideToast, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.visible, hideToast]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -28,12 +37,14 @@ function MainLayout() {
           <Outlet context={{ showToast }} />
         </main>
         <footer></footer>
-        <Toast
-          visible={toast.visible}
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
+        {toast.visible && (
+          <Toast
+            visible={toast.visible}
+            message={toast.message}
+            type={toast.type}
+            onClose={hideToast}
+          />
+        )}
       </Container>
     </ThemeProvider>
   );
