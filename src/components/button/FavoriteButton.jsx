@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -21,12 +21,6 @@ const FavoriteIcon = styled.button`
     transform: scale(1.1);
   }
 
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    transform: none;
-  }
-
   svg {
     fill: ${({ $isFavorite }) => ($isFavorite ? '#dc2626' : 'none')};
     stroke: ${({ $isFavorite }) => ($isFavorite ? '#dc2626' : 'currentColor')};
@@ -38,7 +32,6 @@ const FavoriteIcon = styled.button`
 
 const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
   const { isAuthenticated, isFavorite, toggleFavorite } = useAuth();
-  const [isUpdating, setIsUpdating] = useState(false);
   const favorite = isFavorite(storeId);
 
   const handleClick = async (e) => {
@@ -50,9 +43,6 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
       return;
     }
 
-    if (isUpdating) return;
-
-    setIsUpdating(true);
     try {
       const result = await toggleFavorite(storeId);
       showToast(result.message, result.success ? 'success' : 'error');
@@ -61,8 +51,6 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
       }
     } catch (error) {
       showToast(error.message, 'error');
-    } finally {
-      setIsUpdating(false);
     }
   };
 
@@ -71,7 +59,6 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
       onClick={handleClick}
       $isFavorite={favorite}
       aria-label={favorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'}
-      disabled={isUpdating}
       type='button'
     >
       <Heart />
