@@ -15,7 +15,7 @@ import { useToast } from '../hooks/useToast';
 
 function Favorites() {
   const navigate = useNavigate();
-  const { isAuthenticated, favorites } = useAuth();
+  const { isAuthenticated, favorites, toggleFavorite } = useAuth();
   const { toast, showToast, hideToast } = useToast();
 
   const [favoriteStores, setFavoriteStores] = useState([]);
@@ -28,13 +28,12 @@ function Favorites() {
     } else {
       setLoading(false);
     }
-  }, [isAuthenticated, favorites]); // Bemærk: Vi lytter nu på favorites fra AuthContext
+  }, [isAuthenticated, favorites]);
 
   const fetchFavoriteStores = async () => {
     try {
       setLoading(true);
       const result = await facade.getFavorites();
-
       if (result.success) {
         setFavoriteStores(result.data);
       } else {
@@ -44,6 +43,19 @@ function Favorites() {
       showToast('Der opstod en fejl ved hentning af favoritter', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFavoriteToggle = async (storeId) => {
+    try {
+      const result = await toggleFavorite(storeId);
+      if (result.success) {
+        showToast(result.message, 'success');
+      } else {
+        showToast('Der opstod en fejl', 'error');
+      }
+    } catch (error) {
+      showToast('Der opstod en fejl ved opdatering', 'error');
     }
   };
 
@@ -77,9 +89,11 @@ function Favorites() {
           {favoriteStores.map((store) => (
             <StoreCard
               key={store.id}
-              store={{ ...store, isFavorite: true }}
+              store={store}
               onClick={() => setSelectedStore(store)}
+              onLoginRequired={() => {}}
               showToast={showToast}
+              onFavoriteToggle={handleFavoriteToggle}
             />
           ))}
         </CardGrid>

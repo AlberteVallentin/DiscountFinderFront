@@ -119,6 +119,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       setFavorites(newFavorites);
+
       return {
         success: true,
         isFavorite: !isFavorite,
