@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import facade from '../../utils/apiFacade';
 
 const FavoriteIcon = styled.button`
   position: absolute;
@@ -31,7 +30,7 @@ const FavoriteIcon = styled.button`
   }
 `;
 
-const FavoriteButton = ({ storeId, onLoginRequired, showToast }) => {
+const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
   const { isAuthenticated, isFavorite, toggleFavorite } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   const favorite = isFavorite(storeId);
@@ -50,10 +49,12 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast }) => {
     setIsUpdating(true);
     try {
       const result = await toggleFavorite(storeId);
-      if (!result.success) {
-        showToast('Der opstod en fejl', 'error');
+      if (result.success) {
+        showToast(result.message, 'success');
+        if (onToggle) {
+          onToggle(storeId); // Kalder parent komponentens onToggle for at opdatere UI
+        }
       }
-      // Fjerner success toast her da det allerede håndteres i toggleFavorite
     } finally {
       setIsUpdating(false);
     }

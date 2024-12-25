@@ -11,12 +11,13 @@ import ProductListModal from '../components/modal/ProductListModal';
 import Toast from '../components/Toast';
 import EmptyState from '../components/EmptyState';
 import { useToast } from '../hooks/useToast';
+import { useOutletContext } from 'react-router';
 
 function Favorites() {
-  console.log('Favorites component rendering'); // Debugging
+  const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const { isAuthenticated, favorites, toggleFavorite } = useAuth();
-  const { toast, showToast, hideToast } = useToast();
+  //const { toast, showToast, hideToast } = useToast();
 
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,17 +111,6 @@ function Favorites() {
           onClose={() => setSelectedStore(null)}
         />
       )}
-
-      {/* Toast med korrekt "visible"-logik */}
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => {
-          console.log('Toast lukket');
-          hideToast();
-        }}
-      />
     </OutletContainer>
   );
 }

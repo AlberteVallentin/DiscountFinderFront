@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 import { useErrorHandler } from '../utils/errorHandler';
 import { useToast } from '../hooks/useToast';
+import { useOutletContext } from 'react-router';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -108,7 +109,8 @@ const LoginPage = () => {
     confirmPassword: '',
   });
 
-  const { toast, showToast, hideToast } = useToast();
+  //const { toast, showToast, hideToast } = useToast();
+  const { showToast } = useOutletContext();
   const handleError = useErrorHandler(showToast);
 
   const handleLogin = async (e) => {
@@ -256,13 +258,6 @@ const LoginPage = () => {
           </Button>
         </Form>
       </FormCard>
-
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onClose={hideToast}
-      />
     </LoginContainer>
   );
 };
