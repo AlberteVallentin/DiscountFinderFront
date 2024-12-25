@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import styled from 'styled-components';
 import CardGrid from '../components/card/CardGrid';
 import StoreCard from '../components/card/StoreCard';
 import LoginModal from '../components/modal/LoginModal';
