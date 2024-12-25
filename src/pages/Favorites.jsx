@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import styled from 'styled-components';
 import CardGrid from '../components/card/CardGrid';
 import StoreCard from '../components/card/StoreCard';
 import LoginModal from '../components/modal/LoginModal';
@@ -9,14 +8,16 @@ import OutletContainer from '../components/layout/OutletContainer';
 import { useAuth } from '../context/AuthContext';
 import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
-import Toast from '../components/Toast';
 import EmptyState from '../components/EmptyState';
-import { useToast } from '../hooks/useToast';
+import { useErrorHandler } from '../utils/errorHandler';
+import { useOutletContext } from 'react-router';
 
 function Favorites() {
+  const { showToast } = useOutletContext();
   const navigate = useNavigate();
-  const { isAuthenticated, favorites } = useAuth();
-  const { toast, showToast, hideToast } = useToast();
+  const { isAuthenticated, isFavorite, favorites } = useAuth();
+  const handleError = useErrorHandler(showToast);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,26 +26,15 @@ function Favorites() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchFavoriteStores();
-    } else {
-      setLoading(false);
     }
-  }, [isAuthenticated, favorites]); // Bemærk: Vi lytter nu på favorites fra AuthContext
+  }, [isAuthenticated, favorites]);
 
   const fetchFavoriteStores = async () => {
-    try {
-      setLoading(true);
-      const result = await facade.getFavorites();
-
-      if (result.success) {
-        setFavoriteStores(result.data);
-      } else {
-        showToast(result.error, 'error');
-      }
-    } catch (error) {
-      showToast('Der opstod en fejl ved hentning af favoritter', 'error');
-    } finally {
-      setLoading(false);
+    const result = await handleError(facade.getFavorites());
+    if (result.success) {
+      setFavoriteStores(result.data);
     }
+    setLoading(false);
   };
 
   if (loading) {
@@ -69,7 +59,6 @@ function Favorites() {
   return (
     <OutletContainer>
       <h1>Mine favoritbutikker</h1>
-
       {favoriteStores.length === 0 ? (
         <EmptyState type='NO_FAVORITES' />
       ) : (
@@ -77,27 +66,20 @@ function Favorites() {
           {favoriteStores.map((store) => (
             <StoreCard
               key={store.id}
-              store={{ ...store, isFavorite: true }}
+              store={store}
               onClick={() => setSelectedStore(store)}
+              onLoginRequired={() => navigate('/login')}
               showToast={showToast}
             />
           ))}
         </CardGrid>
       )}
-
       {selectedStore && (
         <ProductListModal
           store={selectedStore}
           onClose={() => setSelectedStore(null)}
         />
       )}
-
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onClose={hideToast}
-      />
     </OutletContainer>
   );
 }

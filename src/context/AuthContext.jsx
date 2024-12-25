@@ -111,14 +111,23 @@ export const AuthProvider = ({ children }) => {
       const newFavorites = new Set(favorites);
 
       if (isFavorite) {
-        await facade.removeFavorite(storeId);
-        newFavorites.delete(storeId);
+        const result = await facade.removeFavorite(storeId);
+        if (result.success) {
+          newFavorites.delete(storeId);
+        } else {
+          throw new Error(result.error);
+        }
       } else {
-        await facade.addFavorite(storeId);
-        newFavorites.add(storeId);
+        const result = await facade.addFavorite(storeId);
+        if (result.success) {
+          newFavorites.add(storeId);
+        } else {
+          throw new Error(result.error);
+        }
       }
 
       setFavorites(newFavorites);
+
       return {
         success: true,
         isFavorite: !isFavorite,
@@ -127,8 +136,7 @@ export const AuthProvider = ({ children }) => {
           : 'Butik fjernet fra favoritter',
       };
     } catch (error) {
-      console.error('Error toggling favorite:', error);
-      return { success: false, error: error.message };
+      throw error; // Lad error handling ske i komponenten i stedet
     }
   };
 

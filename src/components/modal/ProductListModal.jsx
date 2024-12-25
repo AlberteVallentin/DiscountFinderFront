@@ -9,6 +9,7 @@ import Toast from '../Toast';
 import EmptyState from '../EmptyState';
 import { useErrorHandler } from '../../utils/errorHandler';
 import { useToast } from '../../hooks/useToast';
+import { useOutletContext } from 'react-router';
 
 const StoreHeader = styled.div`
   display: flex;
@@ -208,6 +209,7 @@ const Content = styled.div`
 `;
 
 const ProductListModal = ({ store, onClose }) => {
+  const { showToast } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -219,7 +221,7 @@ const ProductListModal = ({ store, onClose }) => {
   });
   const [sortOption, setSortOption] = useState('');
 
-  const { toast, showToast, hideToast } = useToast();
+  //const { toast, showToast, hideToast } = useToast();
   const handleError = useErrorHandler(showToast);
 
   useEffect(() => {
@@ -464,13 +466,6 @@ const ProductListModal = ({ store, onClose }) => {
             ))}
           </ProductsGrid>
         )}
-
-        <Toast
-          visible={toast.visible}
-          message={toast.message}
-          type={toast.type}
-          onClose={hideToast}
-        />
       </Content>
     </Modal>
   );
