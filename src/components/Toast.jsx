@@ -16,7 +16,7 @@ const ToastContainer = styled.div`
   align-items: center;
   gap: 0.5rem;
   transition: top 0.3s ease;
-  z-index: 9999; // Øger z-index for at sikre den er øverst
+  z-index: 9999;
 
   svg {
     width: 20px;
@@ -26,10 +26,12 @@ const ToastContainer = styled.div`
 
 const Toast = ({ visible, message, type = 'success', onClose }) => {
   useEffect(() => {
+    console.log('Toast mounted, visible:', visible); // Debugging
     if (visible) {
       const timer = setTimeout(() => {
+        console.log('Toast auto-closing');
         if (onClose) onClose();
-      }, 3000); // Fast 5 sekunders duration
+      }, 3000);
 
       return () => clearTimeout(timer);
     }

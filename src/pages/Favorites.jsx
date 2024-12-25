@@ -13,6 +13,7 @@ import EmptyState from '../components/EmptyState';
 import { useToast } from '../hooks/useToast';
 
 function Favorites() {
+  console.log('Favorites component rendering'); // Debugging
   const navigate = useNavigate();
   const { isAuthenticated, favorites, toggleFavorite } = useAuth();
   const { toast, showToast, hideToast } = useToast();
@@ -22,12 +23,13 @@ function Favorites() {
   const [selectedStore, setSelectedStore] = useState(null);
 
   useEffect(() => {
+    console.log('useEffect running - isAuthenticated:', isAuthenticated);
     if (isAuthenticated) {
       fetchFavoriteStores();
     } else {
       setLoading(false);
     }
-  }, [isAuthenticated, favorites]);
+  }, [isAuthenticated]);
 
   const fetchFavoriteStores = async () => {
     try {
@@ -49,6 +51,10 @@ function Favorites() {
     try {
       const result = await toggleFavorite(storeId);
       if (result.success) {
+        // Fjern butikken fra favoriteStores
+        setFavoriteStores((prevStores) =>
+          prevStores.filter((store) => store.id !== storeId)
+        );
         showToast(result.message, 'success');
       } else {
         showToast('Der opstod en fejl', 'error');
@@ -105,11 +111,15 @@ function Favorites() {
         />
       )}
 
+      {/* Toast med korrekt "visible"-logik */}
       <Toast
         visible={toast.visible}
         message={toast.message}
         type={toast.type}
-        onClose={hideToast}
+        onClose={() => {
+          console.log('Toast lukket');
+          hideToast();
+        }}
       />
     </OutletContainer>
   );

@@ -111,14 +111,14 @@ export const AuthProvider = ({ children }) => {
       const newFavorites = new Set(favorites);
 
       if (isFavorite) {
-        await facade.removeFavorite(storeId);
-        newFavorites.delete(storeId);
+        await facade.removeFavorite(storeId); // Opdater server
+        newFavorites.delete(storeId); // Opdater global tilstand
       } else {
         await facade.addFavorite(storeId);
         newFavorites.add(storeId);
       }
 
-      setFavorites(newFavorites);
+      setFavorites(newFavorites); // Sæt global tilstand
 
       return {
         success: true,

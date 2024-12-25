@@ -50,11 +50,10 @@ const FavoriteButton = ({ storeId, onLoginRequired, showToast }) => {
     setIsUpdating(true);
     try {
       const result = await toggleFavorite(storeId);
-      if (result.success) {
-        showToast(result.message, 'success');
-      } else {
+      if (!result.success) {
         showToast('Der opstod en fejl', 'error');
       }
+      // Fjerner success toast her da det allerede håndteres i toggleFavorite
     } finally {
       setIsUpdating(false);
     }
