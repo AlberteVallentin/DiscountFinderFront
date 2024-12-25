@@ -382,7 +382,6 @@ const ProductListModal = ({ store, onClose }) => {
             )}
           </div>
         </Controls>
-
         {isFilterOpen && (
           <FilterPanel>
             <FilterSection>
@@ -429,10 +428,13 @@ const ProductListModal = ({ store, onClose }) => {
             </FilterSection>
           </FilterPanel>
         )}
-
         {loading ? (
           <LoadingSpinner text='Henter tilbud...' />
+        ) : products.length === 0 ? (
+          // Hvis der ikke er varer i butikken
+          <EmptyState type='NO_PRODUCTS' />
         ) : filteredProducts.length === 0 ? (
+          // Hvis der er varer, men alle er filtreret fra
           <EmptyState type='NO_SEARCH_RESULTS' />
         ) : (
           <ProductsGrid>
