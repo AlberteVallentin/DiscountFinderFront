@@ -13,18 +13,14 @@ import Toast from '../components/Toast';
 import EmptyState from '../components/EmptyState';
 import { useToast } from '../hooks/useToast';
 
-const Title = styled.h1`
-  margin-bottom: 2rem;
-`;
-
 function Favorites() {
+  const navigate = useNavigate();
+  const { isAuthenticated, favorites } = useAuth();
+  const { toast, showToast, hideToast } = useToast();
+
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
-
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,7 +28,7 @@ function Favorites() {
     } else {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, favorites]); // Bemærk: Vi lytter nu på favorites fra AuthContext
 
   const fetchFavoriteStores = async () => {
     try {
@@ -40,47 +36,14 @@ function Favorites() {
       const result = await facade.getFavorites();
 
       if (result.success) {
-        const favoriteStores = result.data.map((store) => ({
-          ...store,
-          isFavorite: true,
-        }));
-        setFavoriteStores(favoriteStores);
+        setFavoriteStores(result.data);
       } else {
         showToast(result.error, 'error');
       }
     } catch (error) {
-      showToast(error.message, 'error');
+      showToast('Der opstod en fejl ved hentning af favoritter', 'error');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleFavoriteToggle = async (storeId) => {
-    // Gem den nuværende state før vi laver ændringer
-    const currentStores = [...favoriteStores];
-    const storeToRemove = currentStores.find((store) => store.id === storeId);
-
-    if (!storeToRemove) return;
-
-    try {
-      // Optimistisk UI opdatering - fjern med det samme
-      setFavoriteStores((prevStores) =>
-        prevStores.filter((store) => store.id !== storeId)
-      );
-
-      const result = await facade.removeFavorite(storeId);
-
-      if (result.success) {
-        showToast('Butik fjernet fra favoritter', 'success');
-      } else {
-        // Hvis der er fejl, gendan den tidligere state
-        setFavoriteStores(currentStores);
-        showToast(result.error, 'error');
-      }
-    } catch (error) {
-      // Ved uventet fejl, gendan den tidligere state
-      setFavoriteStores(currentStores);
-      showToast('Der opstod en fejl ved fjernelse af favorit', 'error');
     }
   };
 
@@ -96,9 +59,7 @@ function Favorites() {
         isOpen={true}
         onClose={() => navigate('/stores')}
         onLogin={() =>
-          navigate('/login', {
-            state: { returnPath: '/favorites' },
-          })
+          navigate('/login', { state: { returnPath: '/favorites' } })
         }
         message='Du skal være logget ind for at se dine favoritbutikker.'
       />
@@ -107,7 +68,7 @@ function Favorites() {
 
   return (
     <OutletContainer>
-      <Title>Mine favoritbutikker</Title>
+      <h1>Mine favoritbutikker</h1>
 
       {favoriteStores.length === 0 ? (
         <EmptyState type='NO_FAVORITES' />
@@ -116,9 +77,8 @@ function Favorites() {
           {favoriteStores.map((store) => (
             <StoreCard
               key={store.id}
-              store={store}
+              store={{ ...store, isFavorite: true }}
               onClick={() => setSelectedStore(store)}
-              onFavoriteToggle={handleFavoriteToggle}
               showToast={showToast}
             />
           ))}

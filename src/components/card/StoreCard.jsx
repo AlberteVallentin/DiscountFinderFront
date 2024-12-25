@@ -54,7 +54,6 @@ const StoreCard = ({
       <BaseCard onClick={onClick} $clickable={!!onClick}>
         <FavoriteButton
           storeId={store.id}
-          initialFavorite={store.isFavorite}
           onLoginRequired={handleLoginRequired}
           onToggle={handleFavoriteToggle}
           showToast={showToast}

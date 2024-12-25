@@ -31,16 +31,10 @@ const FavoriteIcon = styled.button`
   }
 `;
 
-const FavoriteButton = ({
-  storeId,
-  initialFavorite,
-  onLoginRequired,
-  onToggle,
-  showToast,
-}) => {
-  const { isAuthenticated } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
+const FavoriteButton = ({ storeId, onLoginRequired, showToast }) => {
+  const { isAuthenticated, isFavorite, toggleFavorite } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
+  const favorite = isFavorite(storeId);
 
   const handleClick = async (e) => {
     e.stopPropagation();
@@ -54,24 +48,13 @@ const FavoriteButton = ({
     if (isUpdating) return;
 
     setIsUpdating(true);
-    const newState = !isFavorite;
-
     try {
-      if (newState) {
-        // Tilføj til favoritter
-        await facade.addFavorite(storeId);
-        showToast('Butik tilføjet til favoritter', 'success');
+      const result = await toggleFavorite(storeId);
+      if (result.success) {
+        showToast(result.message, 'success');
       } else {
-        // Fjern fra favoritter
-        await facade.removeFavorite(storeId);
-        showToast('Butik fjernet fra favoritter', 'success');
+        showToast('Der opstod en fejl', 'error');
       }
-
-      setIsFavorite(newState);
-      if (onToggle) onToggle(storeId, newState);
-    } catch (error) {
-      setIsFavorite(!newState); // Reset state ved fejl
-      showToast('Der opstod en fejl', 'error');
     } finally {
       setIsUpdating(false);
     }
@@ -80,8 +63,8 @@ const FavoriteButton = ({
   return (
     <FavoriteIcon
       onClick={handleClick}
-      $isFavorite={isFavorite}
-      aria-label={isFavorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'}
+      $isFavorite={favorite}
+      aria-label={favorite ? 'Fjern fra favoritter' : 'Tilføj til favoritter'}
       disabled={isUpdating}
     >
       <Heart />

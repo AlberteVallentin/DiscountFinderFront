@@ -17,6 +17,7 @@ import LoginModal from '../components/modal/LoginModal';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
 
+// Behold dine eksisterende styled components
 const SearchSection = styled.div`
   display: flex;
   gap: 1rem;
@@ -66,7 +67,7 @@ const BrandSection = styled.div`
 
 function Stores() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isFavorite, favorites } = useAuth();
   const { toast, showToast, hideToast } = useToast();
 
   // States
@@ -80,84 +81,86 @@ function Stores() {
   const [selectedStore, setSelectedStore] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  // Ny funktion til at opdatere favorit status
+  const updateStoresWithFavorites = (storesArray) => {
+    return storesArray.map((store) => ({
+      ...store,
+      isFavorite: isFavorite(store.id),
+    }));
+  };
+
+  // Opdater begge arrays når favorites ændres
+  useEffect(() => {
+    if (stores.length > 0) {
+      const updatedStores = updateStoresWithFavorites(stores);
+      setStores(updatedStores);
+      filterStores(
+        searchTerm,
+        selectedPostalCode,
+        selectedBrands,
+        updatedStores
+      );
+    }
+  }, [favorites]);
+
+  useEffect(() => {
+    fetchStores();
+  }, []);
+
   const fetchStores = async () => {
     try {
       setLoading(true);
-      const storesResult = await facade.getAllStores();
+      const result = await facade.getAllStores();
 
-      if (!storesResult.success) {
-        showToast(storesResult.error, 'error');
-        return;
+      if (result.success) {
+        const storesWithFavorites = updateStoresWithFavorites(result.data);
+        setStores(storesWithFavorites);
+        setFilteredStores(storesWithFavorites);
+
+        const uniquePostalCodes = [
+          ...new Set(
+            storesWithFavorites.map(
+              (store) => store.address.postalCode.postalCode
+            )
+          ),
+        ].sort();
+
+        setPostalCodes(uniquePostalCodes);
+      } else {
+        showToast(result.error, 'error');
       }
-
-      let favoriteIds = new Set();
-      if (isAuthenticated) {
-        const favoritesResult = await facade.getFavorites();
-        if (favoritesResult.success) {
-          favoriteIds = new Set(favoritesResult.data.map((fav) => fav.id));
-        }
-      }
-
-      const storesWithFavorites = storesResult.data.map((store) => ({
-        ...store,
-        isFavorite: favoriteIds.has(store.id),
-      }));
-
-      setStores(storesWithFavorites);
-      setFilteredStores(storesWithFavorites);
-
-      const uniquePostalCodes = [
-        ...new Set(
-          storesWithFavorites.map(
-            (store) => store.address.postalCode.postalCode
-          )
-        ),
-      ].sort();
-
-      setPostalCodes(uniquePostalCodes);
     } catch (error) {
-      showToast(error.message, 'error');
+      showToast('Der opstod en fejl ved hentning af butikker', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchStores();
-  }, [isAuthenticated]);
+  // Opdater filterStores til at tage imod et valgfrit stores array
+  const filterStores = (search, postalCode, brands, storesArray = stores) => {
+    let filtered = storesArray;
 
-  const handleLoginRequired = () => {
-    setShowLoginModal(true);
-  };
-
-  const handleFavoriteToggle = async (storeId, newFavoriteState) => {
-    try {
-      // newFavoriteState er den NYE tilstand vi ønsker
-      const apiCall = newFavoriteState
-        ? facade.addFavorite
-        : facade.removeFavorite;
-      await apiCall(storeId);
-
-      // Opdater stores og filteredStores med den nye tilstand
-      const updateStores = (prev) =>
-        prev.map((store) =>
-          store.id === storeId
-            ? { ...store, isFavorite: newFavoriteState }
-            : store
-        );
-
-      setStores(updateStores);
-      setFilteredStores(updateStores);
-
-      showToast(
-        newFavoriteState
-          ? 'Butik tilføjet til favoritter'
-          : 'Butik fjernet fra favoritter',
-        'success'
+    if (search) {
+      filtered = filtered.filter(
+        (store) =>
+          store.name.toLowerCase().includes(search.toLowerCase()) ||
+          store.brand.displayName.toLowerCase().includes(search.toLowerCase())
       );
-    } catch (error) {
-      showToast('Der opstod en fejl', 'error');
     }
+
+    if (postalCode) {
+      filtered = filtered.filter(
+        (store) => store.address.postalCode.postalCode === parseInt(postalCode)
+      );
+    }
+
+    if (brands?.size > 0) {
+      filtered = filtered.filter((store) =>
+        brands.has(store.brand.displayName)
+      );
+    }
+
+    setFilteredStores(filtered);
   };
 
   const handleSearch = (event) => {
@@ -179,15 +182,10 @@ function Stores() {
           return;
         }
 
-        const storesWithFavorites = result.data.map((newStore) => {
-          const existingStore = stores.find(
-            (store) => store.id === newStore.id
-          );
-          return {
-            ...newStore,
-            isFavorite: existingStore ? existingStore.isFavorite : false,
-          };
-        });
+        const storesWithFavorites = result.data.map((store) => ({
+          ...store,
+          isFavorite: isFavorite(store.id),
+        }));
 
         setFilteredStores(
           selectedBrands.size > 0
@@ -217,30 +215,8 @@ function Stores() {
     filterStores(searchTerm, selectedPostalCode, newSelectedBrands);
   };
 
-  const filterStores = (search, postalCode, brands) => {
-    let filtered = stores;
-
-    if (search) {
-      filtered = filtered.filter(
-        (store) =>
-          store.name.toLowerCase().includes(search.toLowerCase()) ||
-          store.brand.displayName.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    if (postalCode) {
-      filtered = filtered.filter(
-        (store) => store.address.postalCode.postalCode === parseInt(postalCode)
-      );
-    }
-
-    if (brands?.size > 0) {
-      filtered = filtered.filter((store) =>
-        brands.has(store.brand.displayName)
-      );
-    }
-
-    setFilteredStores(filtered);
+  const handleLoginRequired = () => {
+    setShowLoginModal(true);
   };
 
   if (loading) {
@@ -298,7 +274,6 @@ function Stores() {
             key={store.id}
             store={store}
             onClick={() => setSelectedStore(store)}
-            onFavoriteToggle={handleFavoriteToggle}
             onLoginRequired={handleLoginRequired}
             showToast={showToast}
           />
