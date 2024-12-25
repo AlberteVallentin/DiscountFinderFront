@@ -23,6 +23,19 @@ function Favorites() {
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
 
+  if (!isAuthenticated) {
+    return (
+      <LoginModal
+        isOpen={true}
+        onClose={() => navigate('/stores')}
+        onLogin={() =>
+          navigate('/login', { state: { returnPath: '/favorites' } })
+        }
+        message='Du skal være logget ind for at se dine favoritbutikker.'
+      />
+    );
+  }
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchFavoriteStores();
@@ -40,19 +53,6 @@ function Favorites() {
   if (loading) {
     return (
       <LoadingSpinner text='Henter favoritbutikker...' fullscreen={true} />
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <LoginModal
-        isOpen={true}
-        onClose={() => navigate('/stores')}
-        onLogin={() =>
-          navigate('/login', { state: { returnPath: '/favorites' } })
-        }
-        message='Du skal være logget ind for at se dine favoritbutikker.'
-      />
     );
   }
 
