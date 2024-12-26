@@ -38,7 +38,7 @@ const FilterDropdown = ({
 
   return (
     <Dropdown
-      buttonText='Filter'
+      buttonText='Kategorier'
       icon='SlidersHorizontal'
       isActive={selectedCount > 0}
       renderOptions={renderOptions}
