@@ -8,16 +8,13 @@ const Container = styled.div`
   position: relative;
 `;
 
-export const DropdownButton = styled(Button)`
+const DropdownButton = styled(Button)`
   &:hover {
     transform: none;
   }
-  padding: 0.5rem 1.5rem;
-  height: auto;
-  width: auto;
 `;
 
-export const Overlay = styled.div`
+const Overlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -26,7 +23,7 @@ export const Overlay = styled.div`
   z-index: 90;
 `;
 
-export const DropdownContent = styled.div`
+const DropdownContent = styled.div`
   position: absolute;
   top: calc(100% + 0.5rem);
   ${({ $align }) => ($align === 'right' ? 'right: 0;' : 'left: 0;')}
@@ -55,7 +52,7 @@ export const DropdownContent = styled.div`
   }
 `;
 
-export const DropdownOption = styled.div`
+const DropdownOption = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -70,14 +67,14 @@ export const DropdownOption = styled.div`
   }
 `;
 
-export const ButtonContent = styled.div`
+const ButtonContent = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   height: 100%;
 `;
 
-const BaseDropdown = ({
+const Dropdown = ({
   buttonText,
   icon,
   isActive,
@@ -95,7 +92,7 @@ const BaseDropdown = ({
       ) : (
         <DropdownButton onClick={() => setIsOpen(!isOpen)} $active={isActive}>
           <ButtonContent>
-            {icon && <Icon name={icon} />}
+            {icon && <Icon name={icon} color='buttonText' />}
             {buttonText}
           </ButtonContent>
         </DropdownButton>
@@ -113,4 +110,5 @@ const BaseDropdown = ({
   );
 };
 
+export { DropdownButton, DropdownOption, ButtonContent, DropdownContent };
 export default Dropdown;

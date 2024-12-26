@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import BaseDropdown, { DropdownOption } from './Dropdown';
+import Dropdown, { DropdownOption } from './Dropdown';
 import { borderRadius } from '../../styles/Theme';
 import Icon from '../ui/Icon';
 
@@ -37,7 +37,7 @@ const FilterDropdown = ({
   );
 
   return (
-    <BaseDropdown
+    <Dropdown
       buttonText='Filter'
       icon='SlidersHorizontal'
       isActive={selectedCount > 0}

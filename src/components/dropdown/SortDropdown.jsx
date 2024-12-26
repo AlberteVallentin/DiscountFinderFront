@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseDropdown, { DropdownOption } from './Dropdown';
+import Dropdown, { DropdownOption } from './Dropdown';
 import Icon from '../ui/Icon';
 
 const SortDropdown = ({
@@ -36,7 +36,7 @@ const SortDropdown = ({
   );
 
   return (
-    <BaseDropdown
+    <Dropdown
       buttonText={buttonText}
       icon={icon}
       isActive={selectedOption !== null}

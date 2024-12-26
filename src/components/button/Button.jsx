@@ -8,7 +8,7 @@ const StyledButton = styled.button`
   justify-content: center;
   height: auto;
   padding: 1rem 0rem;
-  width: 9rem;
+  width: 11rem;
   font-size: var(--fs-n);
   border-radius: ${borderRadius.round};
   cursor: pointer;
