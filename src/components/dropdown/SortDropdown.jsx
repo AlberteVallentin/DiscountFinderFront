@@ -1,81 +1,6 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { borderRadius, borders } from '../../styles/Theme';
-import Button from '../button/Button';
+import React from 'react';
+import BaseDropdown, { DropdownOption } from './Dropdown';
 import Icon from '../ui/Icon';
-
-const Container = styled.div`
-  position: relative;
-`;
-
-const SortStyledButton = styled(Button)`
-  &:hover {
-    transform: none;
-  }
-  padding: 0.5rem 1.5rem;
-  height: auto;
-  width: auto;
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 90;
-`;
-
-const DropdownContent = styled.div`
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  ${({ $align }) => ($align === 'right' ? 'right: 0;' : 'left: 0;')}
-  background: ${({ theme }) => theme.colors.card};
-  border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
-  border-radius: ${borderRadius.rounded};
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-  width: 280px;
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 100;
-  padding: 0.5rem;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${({ theme }) => theme.colors.background};
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.border};
-    border-radius: 4px;
-  }
-`;
-
-const Option = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  border-radius: ${borderRadius.rounded};
-  color: ${({ theme }) => theme.colors.text};
-  transition: all 0.2s;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.background};
-  }
-`;
-
-const ButtonContent = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  height: 100%;
-`;
 
 const SortDropdown = ({
   options,
@@ -85,46 +10,39 @@ const SortDropdown = ({
   align = 'left',
   icon = 'ArrowDownUp',
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   const handleSelect = (optionValue) => {
     if (selectedOption === optionValue) {
-      onSelect(null); // Fravælg hvis den samme mulighed vælges igen
+      onSelect(null);
     } else {
       onSelect(optionValue);
     }
-    setIsOpen(false);
   };
 
-  return (
-    <Container>
-      <SortStyledButton
-        onClick={() => setIsOpen(!isOpen)}
-        $active={selectedOption !== null}
-      >
-        <ButtonContent>
-          <Icon name={icon} />
-          {buttonText}
-        </ButtonContent>
-      </SortStyledButton>
+  const renderOptions = (closeDropdown) => (
+    <>
+      {options.map((option) => (
+        <DropdownOption
+          key={option.value}
+          onClick={() => {
+            handleSelect(option.value);
+            closeDropdown();
+          }}
+        >
+          {option.label}
+          {selectedOption === option.value && <Icon name='Check' />}
+        </DropdownOption>
+      ))}
+    </>
+  );
 
-      {isOpen && (
-        <>
-          <Overlay onClick={() => setIsOpen(false)} />
-          <DropdownContent $align={align} onClick={(e) => e.stopPropagation()}>
-            {options.map((option) => (
-              <Option
-                key={option.value}
-                onClick={() => handleSelect(option.value)}
-              >
-                {option.label}
-                {selectedOption === option.value && <Icon name='Check' />}
-              </Option>
-            ))}
-          </DropdownContent>
-        </>
-      )}
-    </Container>
+  return (
+    <BaseDropdown
+      buttonText={buttonText}
+      icon={icon}
+      isActive={selectedOption !== null}
+      align={align}
+      renderOptions={renderOptions}
+    />
   );
 };
 
