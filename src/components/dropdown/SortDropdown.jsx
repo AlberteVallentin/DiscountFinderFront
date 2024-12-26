@@ -12,6 +12,9 @@ const SortStyledButton = styled(Button)`
   &:hover {
     transform: none;
   }
+  padding: 0.5rem 1.5rem;
+  height: auto;
+  width: auto;
 `;
 
 const Overlay = styled.div`
@@ -71,14 +74,7 @@ const ButtonContent = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 0;
   height: 100%;
-`;
-
-const SortLabel = styled.span`
-  color: ${({ theme }) => theme.colors.buttonText};
-  font-size: var(--fs-s);
-  margin-left: 0.5rem;
 `;
 
 const SortDropdown = ({
@@ -91,8 +87,12 @@ const SortDropdown = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSelect = (option) => {
-    onSelect(option);
+  const handleSelect = (optionValue) => {
+    if (selectedOption === optionValue) {
+      onSelect(null); // Fravælg hvis den samme mulighed vælges igen
+    } else {
+      onSelect(optionValue);
+    }
     setIsOpen(false);
   };
 
@@ -105,11 +105,6 @@ const SortDropdown = ({
         <ButtonContent>
           <Icon name={icon} />
           {buttonText}
-          {selectedOption && (
-            <SortLabel>
-              : {options.find((opt) => opt.value === selectedOption)?.label}
-            </SortLabel>
-          )}
         </ButtonContent>
       </SortStyledButton>
 

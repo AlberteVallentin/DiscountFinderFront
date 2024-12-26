@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
 import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
 import EmptyState from '../EmptyState';
-import { useErrorHandler } from '../../utils/errorHandler';
 import { useOutletContext } from 'react-router';
 import FilterDropdown from '../dropdown/FilterDropdown';
+import SortDropdown from '../dropdown/SortDropdown';
 import { borderRadius } from '../../styles/Theme';
 
 const StoreHeader = styled.div`
@@ -35,48 +34,6 @@ const Controls = styled.div`
   width: 100%;
 `;
 
-const ControlButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1.2rem 1.5rem;
-  border-radius: ${borderRadius.round};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.border};
-  }
-`;
-
-const SortDropdown = styled.div`
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 8px;
-  padding: 0.5rem;
-  min-width: 200px;
-  z-index: 10;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-`;
-
-const SortOption = styled.div`
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.text};
-  border-radius: 4px;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.background};
-  }
-`;
-
 const ProductsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -85,7 +42,7 @@ const ProductsGrid = styled.div`
 
 const ProductCard = styled.div`
   background: ${({ theme }) => theme.colors.card};
-  border-radius: 12px;
+  border-radius: ${borderRadius.rounded};
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -94,7 +51,7 @@ const ProductCard = styled.div`
 `;
 
 const ProductTitle = styled.h3`
-  font-size: 1rem;
+  font-size: var(--fs-n);
   color: ${({ theme }) => theme.colors.text};
   margin: 0;
 `;
@@ -106,11 +63,11 @@ const CategoriesContainer = styled.div`
 `;
 
 const CategoryTag = styled.span`
-  background: ${({ theme }) => theme.colors.card};
+  background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
   padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.8rem;
+  border-radius: ${borderRadius.round};
+  font-size: var(--fs-s);
   border: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
@@ -121,15 +78,15 @@ const PriceInfo = styled.div`
 `;
 
 const Price = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: var(--fs-m);
+  font-weight: var(--fw-semi-bold);
   color: ${({ theme }) => theme.colors.text};
 `;
 
 const OldPrice = styled.span`
   text-decoration: line-through;
   color: ${({ theme }) => theme.colors.border};
-  font-size: 0.9rem;
+  font-size: var(--fs-s);
   margin-left: 0.5rem;
 `;
 
@@ -137,17 +94,17 @@ const Discount = styled.span`
   background: #dc2626;
   color: white;
   padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.8rem;
+  border-radius: ${borderRadius.round};
+  font-size: var(--fs-s);
 `;
 
 const StockInfo = styled.div`
-  font-size: 0.9rem;
+  font-size: var(--fs-s);
   color: ${({ theme }) => theme.colors.text};
 `;
 
 const DateInfo = styled.div`
-  font-size: 0.9rem;
+  font-size: var(--fs-s);
   color: ${({ theme }) => theme.colors.text};
 `;
 
@@ -157,15 +114,20 @@ const Content = styled.div`
   width: 100%;
 `;
 
+const sortOptions = [
+  { value: 'price-asc', label: 'Pris (laveste først)' },
+  { value: 'price-desc', label: 'Pris (højeste først)' },
+  { value: 'discount', label: 'Største rabat først' },
+  { value: 'expiry', label: 'Udløber snarest' },
+];
+
 const ProductListModal = ({ store, onClose }) => {
   const { showToast } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState(new Set());
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('');
-  const handleError = useErrorHandler(showToast);
+  const [sortOption, setSortOption] = useState(null);
 
   useEffect(() => {
     if (store?.id) {
@@ -266,49 +228,12 @@ const ProductListModal = ({ store, onClose }) => {
             onCategoryToggle={handleCategoryToggle}
           />
 
-          <div style={{ position: 'relative' }}>
-            <ControlButton onClick={() => setIsSortOpen(!isSortOpen)}>
-              <ArrowDownUp size={20} />
-              Sorter
-            </ControlButton>
-
-            {isSortOpen && (
-              <SortDropdown>
-                <SortOption
-                  onClick={() => {
-                    setSortOption('price-asc');
-                    setIsSortOpen(false);
-                  }}
-                >
-                  Pris (laveste først)
-                </SortOption>
-                <SortOption
-                  onClick={() => {
-                    setSortOption('price-desc');
-                    setIsSortOpen(false);
-                  }}
-                >
-                  Pris (højeste først)
-                </SortOption>
-                <SortOption
-                  onClick={() => {
-                    setSortOption('discount');
-                    setIsSortOpen(false);
-                  }}
-                >
-                  Største rabat først
-                </SortOption>
-                <SortOption
-                  onClick={() => {
-                    setSortOption('expiry');
-                    setIsSortOpen(false);
-                  }}
-                >
-                  Udløber snarest
-                </SortOption>
-              </SortDropdown>
-            )}
-          </div>
+          <SortDropdown
+            options={sortOptions}
+            selectedOption={sortOption}
+            onSelect={setSortOption}
+            align='right'
+          />
         </Controls>
 
         {loading ? (
