@@ -14,8 +14,6 @@ import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/OutletContainer';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from '../components/modal/LoginModal';
-import Toast from '../components/Toast';
-import { useToast } from '../hooks/useToast';
 import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
 
@@ -69,9 +67,7 @@ const BrandSection = styled.div`
 
 function Stores() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const { isFavorite, favorites } = useFavorites();
-  //const { toast, hideToast } = useToast();
   const { showToast } = useOutletContext();
 
   // States

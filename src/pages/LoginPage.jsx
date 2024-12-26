@@ -111,7 +111,6 @@ const LoginPage = () => {
     confirmPassword: '',
   });
 
-  //const { toast, showToast, hideToast } = useToast();
   const { showToast } = useOutletContext();
   const handleError = useErrorHandler(showToast);
 
