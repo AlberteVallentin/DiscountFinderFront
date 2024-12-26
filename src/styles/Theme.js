@@ -54,6 +54,7 @@ export const lightTheme = {
         buttonColor: colors.neutralBlue,
         buttonText: colors.neutralLight,
         searchBarIcon: colors.neutralDark,
+
     },
     searchBar: {
         text: colors.neutralDark,

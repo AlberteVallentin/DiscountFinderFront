@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { SlidersHorizontal, Check } from 'lucide-react';
+import Icon from '../ui/Icon';
 import { borderRadius, borders } from '../../styles/Theme';
 import Button from '../button/Button';
 
-const FilterStyledButton = styled(Button)`
-  background: ${({ theme, $active }) =>
-    $active ? theme.colors.buttonColor : theme.colors.card};
-  color: ${({ theme, $active }) =>
-    $active ? theme.colors.buttonText : theme.colors.text};
-  border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
+const Container = styled.div`
+  position: relative;
+`;
 
+const FilterStyledButton = styled(Button)`
   &:hover {
-    background: ${({ theme, $active }) =>
-      $active ? theme.colors.buttonColor : theme.colors.background};
-    opacity: ${({ $active }) => ($active ? 0.9 : 1)};
+    transform: none;
   }
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
 `;
 
 const DropdownContent = styled.div`
@@ -86,13 +91,13 @@ const FilterDropdown = ({
   const selectedCount = selectedCategories.size;
 
   return (
-    <div style={{ position: 'relative' }}>
+    <Container>
       <FilterStyledButton
         onClick={() => setIsOpen(!isOpen)}
         $active={selectedCount > 0}
       >
         <ButtonContent>
-          <SlidersHorizontal size={20} />
+          <Icon name='SlidersHorizontal' color='buttonText' />
           Filter
           {selectedCount > 0 && <SelectedCount>{selectedCount}</SelectedCount>}
         </ButtonContent>
@@ -100,17 +105,7 @@ const FilterDropdown = ({
 
       {isOpen && (
         <>
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 90,
-            }}
-            onClick={() => setIsOpen(false)}
-          />
+          <Overlay onClick={() => setIsOpen(false)} />
           <DropdownContent onClick={(e) => e.stopPropagation()}>
             {categories.map((category) => (
               <CategoryOption
@@ -118,13 +113,13 @@ const FilterDropdown = ({
                 onClick={() => onCategoryToggle(category)}
               >
                 {category}
-                {selectedCategories.has(category) && <Check size={20} />}
+                {selectedCategories.has(category) && <Icon name='Check' />}
               </CategoryOption>
             ))}
           </DropdownContent>
         </>
       )}
-    </div>
+    </Container>
   );
 };
 
