@@ -16,6 +16,7 @@ import EmptyStateDemo from './pages/EmptyStateDemo.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { FavoritesProvider } from './context/FavoritesContext.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,9 +34,11 @@ const router = createBrowserRouter(
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <ThemeProvider>
-        <RouterProvider router={router} />
-      </ThemeProvider>
+      <FavoritesProvider>
+        <ThemeProvider>
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </FavoritesProvider>
     </AuthProvider>
   </StrictMode>
 );

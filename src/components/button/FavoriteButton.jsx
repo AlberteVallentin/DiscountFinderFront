@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useFavorites } from '../../context/FavoritesContext';
 
 const FavoriteIcon = styled.button`
   position: absolute;
@@ -31,7 +32,8 @@ const FavoriteIcon = styled.button`
 `;
 
 const FavoriteButton = ({ storeId, onLoginRequired, showToast, onToggle }) => {
-  const { isAuthenticated, isFavorite, toggleFavorite } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(storeId);
 
   const handleClick = async (e) => {
