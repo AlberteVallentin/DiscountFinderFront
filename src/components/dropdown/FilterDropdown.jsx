@@ -5,8 +5,8 @@ import { borderRadius } from '../../styles/Theme';
 import Icon from '../ui/Icon';
 
 const SelectedCount = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
+  background: ${({ theme }) => theme.colors.buttonText};
+  color: ${({ theme }) => theme.colors.buttonColor};
   padding: 0.25rem 0.75rem;
   border-radius: ${borderRadius.round};
   font-size: var(--fs-s);
@@ -38,9 +38,13 @@ const FilterDropdown = ({
 
   return (
     <Dropdown
-      buttonText='Kategorier'
+      buttonText={
+        <>
+          Filter
+          {selectedCount > 0 && <SelectedCount>{selectedCount}</SelectedCount>}
+        </>
+      }
       icon='SlidersHorizontal'
-      isActive={selectedCount > 0}
       renderOptions={renderOptions}
     />
   );
