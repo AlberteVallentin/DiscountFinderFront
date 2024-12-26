@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { SlidersHorizontal, ArrowDownUp } from 'lucide-react';
+import { ArrowDownUp } from 'lucide-react';
 import Modal from './Modal';
 import LoadingSpinner from '../LoadingSpinner';
 import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
-import Toast from '../Toast';
 import EmptyState from '../EmptyState';
 import { useErrorHandler } from '../../utils/errorHandler';
-import { useToast } from '../../hooks/useToast';
 import { useOutletContext } from 'react-router';
+import FilterDropdown from '../button/FilterButton';
+import { borderRadius } from '../../styles/Theme';
 
 const StoreHeader = styled.div`
   display: flex;
@@ -40,7 +40,7 @@ const ControlButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 1.2rem 1.5rem;
-  border-radius: 8px;
+  border-radius: ${borderRadius.round};
   border: 1px solid ${({ theme }) => theme.colors.border};
   background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
@@ -51,57 +51,6 @@ const ControlButton = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.border};
   }
-`;
-
-const FilterPanel = styled.div`
-  width: 100%;
-  padding: 1.5rem;
-  background: ${({ theme }) => theme.colors.background};
-  border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  margin-bottom: 2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-`;
-
-const FilterSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const FilterTitle = styled.h3`
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 0.5rem;
-`;
-
-const CheckboxLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text};
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-const PriceInputs = styled.div`
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-`;
-
-const PriceInput = styled.input`
-  padding: 0.5rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 4px;
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
-  width: 100px;
 `;
 
 const SortDropdown = styled.div`
@@ -213,15 +162,9 @@ const ProductListModal = ({ store, onClose }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState(new Set());
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [filterOptions, setFilterOptions] = useState({
-    categories: new Set(),
-    priceRange: { min: '', max: '' },
-  });
   const [sortOption, setSortOption] = useState('');
-
-  //const { toast, showToast, hideToast } = useToast();
   const handleError = useErrorHandler(showToast);
 
   useEffect(() => {
@@ -257,6 +200,18 @@ const ProductListModal = ({ store, onClose }) => {
     return Array.from(categorySet).sort();
   }, [products]);
 
+  const handleCategoryToggle = (category) => {
+    setSelectedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
@@ -266,25 +221,10 @@ const ProductListModal = ({ store, onClose }) => {
       );
     }
 
-    if (filterOptions.categories.size > 0) {
+    if (selectedCategories.size > 0) {
       filtered = filtered.filter((product) =>
-        product.categories.some((cat) =>
-          filterOptions.categories.has(cat.nameDa)
-        )
+        product.categories.some((cat) => selectedCategories.has(cat.nameDa))
       );
-    }
-
-    if (filterOptions.priceRange.min || filterOptions.priceRange.max) {
-      filtered = filtered.filter((product) => {
-        const price = product.price.newPrice;
-        const min = filterOptions.priceRange.min
-          ? parseFloat(filterOptions.priceRange.min)
-          : 0;
-        const max = filterOptions.priceRange.max
-          ? parseFloat(filterOptions.priceRange.max)
-          : Infinity;
-        return price >= min && price <= max;
-      });
     }
 
     if (sortOption) {
@@ -305,20 +245,7 @@ const ProductListModal = ({ store, onClose }) => {
     }
 
     return filtered;
-  }, [products, searchTerm, filterOptions, sortOption]);
-
-  const handleCategoryToggle = (category) => {
-    const newCategories = new Set(filterOptions.categories);
-    if (newCategories.has(category)) {
-      newCategories.delete(category);
-    } else {
-      newCategories.add(category);
-    }
-    setFilterOptions((prev) => ({
-      ...prev,
-      categories: newCategories,
-    }));
-  };
+  }, [products, searchTerm, selectedCategories, sortOption]);
 
   return (
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
@@ -333,10 +260,11 @@ const ProductListModal = ({ store, onClose }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
-          <ControlButton onClick={() => setIsFilterOpen(!isFilterOpen)}>
-            <SlidersHorizontal size={20} />
-            Filter
-          </ControlButton>
+          <FilterDropdown
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onCategoryToggle={handleCategoryToggle}
+          />
 
           <div style={{ position: 'relative' }}>
             <ControlButton onClick={() => setIsSortOpen(!isSortOpen)}>
@@ -382,59 +310,12 @@ const ProductListModal = ({ store, onClose }) => {
             )}
           </div>
         </Controls>
-        {isFilterOpen && (
-          <FilterPanel>
-            <FilterSection>
-              <FilterTitle>Kategorier</FilterTitle>
-              {categories.map((category) => (
-                <CheckboxLabel key={category}>
-                  <input
-                    type='checkbox'
-                    checked={filterOptions.categories.has(category)}
-                    onChange={() => handleCategoryToggle(category)}
-                  />
-                  {category}
-                </CheckboxLabel>
-              ))}
-            </FilterSection>
 
-            <FilterSection>
-              <FilterTitle>Prisinterval</FilterTitle>
-              <PriceInputs>
-                <PriceInput
-                  type='number'
-                  placeholder='Min'
-                  value={filterOptions.priceRange.min}
-                  onChange={(e) =>
-                    setFilterOptions((prev) => ({
-                      ...prev,
-                      priceRange: { ...prev.priceRange, min: e.target.value },
-                    }))
-                  }
-                />
-                <span>-</span>
-                <PriceInput
-                  type='number'
-                  placeholder='Max'
-                  value={filterOptions.priceRange.max}
-                  onChange={(e) =>
-                    setFilterOptions((prev) => ({
-                      ...prev,
-                      priceRange: { ...prev.priceRange, max: e.target.value },
-                    }))
-                  }
-                />
-              </PriceInputs>
-            </FilterSection>
-          </FilterPanel>
-        )}
         {loading ? (
           <LoadingSpinner text='Henter tilbud...' />
         ) : products.length === 0 ? (
-          // Hvis der ikke er varer i butikken
           <EmptyState type='NO_PRODUCTS' />
         ) : filteredProducts.length === 0 ? (
-          // Hvis der er varer, men alle er filtreret fra
           <EmptyState type='NO_SEARCH_RESULTS' />
         ) : (
           <ProductsGrid>
