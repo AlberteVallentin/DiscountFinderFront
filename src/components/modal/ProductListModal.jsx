@@ -8,7 +8,7 @@ import SearchBar from '../ui/SearchBar';
 import EmptyState from '../EmptyState';
 import { useErrorHandler } from '../../utils/errorHandler';
 import { useOutletContext } from 'react-router';
-import FilterDropdown from '../button/FilterButton';
+import FilterDropdown from '../dropdown/FilterDropdown';
 import { borderRadius } from '../../styles/Theme';
 
 const StoreHeader = styled.div`
