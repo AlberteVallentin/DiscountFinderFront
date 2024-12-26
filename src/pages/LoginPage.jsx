@@ -7,6 +7,7 @@ import Toast from '../components/Toast';
 import { useErrorHandler } from '../utils/errorHandler';
 import { useToast } from '../hooks/useToast';
 import { useOutletContext } from 'react-router';
+import { useFavorites } from '../context/FavoritesContext';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -99,6 +100,7 @@ const ToggleButton = styled.button`
 
 const LoginPage = () => {
   const { login, register } = useAuth();
+  const { loadFavorites } = useFavorites();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -120,16 +122,14 @@ const LoginPage = () => {
         login(formData.email, formData.password)
       );
       if (result.success) {
-        // Vi tjekker om login var succesfuld
+        await loadFavorites(); // Nu kan vi bare kalde den direkte
         showToast('Du er nu logget ind', 'success');
 
-        // Navigate til return path hvis det findes, ellers til stores
         const returnPath = location.state?.returnPath || '/stores';
         setTimeout(() => {
           navigate(returnPath);
         }, 1500);
       } else {
-        // Hvis login ikke var succesfuld, vis fejlbesked
         showToast(
           result.error || 'Login fejlede - tjek email og password',
           'error'

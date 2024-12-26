@@ -17,6 +17,7 @@ import LoginModal from '../components/modal/LoginModal';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
 import { useOutletContext } from 'react-router';
+import { useFavorites } from '../context/FavoritesContext';
 
 // Behold dine eksisterende styled components
 const SearchSection = styled.div`
@@ -68,7 +69,8 @@ const BrandSection = styled.div`
 
 function Stores() {
   const navigate = useNavigate();
-  const { isAuthenticated, isFavorite, favorites } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { isFavorite, favorites } = useFavorites();
   //const { toast, hideToast } = useToast();
   const { showToast } = useOutletContext();
 

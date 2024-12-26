@@ -11,18 +11,35 @@ import ProductListModal from '../components/modal/ProductListModal';
 import EmptyState from '../components/EmptyState';
 import { useErrorHandler } from '../utils/errorHandler';
 import { useOutletContext } from 'react-router';
+import { useFavorites } from '../context/FavoritesContext';
 
 function Favorites() {
+  // 1. Først deklarerer vi ALLE hooks
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
-  const { isAuthenticated, isFavorite, favorites } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { isFavorite, favorites } = useFavorites();
   const handleError = useErrorHandler(showToast);
   const [isUpdating, setIsUpdating] = useState(false);
-
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
 
+  // 2. useEffect for at hente favoritter når komponenten indlæses
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (isAuthenticated) {
+        const result = await handleError(facade.getFavorites());
+        if (result.success) {
+          setFavoriteStores(result.data);
+        }
+        setLoading(false);
+      }
+    };
+    loadFavorites();
+  }, [isAuthenticated, favorites]);
+
+  // 3. Betingede returns
   if (!isAuthenticated) {
     return (
       <LoginModal
@@ -36,26 +53,13 @@ function Favorites() {
     );
   }
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchFavoriteStores();
-    }
-  }, [isAuthenticated, favorites]);
-
-  const fetchFavoriteStores = async () => {
-    const result = await handleError(facade.getFavorites());
-    if (result.success) {
-      setFavoriteStores(result.data);
-    }
-    setLoading(false);
-  };
-
   if (loading) {
     return (
       <LoadingSpinner text='Henter favoritbutikker...' fullscreen={true} />
     );
   }
 
+  // 4. Hovedrender
   return (
     <OutletContainer>
       <h1>Mine favoritbutikker</h1>
