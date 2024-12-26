@@ -31,7 +31,13 @@ export const borderRadius = {
     round: '2rem',
 };
 
-
+export const zIndex = {
+    modal: 1000,
+    overlay: 900,
+    dropdown: 800,
+    header: 700,
+    footer: 600,
+};
 
 
 export const lightTheme = {
