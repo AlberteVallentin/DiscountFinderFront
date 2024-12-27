@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import CardGrid from '../components/card/CardGrid';
+import CardGrid from '../components/layout/container/CardGrid';
 import StoreCard from '../components/card/StoreCard';
 import LoginModal from '../components/modal/LoginModal';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
-import OutletContainer from '../components/layout/OutletContainer';
+import OutletContainer from '../components/layout/container/OutletContainer';
 import { useAuth } from '../context/AuthContext';
 import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useAuth } from '../context/AuthContext';
 import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
-import OutletContainer from '../components/layout/OutletContainer';
+import OutletContainer from '../components/layout/container/OutletContainer';
 import { borderRadius, borders } from '../styles/Theme';
 
 // Styled Components
