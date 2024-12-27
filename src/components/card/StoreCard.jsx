@@ -4,17 +4,19 @@ import BaseCard from './BaseCard';
 import FavoriteButton from '../button/FavoriteButton';
 import LoginModal from '../modal/LoginModal';
 import { useNavigate } from 'react-router';
-import { borders } from '../../styles/Theme'; // Tilføjet denne import
+import { borders } from '../../styles/Theme';
 
 const StoreCardWrapper = styled.div`
   position: relative;
   width: 100%;
+  height: 100%;
 `;
 
 const StoreName = styled.h3`
   font-size: var(--fs-m);
   font-weight: var(--fw-medium);
   padding-bottom: 0.75rem;
+  padding-right: 0.5rem;
   border-bottom: ${({ theme }) => `${borders.thin} ${theme.colors.line}`};
 `;
 
@@ -24,13 +26,7 @@ const StoreAddress = styled.div`
   font-size: var(--fs-n);
 `;
 
-const StoreCard = ({
-  store,
-  onClick,
-  onFavoriteToggle,
-  onLoginRequired,
-  showToast,
-}) => {
+const StoreCard = ({ store, onClick, onFavoriteToggle, showToast }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const navigate = useNavigate();
 
