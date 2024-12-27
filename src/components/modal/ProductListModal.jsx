@@ -6,7 +6,7 @@ import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
 import EmptyState from '../EmptyState';
 import { useOutletContext } from 'react-router';
-import FilterDropdown from '../dropdown/FilterDropDown';
+import FilterDropdown from '../dropdown/FilterDropdown';
 import SortDropdown from '../dropdown/SortDropdown';
 import { borderRadius } from '../../styles/Theme';
 
