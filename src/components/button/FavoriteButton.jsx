@@ -1,8 +1,14 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useFavorites } from '../../context/FavoritesContext';
+
+const popAnimation = keyframes`
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+`;
 
 const FavoriteIcon = styled.button`
   position: absolute;
@@ -23,11 +29,15 @@ const FavoriteIcon = styled.button`
   }
 
   svg {
-    fill: ${({ $isFavorite }) => ($isFavorite ? '#dc2626' : 'none')};
-    stroke: ${({ $isFavorite }) => ($isFavorite ? '#dc2626' : 'currentColor')};
-    stroke-width: 2;
-    width: 24px;
-    height: 24px;
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: ${({ $isFavorite }) => ($isFavorite ? '#FF0000' : '#666666')};
+    stroke: ${({ $isFavorite }) => ($isFavorite ? '#FF0000' : '#666666')};
+    animation: ${({ $isFavorite }) =>
+      $isFavorite &&
+      css`
+        ${popAnimation} 0.5s ease
+      `};
   }
 `;
 
