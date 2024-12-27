@@ -34,7 +34,7 @@ const SearchInput = styled.input`
 const SearchBar = ({ placeholder, value, onChange }) => {
   return (
     <SearchBarContainer>
-      <Icon name='Search' color='searchBarIcon' />
+      <Icon name='Search' color='searchBarColor' />
       <SearchInput
         type='text'
         placeholder={placeholder || 'Søg...'}

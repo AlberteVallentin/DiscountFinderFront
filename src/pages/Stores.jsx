@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { borderRadius } from '../styles/Theme';
-import Icon from '../components/ui/Icon';
-import facade from '../utils/apiFacade';
 import styled from 'styled-components';
+import facade from '../utils/apiFacade';
 import ScrollToTop from '../components/ScrollToTop';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StoreCard from '../components/card/StoreCard';
@@ -12,14 +10,11 @@ import ProductListModal from '../components/modal/ProductListModal';
 import SearchBar from '../components/ui/SearchBar';
 import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/OutletContainer';
-import { useAuth } from '../context/AuthContext';
 import LoginModal from '../components/modal/LoginModal';
-import Toast from '../components/Toast';
-import { useToast } from '../hooks/useToast';
 import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
+import SortDropdown from '../components/dropdown/SortDropdown';
 
-// Behold dine eksisterende styled components
 const SearchSection = styled.div`
   display: flex;
   gap: 1rem;
@@ -27,35 +22,6 @@ const SearchSection = styled.div`
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 1rem;
-`;
-
-const SelectWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  svg {
-    position: absolute;
-    right: 1rem;
-    bottom: 1.1rem;
-    pointer-events: none;
-  }
-`;
-
-const PostalCodeSelect = styled.select`
-  color: ${({ theme }) => theme.colors.buttonText};
-  background: ${({ theme }) => theme.colors.buttonColor};
-  border: none;
-  border-radius: ${borderRadius.round};
-  padding: 1rem 2rem;
-  padding-right: 3rem;
-  box-shadow: ${({ theme }) => theme.colors.boxShadow};
-  cursor: pointer;
-  appearance: none;
-
-  &:focus {
-    outline: none;
-  }
 `;
 
 const BrandSection = styled.div`
@@ -69,9 +35,7 @@ const BrandSection = styled.div`
 
 function Stores() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { isFavorite, favorites } = useFavorites();
-  //const { toast, hideToast } = useToast();
+  const { isFavorite } = useFavorites();
   const { showToast } = useOutletContext();
 
   // States
@@ -85,27 +49,26 @@ function Stores() {
   const [selectedStore, setSelectedStore] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Ny funktion til at opdatere favorit status
+  // Konverter postalCodes til det format SortDropdown forventer
+  const postalCodeOptions = useMemo(
+    () => [
+      // Tilføj "Alle postnumre" som første mulighed
+      { value: '', label: 'Alle postnumre' },
+      // Tilføj resten af postnumrene
+      ...postalCodes.map((code) => ({
+        value: code.toString(),
+        label: code.toString(),
+      })),
+    ],
+    [postalCodes]
+  );
+
   const updateStoresWithFavorites = (storesArray) => {
     return storesArray.map((store) => ({
       ...store,
       isFavorite: isFavorite(store.id),
     }));
   };
-
-  // Opdater begge arrays når favorites ændres
-  useEffect(() => {
-    if (stores.length > 0) {
-      const updatedStores = updateStoresWithFavorites(stores);
-      setStores(updatedStores);
-      filterStores(
-        searchTerm,
-        selectedPostalCode,
-        selectedBrands,
-        updatedStores
-      );
-    }
-  }, [favorites]);
 
   useEffect(() => {
     fetchStores();
@@ -140,8 +103,7 @@ function Stores() {
     }
   };
 
-  const handlePostalCodeChange = async (event) => {
-    const postalCode = event.target.value;
+  const handlePostalCodeChange = async (postalCode) => {
     setSelectedPostalCode(postalCode);
     setLoading(true);
 
@@ -149,11 +111,7 @@ function Stores() {
       if (postalCode) {
         const result = await facade.getStoresByPostalCode(postalCode);
         if (result.success) {
-          const storesWithFavorites = result.data.map((store) => ({
-            ...store,
-            isFavorite: isFavorite(store.id),
-          }));
-
+          const storesWithFavorites = updateStoresWithFavorites(result.data);
           setFilteredStores(
             selectedBrands.size > 0
               ? storesWithFavorites.filter((store) =>
@@ -172,7 +130,23 @@ function Stores() {
     }
   };
 
-  // Opdater filterStores til at tage imod et valgfrit stores array
+  const handleSearch = (event) => {
+    const term = event.target.value.toLowerCase();
+    setSearchTerm(term);
+    filterStores(term, selectedPostalCode, selectedBrands);
+  };
+
+  const handleBrandClick = (brand) => {
+    const newSelectedBrands = new Set(selectedBrands);
+    if (selectedBrands.has(brand)) {
+      newSelectedBrands.delete(brand);
+    } else {
+      newSelectedBrands.add(brand);
+    }
+    setSelectedBrands(newSelectedBrands);
+    filterStores(searchTerm, selectedPostalCode, newSelectedBrands);
+  };
+
   const filterStores = (search, postalCode, brands, storesArray = stores) => {
     let filtered = storesArray;
 
@@ -199,23 +173,6 @@ function Stores() {
     setFilteredStores(filtered);
   };
 
-  const handleSearch = (event) => {
-    const term = event.target.value.toLowerCase();
-    setSearchTerm(term);
-    filterStores(term, selectedPostalCode, selectedBrands);
-  };
-
-  const handleBrandClick = (brand) => {
-    const newSelectedBrands = new Set(selectedBrands);
-    if (selectedBrands.has(brand)) {
-      newSelectedBrands.delete(brand);
-    } else {
-      newSelectedBrands.add(brand);
-    }
-    setSelectedBrands(newSelectedBrands);
-    filterStores(searchTerm, selectedPostalCode, newSelectedBrands);
-  };
-
   const handleLoginRequired = () => {
     setShowLoginModal(true);
   };
@@ -232,20 +189,14 @@ function Stores() {
           value={searchTerm}
           onChange={handleSearch}
         />
-        <SelectWrapper>
-          <PostalCodeSelect
-            value={selectedPostalCode}
-            onChange={handlePostalCodeChange}
-          >
-            <option value=''>Alle postnumre</option>
-            {postalCodes.map((code) => (
-              <option key={code} value={code}>
-                {code}
-              </option>
-            ))}
-          </PostalCodeSelect>
-          <Icon name='ChevronDown' size='m' color='buttonText' />
-        </SelectWrapper>
+
+        <SortDropdown
+          options={postalCodeOptions}
+          selectedOption={selectedPostalCode}
+          onSelect={handlePostalCodeChange}
+          buttonText='Postnummer'
+          icon='MapPin'
+        />
       </SearchSection>
 
       <BrandSection>

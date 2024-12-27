@@ -6,8 +6,9 @@ const StyledButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 3.5rem;
-  width: 9rem;
+  height: auto;
+  padding: 1rem 0rem;
+  width: 11rem;
   font-size: var(--fs-n);
   border-radius: ${borderRadius.round};
   cursor: pointer;

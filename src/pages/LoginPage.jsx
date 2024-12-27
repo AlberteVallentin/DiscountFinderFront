@@ -1,31 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import styled from 'styled-components';
-import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Toast from '../components/Toast';
-import { useErrorHandler } from '../utils/errorHandler';
-import { useToast } from '../hooks/useToast';
 import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
+import OutletContainer from '../components/layout/OutletContainer';
+import { borderRadius, borders } from '../styles/Theme';
 
-const LoginContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-  padding: 2rem;
-  gap: 2rem;
-`;
-
+// Styled Components
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.card};
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: ${borderRadius.rounded};
   box-shadow: ${({ theme }) => theme.colors.boxShadow};
   width: 100%;
   max-width: 400px;
+  margin: 0 auto;
 `;
 
 const Form = styled.form`
@@ -40,18 +30,12 @@ const FormGroup = styled.div`
   gap: 0.5rem;
 `;
 
-const Label = styled.label`
-  font-size: 1rem;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
 const Input = styled.input`
   padding: 0.75rem 1rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 8px;
+  border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
+  border-radius: ${borderRadius.rounded};
   background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
-  font-size: 1rem;
 
   &:focus {
     outline: none;
@@ -60,49 +44,39 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
+  background: ${({ theme }) => theme.colors.buttonColor};
+  color: ${({ theme }) => theme.colors.buttonText};
   padding: 0.75rem 1.5rem;
-  background: ${({ theme }) => theme.colors.text};
-  color: ${({ theme }) => theme.colors.background};
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: ${borderRadius.round};
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     opacity: 0.9;
+    transform: translateY(-2px);
   }
-`;
-
-const ToggleContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 const ToggleButton = styled.button`
   background: none;
   border: none;
   padding: 1rem;
-  font-size: 1rem;
   cursor: pointer;
   color: ${({ theme, $active }) =>
     $active ? theme.colors.text : theme.colors.border};
   border-bottom: 2px solid
     ${({ theme, $active }) => ($active ? theme.colors.text : 'transparent')};
   transition: all 0.3s ease;
-
-  &:hover {
-    color: ${({ theme }) => theme.colors.text};
-  }
 `;
 
 const LoginPage = () => {
   const { login, register } = useAuth();
   const { loadFavorites } = useFavorites();
+  const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -111,56 +85,30 @@ const LoginPage = () => {
     confirmPassword: '',
   });
 
-  //const { toast, showToast, hideToast } = useToast();
-  const { showToast } = useOutletContext();
-  const handleError = useErrorHandler(showToast);
-
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const result = await handleError(
-        login(formData.email, formData.password)
-      );
-      if (result.success) {
-        await loadFavorites(); // Nu kan vi bare kalde den direkte
-        showToast('Du er nu logget ind', 'success');
 
-        const returnPath = location.state?.returnPath || '/stores';
-        setTimeout(() => {
-          navigate(returnPath);
-        }, 1500);
-      } else {
-        showToast(
-          result.error || 'Login fejlede - tjek email og password',
-          'error'
-        );
+    try {
+      if (!isLoginMode && formData.password !== formData.confirmPassword) {
+        showToast('Passwords matcher ikke', 'error');
+        return;
       }
-    } catch (error) {
-      // Error håndteres automatisk via handleError
-    }
-  };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      showToast('Passwords matcher ikke', 'error');
-      return;
-    }
+      const result = isLoginMode
+        ? await login(formData.email, formData.password)
+        : await register(formData.name, formData.email, formData.password);
 
-    try {
-      const result = await register(
-        formData.name,
-        formData.email,
-        formData.password
-      );
       if (result.success) {
-        showToast('Registrering gennemført! Logger ind...', 'success');
+        if (isLoginMode) await loadFavorites();
+        showToast(
+          `Du er nu ${isLoginMode ? 'logget ind' : 'registreret'}!`,
+          'success'
+        );
+
         const returnPath = location.state?.returnPath || '/stores';
-        setTimeout(() => {
-          navigate(returnPath);
-        }, 1500);
+        setTimeout(() => navigate(returnPath), 1500);
       } else {
-        showToast(result.error, 'error');
+        showToast(result.error || 'Der opstod en fejl', 'error');
       }
     } catch (error) {
       showToast('Der opstod en uventet fejl', 'error');
@@ -168,49 +116,38 @@ const LoginPage = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
-  };
-
-  const toggleMode = (mode) => {
-    setIsLoginMode(mode === 'login');
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    });
+    }));
   };
 
   return (
-    <LoginContainer>
+    <OutletContainer>
       <FormCard>
-        <ToggleContainer>
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
           <ToggleButton
-            onClick={() => toggleMode('login')}
+            onClick={() => setIsLoginMode(true)}
             $active={isLoginMode}
             type='button'
           >
             Login
           </ToggleButton>
           <ToggleButton
-            onClick={() => toggleMode('register')}
+            onClick={() => setIsLoginMode(false)}
             $active={!isLoginMode}
             type='button'
           >
             Opret bruger
           </ToggleButton>
-        </ToggleContainer>
+        </div>
 
-        <Form onSubmit={isLoginMode ? handleLogin : handleRegister}>
+        <Form onSubmit={handleSubmit}>
           {!isLoginMode && (
             <FormGroup>
-              <Label htmlFor='name'>Navn</Label>
               <Input
                 type='text'
-                id='name'
+                placeholder='Navn'
                 name='name'
                 value={formData.name}
                 onChange={handleChange}
@@ -219,10 +156,9 @@ const LoginPage = () => {
             </FormGroup>
           )}
           <FormGroup>
-            <Label htmlFor='email'>Email</Label>
             <Input
               type='email'
-              id='email'
+              placeholder='Email'
               name='email'
               value={formData.email}
               onChange={handleChange}
@@ -230,10 +166,9 @@ const LoginPage = () => {
             />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor='password'>Password</Label>
             <Input
               type='password'
-              id='password'
+              placeholder='Password'
               name='password'
               value={formData.password}
               onChange={handleChange}
@@ -242,10 +177,9 @@ const LoginPage = () => {
           </FormGroup>
           {!isLoginMode && (
             <FormGroup>
-              <Label htmlFor='confirmPassword'>Gentag Password</Label>
               <Input
                 type='password'
-                id='confirmPassword'
+                placeholder='Gentag Password'
                 name='confirmPassword'
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -258,7 +192,7 @@ const LoginPage = () => {
           </Button>
         </Form>
       </FormCard>
-    </LoginContainer>
+    </OutletContainer>
   );
 };
 
