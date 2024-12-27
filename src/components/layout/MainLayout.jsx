@@ -3,7 +3,7 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import styled, { ThemeProvider } from 'styled-components';
 import TopMenu from './navigation/TopMenu';
 import { useTheme } from '../../context/ThemeContext';
-import Toast from '../Toast';
+import Toast from '../feedback/Toast';
 import { useToast } from '../../hooks/useToast';
 
 const Container = styled.div`

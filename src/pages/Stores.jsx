@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import facade from '../utils/apiFacade';
-import ScrollToTop from '../components/feedback/ScrollToTop';
+import ScrollToTop from '../components/layout/navigation/ScrollToTop';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import StoreCard from '../components/card/StoreCard';
 import CardGrid from '../components/layout/container/CardGrid';
