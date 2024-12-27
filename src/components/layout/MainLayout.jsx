@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router';
-import GlobalStyle from '../styles/GlobalStyle';
+import GlobalStyle from '../../styles/GlobalStyle';
 import styled, { ThemeProvider } from 'styled-components';
-import TopMenu from '../components/layout/menu/TopMenu';
-import { useTheme } from '../context/ThemeContext';
-import Toast from '../components/Toast';
-import { useToast } from '../hooks/useToast';
+import TopMenu from './navigation/TopMenu';
+import { useTheme } from '../../context/ThemeContext';
+import Toast from '../Toast';
+import { useToast } from '../../hooks/useToast';
 
 const Container = styled.div`
   display: flex;

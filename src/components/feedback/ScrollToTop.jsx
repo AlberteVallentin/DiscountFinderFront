@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Icon from './ui/Icon';
-import { borderRadius } from '../styles/Theme';
+import Icon from '../ui/Icon';
+import { borderRadius } from '../../styles/Theme';
 
 const ScrollButton = styled.button`
   position: fixed;

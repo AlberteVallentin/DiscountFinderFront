@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import EmptyState from '../components/EmptyState';
+import EmptyState from '../components/feedback/EmptyState';
 import OutletContainer from '../components/layout/OutletContainer';
 
 const DemoContainer = styled.div`

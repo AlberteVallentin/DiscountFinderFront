@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import Modal from './Modal';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../feedback/LoadingSpinner';
 import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
-import EmptyState from '../EmptyState';
+import EmptyState from '../feedback/EmptyState';
 import { useOutletContext } from 'react-router';
 import FilterDropdown from '../dropdown/FilterDropDown';
 import SortDropdown from '../dropdown/SortDropdown';
