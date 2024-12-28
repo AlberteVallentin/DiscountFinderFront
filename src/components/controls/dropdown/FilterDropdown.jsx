@@ -20,7 +20,7 @@ const FilterDropdown = ({
 }) => {
   const selectedCount = selectedCategories.size;
 
-  const renderOptions = (closeDropdown) => (
+  const renderOptions = () => (
     <>
       {categories.map((category) => (
         <DropdownOption
