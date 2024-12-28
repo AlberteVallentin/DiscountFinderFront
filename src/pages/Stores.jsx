@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
+import { useSearch } from '../hooks/useSearch';
 import facade from '../utils/apiFacade';
 import ScrollToTop from '../components/layout/navigation/ScrollToTop';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
@@ -34,61 +35,53 @@ const BrandSection = styled.div`
   flex-wrap: wrap;
 `;
 
-const createPostalCodeOptions = (postalCodes) => [
-  { value: '', label: 'Alle postnumre' },
-  ...postalCodes.map((code) => ({
-    value: code.toString(),
-    label: code.toString(),
-  })),
-];
-
-const updateStoresWithFavorites = (stores, isFavorite) => {
-  return stores.map((store) => ({
-    ...store,
-    isFavorite: isFavorite(store.id),
-  }));
-};
-
 function Stores() {
   const navigate = useNavigate();
   const { isFavorite } = useFavorites();
   const { showToast } = useToast();
+
+  // Modal states
   const {
     isOpen: showLoginModal,
     openModal: openLoginModal,
     closeModal: closeLoginModal,
   } = useModal();
+
   const {
     isOpen: showProductModal,
     openModal: openProductModal,
     closeModal: closeProductModal,
   } = useModal();
 
-  const [storeState, setStoreState] = useState({
-    allStores: [],
-    filteredStores: [],
-    postalCodes: [],
-    loading: true,
-  });
-
-  const [filterState, setFilterState] = useState({
-    searchTerm: '',
-    selectedPostalCode: '',
-    selectedBrands: new Set(),
-  });
-
+  // Base state
+  const [stores, setStores] = useState([]);
+  const [postalCodes, setPostalCodes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
+  const [selectedPostalCode, setSelectedPostalCode] = useState('');
+  const [selectedBrands, setSelectedBrands] = useState(new Set());
 
+  // Initialize search
+  const {
+    searchTerm,
+    filteredItems: searchFilteredStores,
+    handleSearch,
+  } = useSearch(stores, {
+    keys: ['name', 'brand.displayName'],
+  });
+
+  // Initial data fetch
   useEffect(() => {
     const fetchStores = async () => {
       try {
         const result = await facade.getAllStores();
 
         if (result.success) {
-          const storesWithFavorites = updateStoresWithFavorites(
-            result.data,
-            isFavorite
-          );
+          const storesWithFavorites = result.data.map((store) => ({
+            ...store,
+            isFavorite: isFavorite(store.id),
+          }));
+
           const uniquePostalCodes = [
             ...new Set(
               storesWithFavorites.map(
@@ -97,135 +90,110 @@ function Stores() {
             ),
           ].sort();
 
-          setStoreState({
-            allStores: storesWithFavorites,
-            filteredStores: storesWithFavorites,
-            postalCodes: uniquePostalCodes,
-            loading: false,
-          });
+          setStores(storesWithFavorites);
+          setPostalCodes(uniquePostalCodes);
         } else {
           showToast('Der opstod en fejl ved hentning af butikker', 'error');
         }
       } catch (error) {
         showToast('Der opstod en fejl ved hentning af butikker', 'error');
-        setStoreState((prev) => ({ ...prev, loading: false }));
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStores();
   }, [isFavorite, showToast]);
 
+  // Apply additional filters to search results
+  const filteredStores = useMemo(() => {
+    let filtered = [...searchFilteredStores];
+
+    if (selectedPostalCode) {
+      filtered = filtered.filter(
+        (store) =>
+          store.address.postalCode.postalCode === parseInt(selectedPostalCode)
+      );
+    }
+
+    if (selectedBrands.size > 0) {
+      filtered = filtered.filter((store) =>
+        selectedBrands.has(store.brand.displayName)
+      );
+    }
+
+    return filtered;
+  }, [searchFilteredStores, selectedPostalCode, selectedBrands]);
+
+  // Create postal code options
+  const postalCodeOptions = useMemo(
+    () => [
+      { value: '', label: 'Alle postnumre' },
+      ...postalCodes.map((code) => ({
+        value: code.toString(),
+        label: code.toString(),
+      })),
+    ],
+    [postalCodes]
+  );
+
+  // Event handlers
+  const handleSearchChange = (event) => {
+    handleSearch(event.target.value);
+  };
+
+  const handlePostalCodeChange = async (postalCode) => {
+    setSelectedPostalCode(postalCode);
+
+    if (postalCode) {
+      setLoading(true);
+      try {
+        const result = await facade.getStoresByPostalCode(postalCode);
+        if (result.success) {
+          const storesWithFavorites = result.data.map((store) => ({
+            ...store,
+            isFavorite: isFavorite(store.id),
+          }));
+          setStores(storesWithFavorites);
+        } else {
+          showToast('Der opstod en fejl ved hentning af butikker', 'error');
+        }
+      } catch (error) {
+        showToast(error.message, 'error');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Reset to all stores
+      const result = await facade.getAllStores();
+      if (result.success) {
+        const storesWithFavorites = result.data.map((store) => ({
+          ...store,
+          isFavorite: isFavorite(store.id),
+        }));
+        setStores(storesWithFavorites);
+      }
+    }
+  };
+
+  const handleBrandClick = (brand) => {
+    setSelectedBrands((prev) => {
+      const newSelectedBrands = new Set(prev);
+      if (newSelectedBrands.has(brand)) {
+        newSelectedBrands.delete(brand);
+      } else {
+        newSelectedBrands.add(brand);
+      }
+      return newSelectedBrands;
+    });
+  };
+
   const handleStoreClick = (store) => {
     setSelectedStore(store);
     openProductModal();
   };
 
-  const handleProductModalClose = () => {
-    closeProductModal();
-    setSelectedStore(null);
-  };
-
-  const handleLoginRequired = () => {
-    openLoginModal();
-  };
-
-  const handleSearch = (event) => {
-    const term = event.target.value.toLowerCase();
-    setFilterState((prev) => ({ ...prev, searchTerm: term }));
-    filterStores(
-      term,
-      filterState.selectedPostalCode,
-      filterState.selectedBrands,
-      storeState.allStores
-    );
-  };
-
-  const handlePostalCodeChange = async (postalCode) => {
-    setFilterState((prev) => ({ ...prev, selectedPostalCode: postalCode }));
-    setStoreState((prev) => ({ ...prev, loading: true }));
-
-    try {
-      if (postalCode) {
-        const result = await facade.getStoresByPostalCode(postalCode);
-        if (result.success) {
-          const storesWithFavorites = updateStoresWithFavorites(
-            result.data,
-            isFavorite
-          );
-          setStoreState((prev) => ({
-            ...prev,
-            filteredStores:
-              filterState.selectedBrands.size > 0
-                ? storesWithFavorites.filter((store) =>
-                    filterState.selectedBrands.has(store.brand.displayName)
-                  )
-                : storesWithFavorites,
-          }));
-        }
-      } else {
-        filterStores(
-          filterState.searchTerm,
-          '',
-          filterState.selectedBrands,
-          storeState.allStores
-        );
-      }
-    } catch (error) {
-      showToast(error.message, 'error');
-    } finally {
-      setStoreState((prev) => ({ ...prev, loading: false }));
-    }
-  };
-
-  const handleBrandClick = (brand) => {
-    const newSelectedBrands = new Set(filterState.selectedBrands);
-    if (filterState.selectedBrands.has(brand)) {
-      newSelectedBrands.delete(brand);
-    } else {
-      newSelectedBrands.add(brand);
-    }
-
-    setFilterState((prev) => ({ ...prev, selectedBrands: newSelectedBrands }));
-    filterStores(
-      filterState.searchTerm,
-      filterState.selectedPostalCode,
-      newSelectedBrands,
-      storeState.allStores
-    );
-  };
-
-  const filterStores = (search, postalCode, brands, stores) => {
-    let filtered = stores;
-
-    if (search) {
-      filtered = filtered.filter(
-        (store) =>
-          store.name.toLowerCase().includes(search.toLowerCase()) ||
-          store.brand.displayName.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    if (postalCode) {
-      filtered = filtered.filter(
-        (store) => store.address.postalCode.postalCode === parseInt(postalCode)
-      );
-    }
-
-    if (brands?.size > 0) {
-      filtered = filtered.filter((store) =>
-        brands.has(store.brand.displayName)
-      );
-    }
-
-    setStoreState((prev) => ({ ...prev, filteredStores: filtered }));
-  };
-
-  const postalCodeOptions = useMemo(
-    () => createPostalCodeOptions(storeState.postalCodes),
-    [storeState.postalCodes]
-  );
-
-  if (storeState.loading) {
+  if (loading) {
     return <LoadingSpinner text='Henter butikker...' fullscreen={true} />;
   }
 
@@ -234,12 +202,12 @@ function Stores() {
       <SearchSection>
         <SearchBar
           placeholder='Søg efter en butik...'
-          value={filterState.searchTerm}
-          onChange={handleSearch}
+          value={searchTerm}
+          onChange={handleSearchChange}
         />
         <SortDropdown
           options={postalCodeOptions}
-          selectedOption={filterState.selectedPostalCode}
+          selectedOption={selectedPostalCode}
           onSelect={handlePostalCodeChange}
           buttonText='Postnummer'
           icon='MapPin'
@@ -250,7 +218,7 @@ function Stores() {
         {['Netto', 'Føtex', 'Bilka'].map((brand) => (
           <BrandButton
             key={brand}
-            active={filterState.selectedBrands.has(brand)}
+            active={selectedBrands.has(brand)}
             onClick={() => handleBrandClick(brand)}
           >
             {brand}
@@ -259,12 +227,12 @@ function Stores() {
       </BrandSection>
 
       <CardGrid>
-        {storeState.filteredStores.map((store) => (
+        {filteredStores.map((store) => (
           <StoreCard
             key={store.id}
             store={store}
             onClick={() => handleStoreClick(store)}
-            onLoginRequired={handleLoginRequired}
+            onLoginRequired={openLoginModal}
             showToast={showToast}
           />
         ))}
@@ -274,7 +242,10 @@ function Stores() {
         <ProductListModal
           store={selectedStore}
           isOpen={showProductModal}
-          onClose={handleProductModalClose}
+          onClose={() => {
+            closeProductModal();
+            setSelectedStore(null);
+          }}
         />
       )}
 
