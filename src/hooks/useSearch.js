@@ -1,25 +1,21 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
-export const useSearch = (initialItems = [], searchConfig = {}) => {
+export const useSearch = (items = [], searchConfig = {}) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [items, setItems] = useState(initialItems);
-    const [filteredItems, setFilteredItems] = useState(initialItems);
 
-    // Helper function for getting nested values
     const getNestedValue = useCallback((obj, path) => {
         return path.split('.').reduce((current, key) => {
             return current && current[key] !== undefined ? current[key] : null;
         }, obj);
     }, []);
 
-    // Search function
-    const performSearch = useCallback((term, itemsToSearch) => {
-        if (!term.trim()) {
-            return itemsToSearch;
+    const filteredItems = useMemo(() => {
+        if (!searchTerm.trim()) {
+            return items;
         }
 
-        const searchTermLower = term.toLowerCase();
-        return itemsToSearch.filter((item) => {
+        const searchTermLower = searchTerm.toLowerCase();
+        return items.filter((item) => {
             if (searchConfig.keys && searchConfig.keys.length > 0) {
                 return searchConfig.keys.some((key) => {
                     const value = getNestedValue(item, key);
@@ -35,26 +31,15 @@ export const useSearch = (initialItems = [], searchConfig = {}) => {
                 );
             });
         });
-    }, [searchConfig.keys, getNestedValue]);
-
-    // Update filtered items when search term or items change
-    useEffect(() => {
-        setFilteredItems(performSearch(searchTerm, items));
-    }, [searchTerm, items, performSearch]);
-
-    // Update items only when initialItems changes
-    useEffect(() => {
-        setItems(initialItems);
-    }, [initialItems]);
+    }, [items, searchTerm, searchConfig.keys, getNestedValue]);
 
     const handleSearch = useCallback((term) => {
-        setSearchTerm(term);
+        setSearchTerm(typeof term === 'string' ? term : term.target.value);
     }, []);
 
     return {
         searchTerm,
         filteredItems,
-        handleSearch,
-        setItems
+        handleSearch
     };
 };
