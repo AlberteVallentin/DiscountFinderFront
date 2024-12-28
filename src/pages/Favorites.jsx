@@ -5,41 +5,68 @@ import StoreCard from '../components/card/StoreCard';
 import LoginModal from '../components/modal/LoginModal';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import OutletContainer from '../components/layout/container/OutletContainer';
-import { useAuth } from '../context/AuthContext';
-import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
 import EmptyState from '../components/feedback/EmptyState';
-import { useErrorHandler } from '../utils/errorHandler';
-import { useOutletContext } from 'react-router';
+import { useAuth } from '../context/AuthContext';
 import { useFavorites } from '../context/FavoritesContext';
+import { useToast } from '../hooks/useToast';
+import { useModal } from '../hooks/useModal';
+import facade from '../utils/apiFacade';
 
 function Favorites() {
-  // 1. Først deklarerer vi ALLE hooks
-  const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { isFavorite, favorites } = useFavorites();
-  const handleError = useErrorHandler(showToast);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [favoriteStores, setFavoriteStores] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedStore, setSelectedStore] = useState(null);
+  const { favorites } = useFavorites();
+  const { showToast } = useToast();
+  const {
+    isOpen: showLoginModal,
+    openModal: openLoginModal,
+    closeModal: closeLoginModal,
+  } = useModal();
+  const {
+    isOpen: showProductModal,
+    openModal: openProductModal,
+    closeModal: closeProductModal,
+  } = useModal();
 
-  // 2. useEffect for at hente favoritter når komponenten indlæses
+  const [{ loading, favoriteStores, selectedStore }, setState] = useState({
+    loading: true,
+    favoriteStores: [],
+    selectedStore: null,
+  });
+
+  // Data fetching
   useEffect(() => {
-    const loadFavorites = async () => {
-      if (isAuthenticated) {
-        const result = await handleError(facade.getFavorites());
-        if (result.success) {
-          setFavoriteStores(result.data);
-        }
-        setLoading(false);
+    const fetchFavorites = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const result = await facade.getFavorites();
+        setState((prev) => ({
+          ...prev,
+          favoriteStores: result.success ? result.data : [],
+          loading: false,
+        }));
+      } catch (error) {
+        showToast('Der opstod en fejl ved hentning af favoritter', 'error');
+        setState((prev) => ({ ...prev, loading: false }));
       }
     };
-    loadFavorites();
-  }, [isAuthenticated, favorites]);
 
-  // 3. Betingede returns
+    fetchFavorites();
+  }, [isAuthenticated, favorites, showToast]);
+
+  // Modal handlers
+  const modalHandlers = {
+    openProduct: (store) => {
+      setState((prev) => ({ ...prev, selectedStore: store }));
+      openProductModal();
+    },
+    closeProduct: () => {
+      setState((prev) => ({ ...prev, selectedStore: null }));
+      closeProductModal();
+    },
+  };
+
   if (!isAuthenticated) {
     return (
       <LoginModal
@@ -59,7 +86,6 @@ function Favorites() {
     );
   }
 
-  // 4. Hovedrender
   return (
     <OutletContainer>
       <h1>Mine favoritbutikker</h1>
@@ -71,19 +97,28 @@ function Favorites() {
             <StoreCard
               key={store.id}
               store={store}
-              onClick={() => setSelectedStore(store)}
-              onLoginRequired={() => navigate('/login')}
+              onClick={() => modalHandlers.openProduct(store)}
+              onLoginRequired={openLoginModal}
               showToast={showToast}
             />
           ))}
         </CardGrid>
       )}
+
       {selectedStore && (
         <ProductListModal
           store={selectedStore}
-          onClose={() => setSelectedStore(null)}
+          isOpen={showProductModal}
+          onClose={modalHandlers.closeProduct}
         />
       )}
+
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={closeLoginModal}
+        onLogin={() => navigate('/login')}
+        message='Du skal være logget ind for at tilføje butikker til favoritter.'
+      />
     </OutletContainer>
   );
 }
