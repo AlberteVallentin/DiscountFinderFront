@@ -13,7 +13,7 @@ import OutletContainer from '../components/layout/container/OutletContainer';
 import LoginModal from '../components/modal/LoginModal';
 import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
-import SortDropdown from '../components/dropdown/SortDropdown';
+import SortDropdown from '../components/controls/dropdown/SortDropdown';
 
 // Styled Components
 const SearchSection = styled.div`

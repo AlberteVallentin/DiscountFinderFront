@@ -6,8 +6,8 @@ import facade from '../../utils/apiFacade';
 import SearchBar from '../ui/SearchBar';
 import EmptyState from '../feedback/EmptyState';
 import { useOutletContext } from 'react-router';
-import FilterDropdown from '../dropdown/FilterDropDown';
-import SortDropdown from '../dropdown/SortDropdown';
+import FilterDropdown from '../controls/dropdown/FilterDropdown';
+import SortDropdown from '../controls/dropdown/SortDropdown';
 import { borderRadius } from '../../styles/Theme';
 
 const StoreHeader = styled.div`

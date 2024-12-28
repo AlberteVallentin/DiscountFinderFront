@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Dropdown, { DropdownOption } from './Dropdown';
-import { borderRadius } from '../../styles/Theme';
-import Icon from '../ui/Icon';
+import { borderRadius } from '../../../styles/Theme';
+import Icon from '../../ui/Icon';
 
 const SelectedCount = styled.span`
   background: ${({ theme }) => theme.colors.buttonText};

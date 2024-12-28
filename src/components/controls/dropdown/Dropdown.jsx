@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { borderRadius, borders } from '../../styles/Theme';
-import Button from '../button/Button';
-import Icon from '../ui/Icon';
+import { borderRadius, borders } from '../../../styles/Theme';
+import Button from '../../button/Button';
+import Icon from '../../ui/Icon';
 
 const Container = styled.div`
   position: relative;
