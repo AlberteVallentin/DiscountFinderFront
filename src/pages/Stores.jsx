@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import StoreCard from '../components/card/StoreCard';
 import CardGrid from '../components/layout/container/CardGrid';
 import ProductListModal from '../components/modal/ProductListModal';
-import SearchBar from '../components/ui/SearchBar';
+import SearchBar from '../components/controls/SearchBar';
 import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import LoginModal from '../components/modal/LoginModal';

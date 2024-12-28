@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Modal from './Modal';
 import LoadingSpinner from '../feedback/LoadingSpinner';
 import facade from '../../utils/apiFacade';
-import SearchBar from '../ui/SearchBar';
+import SearchBar from '../controls/SearchBar';
 import EmptyState from '../feedback/EmptyState';
 import { useOutletContext } from 'react-router';
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
