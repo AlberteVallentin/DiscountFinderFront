@@ -5,14 +5,14 @@ import LoadingSpinner from '../feedback/LoadingSpinner';
 import facade from '../../utils/apiFacade';
 import SearchBar from '../controls/SearchBar';
 import EmptyState from '../feedback/EmptyState';
-import { useOutletContext } from 'react-router';
-
+import { useToast } from '../../hooks/useToast';
+import { useModal } from '../../hooks/useModal';
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
 import SortDropdown from '../controls/dropdown/SortDropdown';
 import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
-
 import { borderRadius } from '../../styles/Theme';
 
+// Styled components (uændrede)
 const StoreHeader = styled.div`
   display: flex;
   flex-direction: column;
@@ -125,7 +125,11 @@ const sortOptions = [
 ];
 
 const ProductListModal = ({ store, onClose }) => {
-  const { showToast } = useOutletContext();
+  // Custom hooks
+  const { toast, showToast } = useToast();
+  const { isOpen } = useModal(true); // Start åben da det er en modal
+
+  // State management
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -133,6 +137,7 @@ const ProductListModal = ({ store, onClose }) => {
   const [sortOption, setSortOption] = useState(null);
   const [priceRange, setPriceRange] = useState(null);
 
+  // Data fetching
   useEffect(() => {
     if (store?.id) {
       fetchProducts();
@@ -156,6 +161,7 @@ const ProductListModal = ({ store, onClose }) => {
     }
   };
 
+  // Memoized values
   const categories = useMemo(() => {
     const categorySet = new Set();
     products.forEach((product) => {
@@ -166,33 +172,24 @@ const ProductListModal = ({ store, onClose }) => {
     return Array.from(categorySet).sort();
   }, [products]);
 
-  const handleCategoryToggle = (category) => {
-    setSelectedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
-  };
-
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
+    // Søgning
     if (searchTerm) {
       filtered = filtered.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
+    // Kategori filter
     if (selectedCategories.size > 0) {
       filtered = filtered.filter((product) =>
         product.categories.some((cat) => selectedCategories.has(cat.nameDa))
       );
     }
 
+    // Pris filter
     if (priceRange) {
       filtered = filtered.filter(
         (product) =>
@@ -201,6 +198,7 @@ const ProductListModal = ({ store, onClose }) => {
       );
     }
 
+    // Sortering
     if (sortOption) {
       filtered.sort((a, b) => {
         switch (sortOption) {
@@ -221,8 +219,22 @@ const ProductListModal = ({ store, onClose }) => {
     return filtered;
   }, [products, searchTerm, selectedCategories, sortOption, priceRange]);
 
+  // Event handlers
+  const handleCategoryToggle = (category) => {
+    setSelectedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
+  // Render
   return (
-    <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
       <Content>
         <Controls>
           <StoreHeader>
