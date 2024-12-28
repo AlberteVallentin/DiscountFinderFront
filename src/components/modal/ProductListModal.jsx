@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import Modal from './Modal';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../feedback/LoadingSpinner';
 import facade from '../../utils/apiFacade';
-import SearchBar from '../ui/SearchBar';
-import EmptyState from '../EmptyState';
+import SearchBar from '../controls/SearchBar';
+import EmptyState from '../feedback/EmptyState';
 import { useOutletContext } from 'react-router';
-import FilterDropdown from '../dropdown/FilterDropdown';
-import SortDropdown from '../dropdown/SortDropdown';
+
+import FilterDropdown from '../controls/dropdown/FilterDropdown';
+import SortDropdown from '../controls/dropdown/SortDropdown';
+import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
+
 import { borderRadius } from '../../styles/Theme';
 
 const StoreHeader = styled.div`
@@ -128,6 +131,7 @@ const ProductListModal = ({ store, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState(new Set());
   const [sortOption, setSortOption] = useState(null);
+  const [priceRange, setPriceRange] = useState(null);
 
   useEffect(() => {
     if (store?.id) {
@@ -189,6 +193,14 @@ const ProductListModal = ({ store, onClose }) => {
       );
     }
 
+    if (priceRange) {
+      filtered = filtered.filter(
+        (product) =>
+          product.price.newPrice >= priceRange.min &&
+          product.price.newPrice <= priceRange.max
+      );
+    }
+
     if (sortOption) {
       filtered.sort((a, b) => {
         switch (sortOption) {
@@ -207,7 +219,7 @@ const ProductListModal = ({ store, onClose }) => {
     }
 
     return filtered;
-  }, [products, searchTerm, selectedCategories, sortOption]);
+  }, [products, searchTerm, selectedCategories, sortOption, priceRange]);
 
   return (
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
@@ -226,6 +238,11 @@ const ProductListModal = ({ store, onClose }) => {
             categories={categories}
             selectedCategories={selectedCategories}
             onCategoryToggle={handleCategoryToggle}
+          />
+
+          <PriceFilterDropdown
+            currentRange={priceRange}
+            onApply={setPriceRange}
           />
 
           <SortDropdown

@@ -12,6 +12,7 @@ const BaseCard = styled.div`
   flex-direction: column;
   gap: 1rem;
   height: 100%;
+  width: 100%;
 
   cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import Dropdown, { DropdownOption } from './Dropdown';
-import Icon from '../ui/Icon';
+import Icon from '../../ui/Icon';
 
 const SortDropdown = ({
   options,

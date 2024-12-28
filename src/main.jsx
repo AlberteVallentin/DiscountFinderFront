@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import Home from './pages/Home.jsx';
 import Favorites from './pages/Favorites.jsx';
-import MainLayout from './layouts/MainLayout.jsx';
+import MainLayout from './components/layout/MainLayout.jsx';
 import {
   createBrowserRouter,
   createRoutesFromElements,

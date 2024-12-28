@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PackageX, Heart, Search } from 'lucide-react';
-import Button from './button/Button';
+import Button from '../button/Button';
 import { useNavigate } from 'react-router';
 
 const EmptyStateContainer = styled.div`
