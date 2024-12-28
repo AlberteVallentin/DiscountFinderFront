@@ -11,11 +11,11 @@ import SearchBar from '../components/controls/SearchBar';
 import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import LoginModal from '../components/modal/LoginModal';
-import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
 import SortDropdown from '../components/controls/dropdown/SortDropdown';
+import { useToast } from '../hooks/useToast';
+import { useModal } from '../hooks/useModal';
 
-// Styled Components
 const SearchSection = styled.div`
   display: flex;
   gap: 1rem;
@@ -34,7 +34,6 @@ const BrandSection = styled.div`
   flex-wrap: wrap;
 `;
 
-// Helper Functions
 const createPostalCodeOptions = (postalCodes) => [
   { value: '', label: 'Alle postnumre' },
   ...postalCodes.map((code) => ({
@@ -51,12 +50,20 @@ const updateStoresWithFavorites = (stores, isFavorite) => {
 };
 
 function Stores() {
-  // Hooks
   const navigate = useNavigate();
   const { isFavorite } = useFavorites();
-  const { showToast } = useOutletContext();
+  const { showToast } = useToast();
+  const {
+    isOpen: showLoginModal,
+    openModal: openLoginModal,
+    closeModal: closeLoginModal,
+  } = useModal();
+  const {
+    isOpen: showProductModal,
+    openModal: openProductModal,
+    closeModal: closeProductModal,
+  } = useModal();
 
-  // State Management
   const [storeState, setStoreState] = useState({
     allStores: [],
     filteredStores: [],
@@ -70,59 +77,56 @@ function Stores() {
     selectedBrands: new Set(),
   });
 
-  const [modalState, setModalState] = useState({
-    selectedStore: null,
-    showLoginModal: false,
-  });
+  const [selectedStore, setSelectedStore] = useState(null);
 
-  // Memoized Values
-  const postalCodeOptions = useMemo(
-    () => createPostalCodeOptions(storeState.postalCodes),
-    [storeState.postalCodes]
-  );
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const result = await facade.getAllStores();
 
-  // Event Handlers
+        if (result.success) {
+          const storesWithFavorites = updateStoresWithFavorites(
+            result.data,
+            isFavorite
+          );
+          const uniquePostalCodes = [
+            ...new Set(
+              storesWithFavorites.map(
+                (store) => store.address.postalCode.postalCode
+              )
+            ),
+          ].sort();
+
+          setStoreState({
+            allStores: storesWithFavorites,
+            filteredStores: storesWithFavorites,
+            postalCodes: uniquePostalCodes,
+            loading: false,
+          });
+        } else {
+          showToast('Der opstod en fejl ved hentning af butikker', 'error');
+        }
+      } catch (error) {
+        showToast('Der opstod en fejl ved hentning af butikker', 'error');
+        setStoreState((prev) => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchStores();
+  }, [isFavorite, showToast]);
+
   const handleStoreClick = (store) => {
-    setModalState((prev) => ({ ...prev, selectedStore: store }));
+    setSelectedStore(store);
+    openProductModal();
+  };
+
+  const handleProductModalClose = () => {
+    closeProductModal();
+    setSelectedStore(null);
   };
 
   const handleLoginRequired = () => {
-    setModalState((prev) => ({ ...prev, showLoginModal: true }));
-  };
-
-  const closeLoginModal = () => {
-    setModalState((prev) => ({ ...prev, showLoginModal: false }));
-  };
-
-  const handleModalClose = () => {
-    setModalState((prev) => ({ ...prev, selectedStore: null }));
-  };
-
-  // Filter Functions
-  const filterStores = (search, postalCode, brands, stores) => {
-    let filtered = stores;
-
-    if (search) {
-      filtered = filtered.filter(
-        (store) =>
-          store.name.toLowerCase().includes(search.toLowerCase()) ||
-          store.brand.displayName.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    if (postalCode) {
-      filtered = filtered.filter(
-        (store) => store.address.postalCode.postalCode === parseInt(postalCode)
-      );
-    }
-
-    if (brands?.size > 0) {
-      filtered = filtered.filter((store) =>
-        brands.has(store.brand.displayName)
-      );
-    }
-
-    setStoreState((prev) => ({ ...prev, filteredStores: filtered }));
+    openLoginModal();
   };
 
   const handleSearch = (event) => {
@@ -190,45 +194,37 @@ function Stores() {
     );
   };
 
-  // Data Fetching
-  useEffect(() => {
-    const fetchStores = async () => {
-      try {
-        const result = await facade.getAllStores();
+  const filterStores = (search, postalCode, brands, stores) => {
+    let filtered = stores;
 
-        if (result.success) {
-          const storesWithFavorites = updateStoresWithFavorites(
-            result.data,
-            isFavorite
-          );
-          const uniquePostalCodes = [
-            ...new Set(
-              storesWithFavorites.map(
-                (store) => store.address.postalCode.postalCode
-              )
-            ),
-          ].sort();
+    if (search) {
+      filtered = filtered.filter(
+        (store) =>
+          store.name.toLowerCase().includes(search.toLowerCase()) ||
+          store.brand.displayName.toLowerCase().includes(search.toLowerCase())
+      );
+    }
 
-          setStoreState((prev) => ({
-            ...prev,
-            allStores: storesWithFavorites,
-            filteredStores: storesWithFavorites,
-            postalCodes: uniquePostalCodes,
-            loading: false,
-          }));
-        } else {
-          showToast('Der opstod en fejl ved hentning af butikker', 'error');
-        }
-      } catch (error) {
-        showToast('Der opstod en fejl ved hentning af butikker', 'error');
-        setStoreState((prev) => ({ ...prev, loading: false }));
-      }
-    };
+    if (postalCode) {
+      filtered = filtered.filter(
+        (store) => store.address.postalCode.postalCode === parseInt(postalCode)
+      );
+    }
 
-    fetchStores();
-  }, [isFavorite, showToast]);
+    if (brands?.size > 0) {
+      filtered = filtered.filter((store) =>
+        brands.has(store.brand.displayName)
+      );
+    }
 
-  // Render Functions
+    setStoreState((prev) => ({ ...prev, filteredStores: filtered }));
+  };
+
+  const postalCodeOptions = useMemo(
+    () => createPostalCodeOptions(storeState.postalCodes),
+    [storeState.postalCodes]
+  );
+
   if (storeState.loading) {
     return <LoadingSpinner text='Henter butikker...' fullscreen={true} />;
   }
@@ -274,21 +270,20 @@ function Stores() {
         ))}
       </CardGrid>
 
-      {modalState.selectedStore && (
+      {selectedStore && (
         <ProductListModal
-          store={modalState.selectedStore}
-          onClose={handleModalClose}
+          store={selectedStore}
+          isOpen={showProductModal}
+          onClose={handleProductModalClose}
         />
       )}
 
-      {modalState.showLoginModal && (
-        <LoginModal
-          isOpen={modalState.showLoginModal}
-          onClose={closeLoginModal}
-          onLogin={() => navigate('/login')}
-          message='Du skal være logget ind for at tilføje butikker til favoritter.'
-        />
-      )}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={closeLoginModal}
+        onLogin={() => navigate('/login')}
+        message='Du skal være logget ind for at tilføje butikker til favoritter.'
+      />
 
       <ScrollToTop />
     </OutletContainer>

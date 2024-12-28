@@ -76,7 +76,7 @@ const CloseButton = styled.button`
 `;
 
 const Modal = ({
-  isOpen,
+  isOpen = false,
   onClose,
   children,
   maxWidth,
@@ -88,6 +88,8 @@ const Modal = ({
 
   useEffect(() => {
     const dialog = dialogRef.current;
+    if (!dialog) return;
+
     if (isOpen && !dialog.open) {
       dialog.showModal();
     } else if (!isOpen && dialog.open) {
@@ -97,6 +99,7 @@ const Modal = ({
 
   useEffect(() => {
     const dialog = dialogRef.current;
+    if (!dialog) return;
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && !closeOnEscape) {
@@ -119,6 +122,7 @@ const Modal = ({
     };
   }, [closeOnEscape, closeOnOutsideClick, onClose]);
 
+  // Hvis ikke isOpen, render ingenting
   if (!isOpen) return null;
 
   return (

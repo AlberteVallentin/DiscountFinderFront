@@ -124,12 +124,8 @@ const sortOptions = [
   { value: 'expiry', label: 'Udløber snarest' },
 ];
 
-const ProductListModal = ({ store, onClose }) => {
-  // Custom hooks
-  const { toast, showToast } = useToast();
-  const { isOpen } = useModal(true); // Start åben da det er en modal
-
-  // State management
+const ProductListModal = ({ store, isOpen, onClose }) => {
+  const { showToast } = useToast();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -137,12 +133,11 @@ const ProductListModal = ({ store, onClose }) => {
   const [sortOption, setSortOption] = useState(null);
   const [priceRange, setPriceRange] = useState(null);
 
-  // Data fetching
   useEffect(() => {
-    if (store?.id) {
+    if (store?.id && isOpen) {
       fetchProducts();
     }
-  }, [store?.id]);
+  }, [store?.id, isOpen]);
 
   const fetchProducts = async () => {
     try {
