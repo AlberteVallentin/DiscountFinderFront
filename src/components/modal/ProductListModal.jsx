@@ -6,12 +6,11 @@ import facade from '../../utils/apiFacade';
 import SearchBar from '../controls/SearchBar';
 import EmptyState from '../feedback/EmptyState';
 import { useOutletContext } from 'react-router';
+import ProductCard from '../card/ProductCard';
 
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
 import SortDropdown from '../controls/dropdown/SortDropdown';
 import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
-
-import { borderRadius } from '../../styles/Theme';
 
 const StoreHeader = styled.div`
   display: flex;
@@ -41,74 +40,6 @@ const ProductsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
-`;
-
-const ProductCard = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border-radius: ${borderRadius.rounded};
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const ProductTitle = styled.h3`
-  font-size: var(--fs-n);
-  color: ${({ theme }) => theme.colors.text};
-  margin: 0;
-`;
-
-const CategoriesContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-`;
-
-const CategoryTag = styled.span`
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
-  padding: 0.25rem 0.75rem;
-  border-radius: ${borderRadius.round};
-  font-size: var(--fs-s);
-  border: 1px solid ${({ theme }) => theme.colors.border};
-`;
-
-const PriceInfo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const Price = styled.div`
-  font-size: var(--fs-m);
-  font-weight: var(--fw-semi-bold);
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const OldPrice = styled.span`
-  text-decoration: line-through;
-  color: ${({ theme }) => theme.colors.border};
-  font-size: var(--fs-s);
-  margin-left: 0.5rem;
-`;
-
-const Discount = styled.span`
-  background: #dc2626;
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: ${borderRadius.round};
-  font-size: var(--fs-s);
-`;
-
-const StockInfo = styled.div`
-  font-size: var(--fs-s);
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const DateInfo = styled.div`
-  font-size: var(--fs-s);
-  color: ${({ theme }) => theme.colors.text};
 `;
 
 const Content = styled.div`
@@ -262,32 +193,7 @@ const ProductListModal = ({ store, onClose }) => {
         ) : (
           <ProductsGrid>
             {filteredProducts.map((product) => (
-              <ProductCard key={product.ean}>
-                <ProductTitle>{product.productName}</ProductTitle>
-                <CategoriesContainer>
-                  {[
-                    ...new Set(product.categories.map((cat) => cat.nameDa)),
-                  ].map((categoryName) => (
-                    <CategoryTag key={categoryName}>{categoryName}</CategoryTag>
-                  ))}
-                </CategoriesContainer>
-                <PriceInfo>
-                  <div>
-                    <Price>{product.price.newPrice.toFixed(2)} kr</Price>
-                    <OldPrice>
-                      {product.price.originalPrice.toFixed(2)} kr
-                    </OldPrice>
-                  </div>
-                  <Discount>
-                    -{product.price.percentDiscount.toFixed(0)}%
-                  </Discount>
-                </PriceInfo>
-                <StockInfo>På lager: {product.stock.quantity} stk.</StockInfo>
-                <DateInfo>
-                  Tilbud gælder til:{' '}
-                  {new Date(product.timing.endTime).toLocaleDateString()}
-                </DateInfo>
-              </ProductCard>
+              <ProductCard key={product.ean} product={product} />
             ))}
           </ProductsGrid>
         )}

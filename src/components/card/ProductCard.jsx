@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 import BaseCard from './BaseCard';
+import { borderRadius } from '../../styles/Theme';
 
 const ProductTitle = styled.h3`
   font-size: var(--fs-n);
   font-weight: var(--fw-medium);
   color: ${({ theme }) => theme.colors.text};
-  margin: 0;
 `;
 
 const TagsContainer = styled.div`
@@ -18,7 +18,7 @@ const Tag = styled.span`
   background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
   padding: 0.25rem 0.75rem;
-  border-radius: 16px;
+  border-radius: ${borderRadius.round};
   font-size: var(--fs-s);
   border: 1px solid ${({ theme }) => theme.colors.border};
 `;
@@ -40,8 +40,7 @@ const Discount = styled.span`
   background: #dc2626;
   color: white;
   padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: var(--fs-s);
+  border-radius: ${borderRadius.round};
 `;
 
 const OriginalPrice = styled.span`
