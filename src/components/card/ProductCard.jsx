@@ -65,9 +65,11 @@ const ProductCard = ({ product }) => (
   <BaseCard>
     <ProductTitle>{product.productName}</ProductTitle>
     <TagsContainer>
-      {product.categories.map((category) => (
-        <Tag key={category.nameDa}>{category.nameDa}</Tag>
-      ))}
+      {[...new Set(product.categories.map((category) => category.nameDa))].map(
+        (categoryName) => (
+          <Tag key={categoryName}>{categoryName}</Tag>
+        )
+      )}
     </TagsContainer>
     <PriceInfo>
       <div>

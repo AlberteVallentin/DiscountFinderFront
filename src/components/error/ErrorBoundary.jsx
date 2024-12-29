@@ -1,6 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from 'react-router';
 import styled from 'styled-components';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const ErrorContainer = styled.div`
   display: flex;
