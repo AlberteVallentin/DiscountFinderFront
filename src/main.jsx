@@ -13,7 +13,7 @@ import Stores from './pages/Stores.jsx';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound.jsx';
 import EmptyStateDemo from './pages/EmptyStateDemo.jsx';
-import ErrorBoundary from './components/ErrorBoundary.jsx';
+import ErrorBoundary from './components/error/ErrorBoundary.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { FavoritesProvider } from './context/FavoritesContext.jsx';

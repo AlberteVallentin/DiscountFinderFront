@@ -52,7 +52,6 @@ const OriginalPrice = styled.span`
 const StockInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   color: ${({ theme }) => theme.colors.text};
   font-size: var(--fs-s);
 `;
@@ -66,9 +65,11 @@ const ProductCard = ({ product }) => (
   <BaseCard>
     <ProductTitle>{product.productName}</ProductTitle>
     <TagsContainer>
-      {product.categories.map((category) => (
-        <Tag key={category.nameDa}>{category.nameDa}</Tag>
-      ))}
+      {[...new Set(product.categories.map((category) => category.nameDa))].map(
+        (categoryName) => (
+          <Tag key={categoryName}>{categoryName}</Tag>
+        )
+      )}
     </TagsContainer>
     <PriceInfo>
       <div>

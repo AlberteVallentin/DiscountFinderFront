@@ -7,18 +7,13 @@ import SearchBar from '../controls/SearchBar';
 import EmptyState from '../feedback/EmptyState';
 import { useOutletContext } from 'react-router';
 import ProductCard from '../card/ProductCard';
-
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
 import SortDropdown from '../controls/dropdown/SortDropdown';
 import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
 
 const StoreHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
   text-align: center;
+  margin-bottom: 1rem;
 `;
 
 const StoreName = styled.h2`
@@ -29,11 +24,25 @@ const StoreName = styled.h2`
 
 const Controls = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
   width: 100%;
+  margin-bottom: 2rem;
+`;
+
+const SearchSection = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+`;
+
+const FilterSection = styled.div`
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ProductsGrid = styled.div`
@@ -159,29 +168,34 @@ const ProductListModal = ({ store, onClose }) => {
           <StoreHeader>
             <StoreName>{store.name}</StoreName>
           </StoreHeader>
-          <SearchBar
-            placeholder='Søg efter varer...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
 
-          <FilterDropdown
-            categories={categories}
-            selectedCategories={selectedCategories}
-            onCategoryToggle={handleCategoryToggle}
-          />
+          <SearchSection>
+            <SearchBar
+              placeholder='Søg efter varer...'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchSection>
 
-          <PriceFilterDropdown
-            currentRange={priceRange}
-            onApply={setPriceRange}
-          />
+          <FilterSection>
+            <FilterDropdown
+              categories={categories}
+              selectedCategories={selectedCategories}
+              onCategoryToggle={handleCategoryToggle}
+            />
 
-          <SortDropdown
-            options={sortOptions}
-            selectedOption={sortOption}
-            onSelect={setSortOption}
-            align='right'
-          />
+            <PriceFilterDropdown
+              currentRange={priceRange}
+              onApply={setPriceRange}
+            />
+
+            <SortDropdown
+              options={sortOptions}
+              selectedOption={sortOption}
+              onSelect={setSortOption}
+              align='right'
+            />
+          </FilterSection>
         </Controls>
 
         {loading ? (
