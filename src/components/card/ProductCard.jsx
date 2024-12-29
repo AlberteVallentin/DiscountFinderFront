@@ -52,7 +52,6 @@ const OriginalPrice = styled.span`
 const StockInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   color: ${({ theme }) => theme.colors.text};
   font-size: var(--fs-s);
 `;
