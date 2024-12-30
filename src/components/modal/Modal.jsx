@@ -8,6 +8,7 @@ const ModalDialog = styled.dialog`
   background: ${({ theme }) => theme.colors.background};
   border: ${({ theme }) => `${borders.thin} ${theme.colors.border}`};
   border-radius: ${borderRadius.rounded};
+  color: ${({ theme }) => theme.colors.text};
   width: 90vw;
   max-width: ${({ $maxWidth }) => $maxWidth || '600px'};
   min-height: ${({ $minHeight }) => $minHeight || '600px'};

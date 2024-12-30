@@ -1,13 +1,16 @@
-const colors = {
+export const colors = {
     neutralLight: "#f7f7f7",
-    neutralDark: "#14181C",
-    neutralBlue: "#2C3440",
+    neutralDark: "#161618",
+    darkBlue: "#1E2327",
     white: "#FFFFFF",
     black: "#000000",
     lightGray: "#E0E0E0",
+    MutedSilver: "#CACACA",
+    grey: "#5a5a5a",
     darkBlueGray: "#2F3A47",
     boxShadowLight: "0 10px 30px rgba(0, 0, 0, 0.1)",
     boxShadowDark: "0 10px 30px rgba(255, 255, 255, 0.05)",
+
 
 };
 
@@ -51,9 +54,10 @@ export const lightTheme = {
         border: colors.lightGray,
         overlay: overlay.overlayLight,
         line: colors.lightGray,
-        buttonColor: colors.neutralBlue,
+        buttonColor: colors.darkBlue,
         buttonText: colors.neutralLight,
         searchBarIcon: colors.neutralDark,
+        disabledHeart: colors.MutedSilver,
 
     },
     searchBar: {
@@ -67,8 +71,8 @@ export const darkTheme = {
     colors: {
         text: colors.neutralLight,
         background: colors.neutralDark,
-        card: colors.neutralBlue,
-        header: colors.neutralBlue,
+        card: colors.darkBlue,
+        header: colors.darkBlue,
         boxShadow: colors.boxShadowDark,
         border: colors.darkBlueGray,
         overlay: overlay.overlayLight,
@@ -76,9 +80,10 @@ export const darkTheme = {
         buttonColor: colors.lightGray,
         buttonText: colors.neutralDark,
         searchBarIcon: colors.neutralLight,
+        disabledHeart: colors.grey,
     },
     searchBar: {
         text: colors.neutralLight,
-        color: colors.neutralBlue,
+        color: colors.darkBlue,
     },
 };

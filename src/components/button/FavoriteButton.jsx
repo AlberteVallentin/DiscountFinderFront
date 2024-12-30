@@ -31,8 +31,10 @@ const FavoriteIcon = styled.button`
   svg {
     width: 1.5rem;
     height: 1.5rem;
-    fill: ${({ $isFavorite }) => ($isFavorite ? '#FF0000' : '#666666')};
-    stroke: ${({ $isFavorite }) => ($isFavorite ? '#FF0000' : '#666666')};
+    fill: ${({ $isFavorite, theme }) =>
+      $isFavorite ? '#FF0000' : theme.colors.disabledHeart};
+    stroke: ${({ $isFavorite, theme }) =>
+      $isFavorite ? '#FF0000' : theme.colors.disabledHeart};
     animation: ${({ $isFavorite }) =>
       $isFavorite &&
       css`
