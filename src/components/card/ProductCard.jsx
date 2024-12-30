@@ -61,16 +61,18 @@ const DateInfo = styled.div`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-const ProductCard = ({ product }) => (
+const ProductCard = ({ product, showCategories = true }) => (
   <BaseCard>
     <ProductTitle>{product.productName}</ProductTitle>
-    <TagsContainer>
-      {[...new Set(product.categories.map((category) => category.nameDa))].map(
-        (categoryName) => (
+    {showCategories && (
+      <TagsContainer>
+        {[
+          ...new Set(product.categories.map((category) => category.nameDa)),
+        ].map((categoryName) => (
           <Tag key={categoryName}>{categoryName}</Tag>
-        )
-      )}
-    </TagsContainer>
+        ))}
+      </TagsContainer>
+    )}
     <PriceInfo>
       <div>
         <Price>{product.price.newPrice.toFixed(2)} kr</Price>
