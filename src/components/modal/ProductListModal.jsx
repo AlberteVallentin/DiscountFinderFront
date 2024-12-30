@@ -10,6 +10,8 @@ import ProductCard from '../card/ProductCard';
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
 import SortDropdown from '../controls/dropdown/SortDropdown';
 import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
+import Switch from '../Switch';
+import Icon from '../ui/Icon';
 
 const StoreHeader = styled.div`
   text-align: center;
@@ -32,9 +34,33 @@ const Controls = styled.div`
 
 const SearchSection = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 2rem;
   width: 100%;
   justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+const ViewOptions = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const ToggleText = styled.span`
+  font-size: var(--fs-s);
+  color: ${({ theme }) => theme.colors.text};
+  text-align: center;
+  width: 9rem;
+
+  display: block;
 `;
 
 const FilterSection = styled.div`
@@ -72,6 +98,7 @@ const ProductListModal = ({ store, onClose }) => {
   const [selectedCategories, setSelectedCategories] = useState(new Set());
   const [sortOption, setSortOption] = useState(null);
   const [priceRange, setPriceRange] = useState(null);
+  const [showCategories, setShowCategories] = useState(true);
 
   useEffect(() => {
     if (store?.id) {
@@ -175,6 +202,18 @@ const ProductListModal = ({ store, onClose }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            <ViewOptions>
+              <ToggleContainer>
+                <Icon name='Tags' size='n' />
+                <Switch
+                  isToggled={showCategories}
+                  onToggle={() => setShowCategories(!showCategories)}
+                />
+              </ToggleContainer>
+              <ToggleText>
+                {showCategories ? 'Skjul kategorier' : 'Vis kategorier'}
+              </ToggleText>
+            </ViewOptions>
           </SearchSection>
 
           <FilterSection>
@@ -183,12 +222,10 @@ const ProductListModal = ({ store, onClose }) => {
               selectedCategories={selectedCategories}
               onCategoryToggle={handleCategoryToggle}
             />
-
             <PriceFilterDropdown
               currentRange={priceRange}
               onApply={setPriceRange}
             />
-
             <SortDropdown
               options={sortOptions}
               selectedOption={sortOption}
@@ -207,7 +244,11 @@ const ProductListModal = ({ store, onClose }) => {
         ) : (
           <ProductsGrid>
             {filteredProducts.map((product) => (
-              <ProductCard key={product.ean} product={product} />
+              <ProductCard
+                key={product.ean}
+                product={product}
+                showCategories={showCategories}
+              />
             ))}
           </ProductsGrid>
         )}
