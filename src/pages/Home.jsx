@@ -1,14 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router';
-import {
-  ShoppingCart,
-  Heart,
-  MapPin,
-  Percent,
-  ArrowRight,
-  Star,
-} from 'lucide-react';
+import Icon from '../components/ui/Icon';
 import Button from '../components/button/Button';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import { borderRadius } from '../styles/Theme';
@@ -254,25 +247,25 @@ const Home = () => {
 
   const features = [
     {
-      icon: <ShoppingCart size={32} />,
+      icon: <Icon name='ShoppingCart' size='l' />,
       title: 'Intelligente Tilbudssøgning',
       description:
         'Find præcis de tilbud du leder efter med vores smarte søgefunktion.',
     },
     {
-      icon: <Heart size={32} />,
+      icon: <Icon name='Heart' size='l' />,
       title: 'Personlige Favoritter',
       description:
         'Skræddersy din oplevelse ved at gemme dine foretrukne butikker.',
     },
     {
-      icon: <MapPin size={32} />,
+      icon: <Icon name='MapPin' size='l' />,
       title: 'Lokale Tilbud',
       description:
         'Opdag de bedste tilbud i nærheden af dig med postnummer-søgning.',
     },
     {
-      icon: <Star size={32} />,
+      icon: <Icon name='Star' size='l' />,
       title: 'Prisoverblik',
       description:
         'Se øjeblikkeligt hvor meget du sparer på hvert enkelt tilbud.',
@@ -291,7 +284,7 @@ const Home = () => {
             Få overblik, spar penge og gør dine indkøb nemmere.
           </HeroSubtitle>
           <CTAButton onClick={() => navigate('/stores')}>
-            Se dagens tilbud <ArrowRight size={24} />
+            Se dagens tilbud <Icon name='ArrowRight' size='m' />
           </CTAButton>
         </HeroContent>
       </HeroSection>
@@ -327,8 +320,8 @@ const Home = () => {
           Tilmeld dig gratis og få adgang til alle funktioner. Begynd at spare
           penge på dine daglige indkøb med det samme.
         </CTADescription>
-        <CTAButton onClick={() => navigate('/login')}>
-          Opret gratis konto <ArrowRight size={24} />
+        <CTAButton onClick={() => navigate('/stores')}>
+          Se dagens tilbud <Icon name='ArrowRight' size='m' />
         </CTAButton>
       </CTASection>
     </PageContainer>
