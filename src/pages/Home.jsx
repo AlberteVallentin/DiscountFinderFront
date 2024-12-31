@@ -32,7 +32,6 @@ const HeroSection = styled.section`
   max-width: 1200px;
   width: calc(100% - 2rem);
   animation: ${fadeIn} 0.8s ease-out;
-  overflow: hidden;
 `;
 
 const HeroAccent = styled.div`
@@ -75,12 +74,8 @@ const HeroSubtitle = styled.p`
 
 const FeaturesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  margin: 0 auto 4rem auto;
-  padding: 0 1rem;
-  max-width: 1200px;
-  width: calc(100% - 2rem);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
 `;
 
 const FeatureCard = styled.div`
@@ -94,6 +89,8 @@ const FeatureCard = styled.div`
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 350px;
 
   &::before {
     content: '';
@@ -240,9 +237,9 @@ const Home = () => {
             Din personlige guide til de bedste tilbud fra Netto, Føtex og Bilka.
             Få overblik, spar penge og gør dine indkøb nemmere.
           </HeroSubtitle>
-          <Button onClick={() => navigate('/login')}>
-            Opret gratis konto&nbsp;
-            <Icon name='MoveRight' size='m' />
+          <Button onClick={() => navigate('/stores')}>
+            Se tilbud&nbsp;
+            <Icon name='MoveRight' size='m' color='buttonText' />
           </Button>
         </HeroContent>
       </HeroSection>
@@ -279,8 +276,8 @@ const Home = () => {
           penge på dine daglige indkøb med det samme.
         </CTADescription>
         <Button onClick={() => navigate('/login')}>
-          Opret gratis konto&nbsp;
-          <Icon name='MoveRight' size='m' />
+          Tilmeld dig&nbsp;
+          <Icon name='MoveRight' size='m' color='buttonText' />
         </Button>
       </CTASection>
     </PageContainer>
