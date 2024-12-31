@@ -5,6 +5,7 @@ import Icon from '../components/ui/Icon';
 import Button from '../components/button/Button';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import { borderRadius } from '../styles/Theme';
+import ScrollToTop from '../components/layout/navigation/ScrollToTop';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -280,6 +281,7 @@ const Home = () => {
           <Icon name='MoveRight' size='m' color='buttonText' />
         </Button>
       </CTASection>
+      <ScrollToTop />
     </PageContainer>
   );
 };
