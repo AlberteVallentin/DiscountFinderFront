@@ -7,20 +7,20 @@ import OutletContainer from '../components/layout/container/OutletContainer';
 import { borderRadius } from '../styles/Theme';
 
 const fadeIn = keyframes`
- from { opacity: 0; transform: translateY(20px); }
- to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 `;
 
 const PageContainer = styled(OutletContainer)`
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  overflow-x: hidden;
 `;
 
 const HeroSection = styled.section`
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
   text-align: center;
   padding: 6rem 2rem;
@@ -29,26 +29,10 @@ const HeroSection = styled.section`
   border-radius: ${borderRadius.rounded};
   margin: 0 auto 4rem auto;
   position: relative;
-  overflow: hidden;
   max-width: 1200px;
-  width: 100%;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-      circle at 30% 30%,
-      ${({ theme }) => theme.colors.buttonColor}15 0%,
-      transparent 70%
-    );
-    pointer-events: none;
-  }
-
+  width: calc(100% - 2rem);
   animation: ${fadeIn} 0.8s ease-out;
+  overflow: hidden;
 `;
 
 const HeroAccent = styled.div`
@@ -96,7 +80,7 @@ const FeaturesGrid = styled.div`
   margin: 0 auto 4rem auto;
   padding: 0 1rem;
   max-width: 1200px;
-  width: 100%;
+  width: calc(100% - 2rem);
 `;
 
 const FeatureCard = styled.div`
@@ -171,34 +155,7 @@ const CTASection = styled.section`
   position: relative;
   overflow: hidden;
   max-width: 1200px;
-  width: 100%;
-
-  &::after {
-    content: '';
-    position: absolute;
-    width: 120%;
-    height: 100px;
-    background: ${({ theme }) => theme.colors.buttonColor}10;
-    transform: rotate(-3deg);
-    bottom: -50px;
-    left: -10%;
-  }
-`;
-
-const CTAButton = styled(Button)`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  font-size: var(--fs-m);
-
-  svg {
-    transition: transform 0.3s ease;
-  }
-
-  &:hover svg {
-    transform: translateX(5px);
-  }
+  width: calc(100% - 2rem);
 `;
 
 const CTATitle = styled.h2`
@@ -223,7 +180,7 @@ const StatsBar = styled.div`
   margin: 4rem auto;
   flex-wrap: wrap;
   max-width: 1000px;
-  width: 100%;
+  width: calc(100% - 2rem);
 `;
 
 const StatItem = styled.div`
@@ -283,9 +240,10 @@ const Home = () => {
             Din personlige guide til de bedste tilbud fra Netto, Føtex og Bilka.
             Få overblik, spar penge og gør dine indkøb nemmere.
           </HeroSubtitle>
-          <CTAButton onClick={() => navigate('/stores')}>
-            Se dagens tilbud <Icon name='ArrowRight' size='m' />
-          </CTAButton>
+          <Button onClick={() => navigate('/login')}>
+            Opret gratis konto&nbsp;
+            <Icon name='MoveRight' size='m' />
+          </Button>
         </HeroContent>
       </HeroSection>
 
@@ -295,7 +253,7 @@ const Home = () => {
           <StatLabel>Aktive tilbud</StatLabel>
         </StatItem>
         <StatItem>
-          <StatValue>1.000+</StatValue>
+          <StatValue>681</StatValue>
           <StatLabel>Butikker</StatLabel>
         </StatItem>
         <StatItem>
@@ -320,9 +278,10 @@ const Home = () => {
           Tilmeld dig gratis og få adgang til alle funktioner. Begynd at spare
           penge på dine daglige indkøb med det samme.
         </CTADescription>
-        <CTAButton onClick={() => navigate('/stores')}>
-          Se dagens tilbud <Icon name='ArrowRight' size='m' />
-        </CTAButton>
+        <Button onClick={() => navigate('/login')}>
+          Opret gratis konto&nbsp;
+          <Icon name='MoveRight' size='m' />
+        </Button>
       </CTASection>
     </PageContainer>
   );
