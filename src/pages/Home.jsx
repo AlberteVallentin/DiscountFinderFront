@@ -202,19 +202,19 @@ const Home = () => {
   const features = [
     {
       icon: <Icon name='ShoppingCart' size='l' />,
-      title: 'Intelligente Tilbudssøgning',
+      title: 'Intelligent tilbudssøgning',
       description:
         'Find præcis de tilbud du leder efter med vores smarte søgefunktion.',
     },
     {
       icon: <Icon name='Heart' size='l' />,
-      title: 'Personlige Favoritter',
+      title: 'Personlige favoritter',
       description:
         'Skræddersy din oplevelse ved at gemme dine foretrukne butikker.',
     },
     {
       icon: <Icon name='MapPin' size='l' />,
-      title: 'Lokale Tilbud',
+      title: 'Lokale tilbud',
       description:
         'Opdag de bedste tilbud i nærheden af dig med postnummer-søgning.',
     },
