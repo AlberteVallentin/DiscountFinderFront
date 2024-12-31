@@ -10,7 +10,7 @@ import ProductCard from '../card/ProductCard';
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
 import SortDropdown from '../controls/dropdown/SortDropdown';
 import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
-import Switch from '../Switch';
+import Switch from '../controls/switch/Switch';
 import Icon from '../ui/Icon';
 
 const StoreHeader = styled.div`

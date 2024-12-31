@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ThemeSwitcher from '../../ThemeSwitcher';
+import ThemeSwitcher from '../../controls/switch/ThemeSwitcher';
 import SideMenu from './SideMenu';
 import Icon from '../../ui/Icon';
 
