@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
+import { useOutletContext } from 'react-router';
+
+// Component imports
 import Modal from './Modal';
 import LoadingSpinner from '../feedback/LoadingSpinner';
-import facade from '../../utils/apiFacade';
 import SearchBar from '../controls/SearchBar';
 import EmptyState from '../feedback/EmptyState';
-import { useOutletContext } from 'react-router';
 import ProductCard from '../card/ProductCard';
 import FilterDropdown from '../controls/dropdown/FilterDropdown';
 import SortDropdown from '../controls/dropdown/SortDropdown';
 import PriceFilterDropdown from '../controls/dropdown/PriceFilterDropdown';
-import Switch from '../Switch';
+import Switch from '../controls/switch/Switch';
 import Icon from '../ui/Icon';
 
+// Utils
+import facade from '../../utils/apiFacade';
+
+// ============= Styled Components =============
 const StoreHeader = styled.div`
   text-align: center;
   margin-bottom: 1rem;
@@ -59,7 +64,6 @@ const ToggleText = styled.span`
   color: ${({ theme }) => theme.colors.text};
   text-align: center;
   width: 9rem;
-
   display: block;
 `;
 
@@ -83,6 +87,7 @@ const Content = styled.div`
   width: 100%;
 `;
 
+// ============= Constants =============
 const sortOptions = [
   { value: 'price-asc', label: 'Pris (laveste først)' },
   { value: 'price-desc', label: 'Pris (højeste først)' },
@@ -90,7 +95,13 @@ const sortOptions = [
   { value: 'expiry', label: 'Udløber snarest' },
 ];
 
+/**
+ * Modal component for displaying and filtering store products
+ * @param {Object} store - Store data including products
+ * @param {Function} onClose - Handler for closing the modal
+ */
 const ProductListModal = ({ store, onClose }) => {
+  // ============= State Management =============
   const { showToast } = useOutletContext();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,12 +111,15 @@ const ProductListModal = ({ store, onClose }) => {
   const [priceRange, setPriceRange] = useState(null);
   const [showCategories, setShowCategories] = useState(true);
 
+  // ============= Effects =============
+  // Fetch products when store changes
   useEffect(() => {
     if (store?.id) {
       fetchProducts();
     }
   }, [store?.id]);
 
+  // ============= Data Fetching =============
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -123,6 +137,8 @@ const ProductListModal = ({ store, onClose }) => {
     }
   };
 
+  // ============= Memoized Values =============
+  // Extract unique categories from products
   const categories = useMemo(() => {
     const categorySet = new Set();
     products.forEach((product) => {
@@ -133,33 +149,25 @@ const ProductListModal = ({ store, onClose }) => {
     return Array.from(categorySet).sort();
   }, [products]);
 
-  const handleCategoryToggle = (category) => {
-    setSelectedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
-  };
-
+  // Filter and sort products based on user selections
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
+    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
+    // Apply category filter
     if (selectedCategories.size > 0) {
       filtered = filtered.filter((product) =>
         product.categories.some((cat) => selectedCategories.has(cat.nameDa))
       );
     }
 
+    // Apply price range filter
     if (priceRange) {
       filtered = filtered.filter(
         (product) =>
@@ -168,6 +176,7 @@ const ProductListModal = ({ store, onClose }) => {
       );
     }
 
+    // Apply sorting
     if (sortOption) {
       filtered.sort((a, b) => {
         switch (sortOption) {
@@ -187,6 +196,24 @@ const ProductListModal = ({ store, onClose }) => {
 
     return filtered;
   }, [products, searchTerm, selectedCategories, sortOption, priceRange]);
+
+  // ============= Event Handlers =============
+  const handleCategoryToggle = (category) => {
+    setSelectedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
+  // ============= Render Logic =============
+  if (loading) {
+    return <LoadingSpinner text='Henter tilbud...' />;
+  }
 
   return (
     <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
@@ -235,9 +262,7 @@ const ProductListModal = ({ store, onClose }) => {
           </FilterSection>
         </Controls>
 
-        {loading ? (
-          <LoadingSpinner text='Henter tilbud...' />
-        ) : products.length === 0 ? (
+        {products.length === 0 ? (
           <EmptyState type='NO_PRODUCTS' />
         ) : filteredProducts.length === 0 ? (
           <EmptyState type='NO_SEARCH_RESULTS' />

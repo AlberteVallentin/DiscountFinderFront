@@ -1,7 +1,9 @@
+// ============= Imports =============
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router';
 
+// ============= Styled Components =============
 const NotFoundContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,9 +44,15 @@ const BackButton = styled.button`
   }
 `;
 
+/**
+ * 404 Not Found page component
+ * Displays when a route doesn't match any defined routes
+ */
 const NotFound = () => {
+  // ============= Hooks =============
   const navigate = useNavigate();
 
+  // ============= Render =============
   return (
     <NotFoundContainer>
       <Title>404 - Siden blev ikke fundet</Title>

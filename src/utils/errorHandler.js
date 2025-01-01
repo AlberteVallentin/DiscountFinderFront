@@ -1,5 +1,10 @@
+// ============= Imports =============
 import { isRouteErrorResponse } from 'react-router';
 
+// ============= Constants =============
+/**
+ * Enum for different types of errors handled in the application
+ */
 export const ErrorType = {
     API: 'API_ERROR',
     AUTH: 'AUTH_ERROR',
@@ -8,6 +13,9 @@ export const ErrorType = {
     FATAL: 'FATAL_ERROR'
 };
 
+/**
+ * Error messages mapped by error type and status code
+ */
 const errorMessages = {
     [ErrorType.API]: {
         default: 'Der opstod en fejl ved kommunikation med serveren',
@@ -31,6 +39,12 @@ const errorMessages = {
     }
 };
 
+// ============= Helper Functions =============
+/**
+ * Determines the type of error based on error response
+ * @param {Error} error - The error object to analyze
+ * @returns {string} The determined error type
+ */
 const getErrorType = (error) => {
     if (isRouteErrorResponse(error)) return ErrorType.ROUTE;
     if (error.status === 401 || error.status === 403) return ErrorType.AUTH;
@@ -39,12 +53,24 @@ const getErrorType = (error) => {
     return ErrorType.API;
 };
 
+/**
+ * Gets appropriate user message for the error
+ * @param {Error} error - The error object
+ * @param {string} type - The error type
+ * @returns {string} User-friendly error message
+ */
 const getUserMessage = (error, type) => {
     if (error.userMessage) return error.userMessage;
     const messages = errorMessages[type];
     return messages[error.status] || messages.default;
 };
 
+// ============= Main Error Handler =============
+/**
+ * Main error handling function
+ * @param {Error} error - The error to handle
+ * @param {Function} showToast - Toast notification function
+ */
 export const handleError = (error, showToast) => {
     console.error('Error occurred:', error);
 
@@ -62,6 +88,12 @@ export const handleError = (error, showToast) => {
     showToast(userMessage, 'error');
 };
 
+// ============= Custom Hook =============
+/**
+ * Custom hook for handling errors in async operations
+ * @param {Function} showToast - Toast notification function
+ * @returns {Function} Error handler function wrapper
+ */
 export const useErrorHandler = (showToast) => {
     return async (promise) => {
         try {

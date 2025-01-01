@@ -1,3 +1,4 @@
+// ============= Imports =============
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import styled from 'styled-components';
@@ -7,7 +8,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import { borderRadius, borders } from '../styles/Theme';
 
-// Styled Components
+// ============= Styled Components =============
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.card};
   padding: 2rem;
@@ -70,13 +71,20 @@ const ToggleButton = styled.button`
   transition: all 0.3s ease;
 `;
 
+// ============= Component =============
+/**
+ * LoginPage component handling both login and registration
+ * @returns {JSX.Element} Login/Register form
+ */
 const LoginPage = () => {
+  // ============= Hooks =============
   const { login, register } = useAuth();
   const { loadFavorites } = useFavorites();
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ============= State =============
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -85,20 +93,28 @@ const LoginPage = () => {
     confirmPassword: '',
   });
 
+  // ============= Event Handlers =============
+  /**
+   * Handles form submission for both login and register
+   * @param {Event} e - Form submission event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Validate password match for registration
       if (!isLoginMode && formData.password !== formData.confirmPassword) {
         showToast('Passwords matcher ikke', 'error');
         return;
       }
 
+      // Attempt login or registration
       const result = isLoginMode
         ? await login(formData.email, formData.password)
         : await register(formData.name, formData.email, formData.password);
 
       if (result.success) {
+        // Load user data and redirect
         if (isLoginMode) await loadFavorites();
         showToast(
           `Du er nu ${isLoginMode ? 'logget ind' : 'registreret'}!`,
@@ -115,6 +131,10 @@ const LoginPage = () => {
     }
   };
 
+  /**
+   * Updates form data state on input change
+   * @param {Event} e - Input change event
+   */
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -122,6 +142,7 @@ const LoginPage = () => {
     }));
   };
 
+  // ============= Render =============
   return (
     <OutletContainer>
       <FormCard>

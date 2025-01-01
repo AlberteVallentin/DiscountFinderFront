@@ -1,16 +1,35 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router';
+
+// Component imports
 import Icon from '../components/ui/Icon';
 import Button from '../components/button/Button';
 import OutletContainer from '../components/layout/container/OutletContainer';
+import ScrollToTop from '../components/layout/navigation/ScrollToTop';
+
+// Style imports
 import { borderRadius } from '../styles/Theme';
 
+// ============= Animations =============
+/**
+ * Fade in animation for content entrance
+ */
 const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 `;
 
+// ============= Styled Components =============
+/**
+ * Container for the entire page with responsive width
+ */
 const PageContainer = styled(OutletContainer)`
   max-width: 1400px;
   margin: 0 auto;
@@ -18,6 +37,9 @@ const PageContainer = styled(OutletContainer)`
   overflow-x: hidden;
 `;
 
+/**
+ * Hero section with gradient background and animation
+ */
 const HeroSection = styled.section`
   display: flex;
   flex-direction: column;
@@ -34,6 +56,9 @@ const HeroSection = styled.section`
   animation: ${fadeIn} 0.8s ease-out;
 `;
 
+/**
+ * Decorative accent element for hero section
+ */
 const HeroAccent = styled.div`
   position: absolute;
   width: 300px;
@@ -45,6 +70,9 @@ const HeroAccent = styled.div`
   ${({ $position }) => $position};
 `;
 
+/**
+ * Container for hero content with proper z-index
+ */
 const HeroContent = styled.div`
   position: relative;
   z-index: 1;
@@ -55,6 +83,9 @@ const HeroContent = styled.div`
   align-items: center;
 `;
 
+/**
+ * Main hero title with responsive sizing
+ */
 const HeroTitle = styled.h1`
   font-size: clamp(2.5rem, 5vw, 4rem);
   margin-bottom: 1.5rem;
@@ -64,6 +95,9 @@ const HeroTitle = styled.h1`
   letter-spacing: -0.02em;
 `;
 
+/**
+ * Hero subtitle with max width for readability
+ */
 const HeroSubtitle = styled.p`
   font-size: var(--fs-l);
   max-width: 600px;
@@ -72,12 +106,18 @@ const HeroSubtitle = styled.p`
   line-height: 1.6;
 `;
 
+/**
+ * Grid layout for feature cards
+ */
 const FeaturesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 `;
 
+/**
+ * Individual feature card with hover effects
+ */
 const FeatureCard = styled.div`
   display: flex;
   flex-direction: column;
@@ -115,6 +155,9 @@ const FeatureCard = styled.div`
   }
 `;
 
+/**
+ * Container for feature icon
+ */
 const IconWrapper = styled.div`
   width: 64px;
   height: 64px;
@@ -127,6 +170,9 @@ const IconWrapper = styled.div`
   border-radius: ${borderRadius.rounded};
 `;
 
+/**
+ * Feature card title
+ */
 const FeatureTitle = styled.h3`
   font-size: var(--fs-m);
   margin-bottom: 1rem;
@@ -134,12 +180,18 @@ const FeatureTitle = styled.h3`
   font-weight: var(--fw-semi-bold);
 `;
 
+/**
+ * Feature card description
+ */
 const FeatureDescription = styled.p`
   font-size: var(--fs-n);
   color: ${({ theme }) => theme.colors.text}CC;
   line-height: 1.6;
 `;
 
+/**
+ * Call-to-action section
+ */
 const CTASection = styled.section`
   display: flex;
   flex-direction: column;
@@ -155,6 +207,9 @@ const CTASection = styled.section`
   width: calc(100% - 2rem);
 `;
 
+/**
+ * CTA section title
+ */
 const CTATitle = styled.h2`
   font-size: var(--fs-xl);
   margin-bottom: 1.5rem;
@@ -162,6 +217,9 @@ const CTATitle = styled.h2`
   font-weight: var(--fw-bold);
 `;
 
+/**
+ * CTA section description
+ */
 const CTADescription = styled.p`
   font-size: var(--fs-m);
   max-width: 600px;
@@ -170,6 +228,9 @@ const CTADescription = styled.p`
   line-height: 1.6;
 `;
 
+/**
+ * Stats display bar
+ */
 const StatsBar = styled.div`
   display: flex;
   justify-content: center;
@@ -180,10 +241,16 @@ const StatsBar = styled.div`
   width: calc(100% - 2rem);
 `;
 
+/**
+ * Individual stat item
+ */
 const StatItem = styled.div`
   text-align: center;
 `;
 
+/**
+ * Stat value display
+ */
 const StatValue = styled.div`
   font-size: var(--fs-xl);
   font-weight: var(--fw-bold);
@@ -191,14 +258,24 @@ const StatValue = styled.div`
   margin-bottom: 0.5rem;
 `;
 
+/**
+ * Stat label display
+ */
 const StatLabel = styled.div`
   font-size: var(--fs-n);
   color: ${({ theme }) => theme.colors.text}CC;
 `;
 
+// ============= Component Definition =============
+/**
+ * Home page component displaying marketing content and call-to-actions
+ * Includes features, statistics, and registration prompts
+ */
 const Home = () => {
+  // ============= Hooks =============
   const navigate = useNavigate();
 
+  // ============= Features Configuration =============
   const features = [
     {
       icon: <Icon name='ShoppingCart' size='l' />,
@@ -226,8 +303,10 @@ const Home = () => {
     },
   ];
 
+  // ============= Render =============
   return (
     <PageContainer>
+      {/* Hero Section */}
       <HeroSection>
         <HeroAccent $position='top: -150px; right: -150px;' />
         <HeroAccent $position='bottom: -100px; left: -100px;' />
@@ -244,6 +323,7 @@ const Home = () => {
         </HeroContent>
       </HeroSection>
 
+      {/* Statistics Section */}
       <StatsBar>
         <StatItem>
           <StatValue>50.000+</StatValue>
@@ -259,6 +339,7 @@ const Home = () => {
         </StatItem>
       </StatsBar>
 
+      {/* Features Section */}
       <FeaturesGrid>
         {features.map((feature, index) => (
           <FeatureCard key={index}>
@@ -269,6 +350,7 @@ const Home = () => {
         ))}
       </FeaturesGrid>
 
+      {/* Call-to-Action Section */}
       <CTASection>
         <CTATitle>Start din sparerejse i dag</CTATitle>
         <CTADescription>
@@ -280,6 +362,8 @@ const Home = () => {
           <Icon name='MoveRight' size='m' color='buttonText' />
         </Button>
       </CTASection>
+
+      <ScrollToTop />
     </PageContainer>
   );
 };

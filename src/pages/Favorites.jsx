@@ -1,31 +1,43 @@
+// ============= Imports =============
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { useOutletContext } from 'react-router';
+import { useAuth } from '../context/AuthContext';
+import { useFavorites } from '../context/FavoritesContext';
+import { useErrorHandler } from '../utils/errorHandler';
+import facade from '../utils/apiFacade';
+
+// Components
 import CardGrid from '../components/layout/container/CardGrid';
 import StoreCard from '../components/card/StoreCard';
 import LoginModal from '../components/modal/LoginModal';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import OutletContainer from '../components/layout/container/OutletContainer';
-import { useAuth } from '../context/AuthContext';
-import facade from '../utils/apiFacade';
 import ProductListModal from '../components/modal/ProductListModal';
 import EmptyState from '../components/feedback/EmptyState';
-import { useErrorHandler } from '../utils/errorHandler';
-import { useOutletContext } from 'react-router';
-import { useFavorites } from '../context/FavoritesContext';
 
+/**
+ * Favorites page component
+ * Displays and manages user's favorite stores with options to view products
+ */
 function Favorites() {
-  // 1. Først deklarerer vi ALLE hooks
+  // ============= Hooks =============
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isFavorite, favorites } = useFavorites();
   const handleError = useErrorHandler(showToast);
+
+  // ============= State =============
   const [isUpdating, setIsUpdating] = useState(false);
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
 
-  // 2. useEffect for at hente favoritter når komponenten indlæses
+  // ============= Effects =============
+  /**
+   * Fetches favorite stores when component mounts or favorites change
+   */
   useEffect(() => {
     const loadFavorites = async () => {
       if (isAuthenticated) {
@@ -39,7 +51,8 @@ function Favorites() {
     loadFavorites();
   }, [isAuthenticated, favorites]);
 
-  // 3. Betingede returns
+  // ============= Conditional Rendering =============
+  // Check authentication
   if (!isAuthenticated) {
     return (
       <LoginModal
@@ -53,13 +66,14 @@ function Favorites() {
     );
   }
 
+  // Show loading state
   if (loading) {
     return (
       <LoadingSpinner text='Henter favoritbutikker...' fullscreen={true} />
     );
   }
 
-  // 4. Hovedrender
+  // ============= Main Render =============
   return (
     <OutletContainer>
       <h1>Mine favoritbutikker</h1>

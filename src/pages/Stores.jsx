@@ -1,7 +1,9 @@
+// React and libraries
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import facade from '../utils/apiFacade';
+
+// Components
 import ScrollToTop from '../components/layout/navigation/ScrollToTop';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import StoreCard from '../components/card/StoreCard';
@@ -11,11 +13,15 @@ import SearchBar from '../components/controls/SearchBar';
 import BrandButton from '../components/button/BrandButton';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import LoginModal from '../components/modal/LoginModal';
-import { useOutletContext } from 'react-router';
-import { useFavorites } from '../context/FavoritesContext';
 import SortDropdown from '../components/controls/dropdown/SortDropdown';
 
-// Styled Components
+// Context and Utilities
+import { useOutletContext } from 'react-router';
+import { useFavorites } from '../context/FavoritesContext';
+import facade from '../utils/apiFacade';
+
+// ============= Styled Components =============
+
 const SearchSection = styled.div`
   display: flex;
   gap: 1rem;
@@ -34,7 +40,13 @@ const BrandSection = styled.div`
   flex-wrap: wrap;
 `;
 
-// Helper Functions
+// ============= Helper Functions =============
+
+/**
+ * Creates dropdown options for postal codes
+ * @param {number[]} postalCodes - Array of postal codes
+ * @returns {Object[]} Array of dropdown option objects
+ */
 const createPostalCodeOptions = (postalCodes) => [
   { value: '', label: 'Alle postnumre' },
   ...postalCodes.map((code) => ({
@@ -43,6 +55,12 @@ const createPostalCodeOptions = (postalCodes) => [
   })),
 ];
 
+/**
+ * Updates store list with favorite status
+ * @param {Object[]} stores - Array of store objects
+ * @param {Function} isFavorite - Function to check favorite status
+ * @returns {Object[]} Updated stores array
+ */
 const updateStoresWithFavorites = (stores, isFavorite) => {
   return stores.map((store) => ({
     ...store,
@@ -50,13 +68,20 @@ const updateStoresWithFavorites = (stores, isFavorite) => {
   }));
 };
 
+// ============= Component Definition =============
+
+/**
+ * Stores page component displaying store list with filtering and search functionality
+ */
 function Stores() {
-  // Hooks
+  // ============= Hooks =============
   const navigate = useNavigate();
   const { isFavorite } = useFavorites();
   const { showToast } = useOutletContext();
 
-  // State Management
+  // ============= State Management =============
+
+  // Store data state
   const [storeState, setStoreState] = useState({
     allStores: [],
     filteredStores: [],
@@ -64,32 +89,39 @@ function Stores() {
     loading: true,
   });
 
+  // Filter state
   const [filterState, setFilterState] = useState({
     searchTerm: '',
     selectedPostalCode: '',
     selectedBrands: new Set(),
   });
 
+  // Modal state
   const [modalState, setModalState] = useState({
     selectedStore: null,
     showLoginModal: false,
   });
 
-  // Memoized Values
+  // ============= Memoized Values =============
+
   const postalCodeOptions = useMemo(
     () => createPostalCodeOptions(storeState.postalCodes),
     [storeState.postalCodes]
   );
 
-  // Event Handlers
+  // ============= Event Handlers =============
+
+  // Handles store card click
   const handleStoreClick = (store) => {
     setModalState((prev) => ({ ...prev, selectedStore: store }));
   };
 
+  // Handles login requirement
   const handleLoginRequired = () => {
     setModalState((prev) => ({ ...prev, showLoginModal: true }));
   };
 
+  // Modal close handlers
   const closeLoginModal = () => {
     setModalState((prev) => ({ ...prev, showLoginModal: false }));
   };
@@ -98,7 +130,11 @@ function Stores() {
     setModalState((prev) => ({ ...prev, selectedStore: null }));
   };
 
-  // Filter Functions
+  // ============= Filter Functions =============
+
+  /**
+   * Filters stores based on search, postal code, and brand filters
+   */
   const filterStores = (search, postalCode, brands, stores) => {
     let filtered = stores;
 
@@ -125,6 +161,7 @@ function Stores() {
     setStoreState((prev) => ({ ...prev, filteredStores: filtered }));
   };
 
+  // Search handler
   const handleSearch = (event) => {
     const term = event.target.value.toLowerCase();
     setFilterState((prev) => ({ ...prev, searchTerm: term }));
@@ -136,6 +173,7 @@ function Stores() {
     );
   };
 
+  // Postal code filter handler
   const handlePostalCodeChange = async (postalCode) => {
     setFilterState((prev) => ({ ...prev, selectedPostalCode: postalCode }));
     setStoreState((prev) => ({ ...prev, loading: true }));
@@ -173,6 +211,7 @@ function Stores() {
     }
   };
 
+  // Brand filter handler
   const handleBrandClick = (brand) => {
     const newSelectedBrands = new Set(filterState.selectedBrands);
     if (filterState.selectedBrands.has(brand)) {
@@ -190,7 +229,9 @@ function Stores() {
     );
   };
 
-  // Data Fetching
+  // ============= Effects =============
+
+  // Fetch initial store data
   useEffect(() => {
     const fetchStores = async () => {
       try {
@@ -228,7 +269,8 @@ function Stores() {
     fetchStores();
   }, [isFavorite, showToast]);
 
-  // Render Functions
+  // ============= Render Logic =============
+
   if (storeState.loading) {
     return <LoadingSpinner text='Henter butikker...' fullscreen={true} />;
   }
