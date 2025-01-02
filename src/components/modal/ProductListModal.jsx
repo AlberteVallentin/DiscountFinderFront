@@ -212,7 +212,11 @@ const ProductListModal = ({ store, onClose }) => {
 
   // ============= Render Logic =============
   if (loading) {
-    return <LoadingSpinner text='Henter tilbud...' />;
+    return (
+      <Modal isOpen={true} onClose={onClose} maxWidth='1200px' minHeight='90vh'>
+        <LoadingSpinner text='Henter tilbud...' />
+      </Modal>
+    );
   }
 
   return (
