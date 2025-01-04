@@ -1,6 +1,7 @@
 // ============= Configuration =============
 const BASE_URL = "https://discountfinder.api.albertevallentin.dk/api";
 
+
 // ============= Error Handling =============
 /**
  * Handles HTTP response errors and formats response data
