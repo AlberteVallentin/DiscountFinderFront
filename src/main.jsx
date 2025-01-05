@@ -13,7 +13,6 @@ import Favorites from './pages/Favorites.jsx';
 import Stores from './pages/Stores.jsx';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound.jsx';
-import EmptyStateDemo from './pages/EmptyStateDemo.jsx';
 
 // Layout and error components
 import MainLayout from './components/layout/MainLayout.jsx';
@@ -39,9 +38,6 @@ const router = createBrowserRouter(
 
       {/* Protected routes */}
       <Route path='favorites' element={<Favorites />} />
-
-      {/* Demo and utility routes */}
-      <Route path='empty-state-demo' element={<EmptyStateDemo />} />
 
       {/* Catch-all route for 404 */}
       <Route path='*' element={<NotFound />} />
