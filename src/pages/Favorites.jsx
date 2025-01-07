@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useOutletContext } from 'react-router';
-import { useAuth } from '../context/AuthContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { useErrorHandler } from '../utils/errorHandler';
 import facade from '../utils/apiFacade';
@@ -10,7 +9,6 @@ import facade from '../utils/apiFacade';
 // Components
 import CardGrid from '../components/layout/container/CardGrid';
 import StoreCard from '../components/card/StoreCard';
-import LoginModal from '../components/modal/LoginModal';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import ProductListModal from '../components/modal/ProductListModal';
@@ -24,12 +22,10 @@ function Favorites() {
   // ============= Hooks =============
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const { isFavorite, favorites } = useFavorites();
   const handleError = useErrorHandler(showToast);
 
   // ============= State =============
-  const [isUpdating, setIsUpdating] = useState(false);
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);
@@ -40,33 +36,16 @@ function Favorites() {
    */
   useEffect(() => {
     const loadFavorites = async () => {
-      if (isAuthenticated) {
-        const result = await handleError(facade.getFavorites());
-        if (result.success) {
-          setFavoriteStores(result.data);
-        }
-        setLoading(false);
+      const result = await handleError(facade.getFavorites());
+      if (result.success) {
+        setFavoriteStores(result.data);
       }
+      setLoading(false);
     };
     loadFavorites();
-  }, [isAuthenticated, favorites]);
+  }, [favorites]);
 
   // ============= Conditional Rendering =============
-  // Check authentication
-  if (!isAuthenticated) {
-    return (
-      <LoginModal
-        isOpen={true}
-        onClose={() => navigate('/stores')}
-        onLogin={() =>
-          navigate('/login', { state: { returnPath: '/favorites' } })
-        }
-        message='Du skal være logget ind for at se dine favoritbutikker.'
-      />
-    );
-  }
-
-  // Show loading state
   if (loading) {
     return (
       <LoadingSpinner text='Henter favoritbutikker...' fullscreen={true} />

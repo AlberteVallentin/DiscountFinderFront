@@ -1,3 +1,4 @@
+// src/main.jsx
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
@@ -14,20 +15,16 @@ import Stores from './pages/Stores.jsx';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound.jsx';
 
-// Layout and error components
+// Layout og error components
 import MainLayout from './components/layout/MainLayout.jsx';
 import ErrorBoundary from './components/error/ErrorBoundary.jsx';
+import ProtectedRoute from './components/route/ProtectedRoute';
 
 // Context providers
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { FavoritesProvider } from './context/FavoritesContext.jsx';
 
-// ============= Router Configuration =============
-/**
- * Application router configuration using React Router v7
- * Defines the main application routes and their respective components
- */
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<MainLayout />} errorElement={<ErrorBoundary />}>
@@ -37,7 +34,14 @@ const router = createBrowserRouter(
       <Route path='login' element={<LoginPage />} />
 
       {/* Protected routes */}
-      <Route path='favorites' element={<Favorites />} />
+      <Route
+        path='favorites'
+        element={
+          <ProtectedRoute>
+            <Favorites />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch-all route for 404 */}
       <Route path='*' element={<NotFound />} />
