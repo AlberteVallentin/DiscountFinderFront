@@ -1,6 +1,35 @@
 // ============= Imports =============
 import { isRouteErrorResponse } from 'react-router';
 
+
+
+// ============= Custom Hook =============
+// Kun denne funktion bliver brugt...
+/**
+ * Custom hook for handling errors in async operations
+ * @param {Function} showToast - Toast notification function
+ * @returns {Function} Error handler function wrapper
+ */
+export const useErrorHandler = (showToast) => {
+    return async (promise) => {
+        try {
+            return await promise;
+        } catch (error) {
+            handleError(error, showToast);
+            throw error;
+        }
+    };
+};
+
+
+
+
+
+
+
+
+
+
 // ============= Constants =============
 /**
  * Enum for different types of errors handled in the application
@@ -88,19 +117,3 @@ export const handleError = (error, showToast) => {
     showToast(userMessage, 'error');
 };
 
-// ============= Custom Hook =============
-/**
- * Custom hook for handling errors in async operations
- * @param {Function} showToast - Toast notification function
- * @returns {Function} Error handler function wrapper
- */
-export const useErrorHandler = (showToast) => {
-    return async (promise) => {
-        try {
-            return await promise;
-        } catch (error) {
-            handleError(error, showToast);
-            throw error;
-        }
-    };
-};
