@@ -4,7 +4,7 @@ import { isRouteErrorResponse } from 'react-router';
 
 
 // ============= Custom Hook =============
-// Kun denne funktion bliver brugt...
+// 
 /**
  * Custom hook for handling errors in async operations
  * @param {Function} showToast - Toast notification function
@@ -44,6 +44,7 @@ export const ErrorType = {
 
 /**
  * Error messages mapped by error type and status code
+ * Bliver ikke brugt
  */
 const errorMessages = {
     [ErrorType.API]: {
