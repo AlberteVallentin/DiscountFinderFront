@@ -328,7 +328,7 @@ function Stores() {
           isOpen={modalState.showLoginModal}
           onClose={closeLoginModal}
           onLogin={() => navigate('/login')}
-          message='Du skal være logget ind for at tilføje butikker til favoritter.'
+          message='Du skal være logget ind for at tilføje butikker til favoritter'
         />
       )}
 
