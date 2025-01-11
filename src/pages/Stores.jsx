@@ -77,7 +77,7 @@ function Stores() {
   // ============= Hooks =============
   const navigate = useNavigate();
   const { isFavorite } = useFavorites();
-  const { showToast } = useOutletContext();
+  const { showToast } = useOutletContext(); //får showToast fra context
 
   // ============= State Management =============
 
