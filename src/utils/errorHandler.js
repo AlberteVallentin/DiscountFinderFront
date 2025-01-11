@@ -10,12 +10,12 @@ import { isRouteErrorResponse } from 'react-router';
  * @param {Function} showToast - Toast notification function
  * @returns {Function} Error handler function wrapper
  */
-export const useErrorHandler = (showToast) => {
+export const useErrorHandler = (showToast) => { // Modtager showToast som parameter
     return async (promise) => {
         try {
             return await promise;
         } catch (error) {
-            handleError(error, showToast);
+            handleError(error, showToast); // sender showToast videre til handleError
             throw error;
         }
     };
@@ -44,7 +44,6 @@ export const ErrorType = {
 
 /**
  * Error messages mapped by error type and status code
- * Bliver ikke brugt
  */
 const errorMessages = {
     [ErrorType.API]: {

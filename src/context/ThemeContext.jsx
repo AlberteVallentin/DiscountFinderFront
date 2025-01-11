@@ -1,7 +1,6 @@
 // ============= Imports =============
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { lightTheme, darkTheme } from '../styles/Theme';
-import facade from '../utils/apiFacade';
 
 // ============= Context Creation =============
 /**
@@ -20,18 +19,7 @@ export const ThemeContext = createContext();
  */
 export function ThemeProvider({ children }) {
   // ============= State =============
-  // Track current theme and authentication status
   const [theme, setTheme] = useState(lightTheme);
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  // ============= Effects =============
-  // Check authentication status on mount
-  useEffect(() => {
-    const token = facade.getToken();
-    if (token) {
-      setLoggedIn(true);
-    }
-  }, []);
 
   // ============= Event Handlers =============
   /**
@@ -46,8 +34,6 @@ export function ThemeProvider({ children }) {
   const value = {
     theme,
     toggleTheme,
-    loggedIn,
-    setLoggedIn,
   };
 
   // ============= Render =============

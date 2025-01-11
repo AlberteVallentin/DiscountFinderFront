@@ -19,6 +19,7 @@ const ModalDialog = styled.dialog`
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
+
   &::backdrop {
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(2px);
@@ -67,10 +68,6 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
 
-  &:focus {
-    outline: none;
-  }
-
   &:hover {
     transform: scale(1.1);
   }
@@ -82,7 +79,6 @@ const Modal = ({
   children,
   maxWidth,
   minHeight,
-  closeOnEscape = true,
   closeOnOutsideClick = true,
 }) => {
   const dialogRef = useRef(null);
@@ -99,26 +95,15 @@ const Modal = ({
   useEffect(() => {
     const dialog = dialogRef.current;
 
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && !closeOnEscape) {
-        e.preventDefault();
-      }
-    };
-
     const handleClick = (e) => {
       if (closeOnOutsideClick && e.target === dialog) {
         onClose();
       }
     };
 
-    dialog.addEventListener('keydown', handleKeyDown);
     dialog.addEventListener('click', handleClick);
-
-    return () => {
-      dialog.removeEventListener('keydown', handleKeyDown);
-      dialog.removeEventListener('click', handleClick);
-    };
-  }, [closeOnEscape, closeOnOutsideClick, onClose]);
+    return () => dialog.removeEventListener('click', handleClick);
+  }, [closeOnOutsideClick, onClose]);
 
   if (!isOpen) return null;
 
