@@ -14,6 +14,7 @@ import Favorites from './pages/Favorites.jsx';
 import Stores from './pages/Stores.jsx';
 import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound.jsx';
+import ErrorTest from './pages/ErrorTest.jsx';
 
 // Layout og error components
 import MainLayout from './components/layout/MainLayout.jsx';
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path='stores' element={<Stores />} />
       <Route path='login' element={<LoginPage />} />
+      <Route path='error' element={<ErrorTest />} />
 
       {/* Protected routes */}
       <Route

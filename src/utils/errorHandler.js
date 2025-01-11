@@ -44,7 +44,6 @@ export const ErrorType = {
 
 /**
  * Error messages mapped by error type and status code
- * Bliver ikke brugt
  */
 const errorMessages = {
     [ErrorType.API]: {
