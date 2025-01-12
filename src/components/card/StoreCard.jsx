@@ -68,7 +68,7 @@ const StoreCard = ({ store, onClick, onFavoriteToggle, showToast }) => {
           isOpen={showLoginModal}
           onClose={() => setShowLoginModal(false)}
           onLogin={handleLogin}
-          message='Du skal være logget ind for at tilføje butikker til favoritter.'
+          message='Du skal være logget ind for at tilføje butikker til favoritter'
         />
       )}
     </StoreCardWrapper>
