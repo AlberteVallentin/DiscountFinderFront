@@ -56,8 +56,6 @@ export const AuthProvider = ({ children }) => {
           email: decodedToken.email,
           name: decodedToken.name,
         });
-        const email = decodedToken.email;
-        sessionStorage.setItem('email', email);
         return { success: true };
       }
       return { success: false, error: result.error };
