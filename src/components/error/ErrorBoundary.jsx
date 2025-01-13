@@ -1,9 +1,9 @@
-// ErrorBoundary.jsx
 import { isRouteErrorResponse, useRouteError } from 'react-router';
 import styled from 'styled-components';
 import { useTheme } from '../../context/ThemeContext';
 import { useEffect } from 'react';
 import { useOutletContext } from 'react-router';
+import { getErrorMessage } from '../../utils/errorMessages';
 
 const ErrorContainer = styled.div`
   display: flex;
@@ -25,19 +25,6 @@ const ErrorMessage = styled.p`
   margin-bottom: 2rem;
 `;
 
-const getUserFriendlyMessage = (error) => {
-  if (error instanceof TypeError) {
-    return 'Der opstod en uventet fejl i applikationen. Vi arbejder på at løse problemet.';
-  }
-  if (error instanceof ReferenceError) {
-    return 'Der opstod en teknisk fejl. Prøv at genindlæse siden.';
-  }
-  if (error instanceof SyntaxError) {
-    return 'Der opstod en fejl i applikationens kode. Vi er blevet notificeret om problemet.';
-  }
-  return 'Der opstod en uventet fejl. Prøv venligst igen.';
-};
-
 export default function ErrorBoundary() {
   const error = useRouteError();
   const { theme } = useTheme();
@@ -46,14 +33,13 @@ export default function ErrorBoundary() {
   try {
     outletContext = useOutletContext();
   } catch {
-    // Hvis vi ikke kan få fat i context, betyder det at vi er på root niveau
     outletContext = { showToast: () => {} };
   }
 
   const { showToast } = outletContext;
 
   useEffect(() => {
-    const message = getUserFriendlyMessage(error);
+    const message = getErrorMessage(error);
     showToast(message, 'error');
   }, [error, showToast]);
 
@@ -62,7 +48,7 @@ export default function ErrorBoundary() {
       <ErrorContainer>
         <ErrorTitle $theme={theme}>{error.status} Fejl</ErrorTitle>
         <ErrorMessage $theme={theme}>
-          {error.statusText || error.data?.message || 'Der opstod en fejl'}
+          {error.statusText || error.data?.message || getErrorMessage(error)}
         </ErrorMessage>
       </ErrorContainer>
     );
@@ -71,9 +57,7 @@ export default function ErrorBoundary() {
   return (
     <ErrorContainer>
       <ErrorTitle $theme={theme}>Ups!</ErrorTitle>
-      <ErrorMessage $theme={theme}>
-        Der opstod en uventet fejl. Vi beklager ulejligheden.
-      </ErrorMessage>
+      <ErrorMessage $theme={theme}>{getErrorMessage(error)}</ErrorMessage>
       {process.env.NODE_ENV === 'development' && (
         <ErrorMessage $theme={theme}>
           <i>{error.message}</i>
