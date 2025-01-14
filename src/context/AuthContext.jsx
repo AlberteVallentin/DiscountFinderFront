@@ -1,50 +1,32 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import facade from '../utils/apiFacade';
 
-// ============= Context Creation =============
 export const AuthContext = createContext(null);
 
-// ============= Types =============
+// Basic user type definition
 /**
  * @typedef {Object} User
- * @property {string} role - User's role (e.g., 'USER', 'ADMIN')
- * @property {string} email - User's email
- * @property {string} name - User's name
+ * @property {string} role - User role
+ * @property {string} email - User email
+ * @property {string} name - User name
  */
 
 /**
- * @typedef {Object} AuthResult
- * @property {boolean} success - Whether the operation was successful
- * @property {string} [error] - Error message if operation failed
- */
-
-/**
- * Provider component for authentication state and operations
- * @param {Object} props - Component props
- * @param {React.ReactNode} props.children - Child components
+ * Auth provider component
  */
 export const AuthProvider = ({ children }) => {
-  // ============= State =============
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ============= Auth Methods =============
-  /**
-   * Handles user logout by clearing token and state
-   */
+  // Handles user logout
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
     setIsAuthenticated(false);
     setUser(null);
   };
 
-  /**
-   * Handles user login
-   * @param {string} email - User's email
-   * @param {string} password - User's password
-   * @returns {Promise<AuthResult>} Result of login attempt
-   */
+  // Processes login attempt
   const handleLogin = async (email, password) => {
     try {
       const result = await facade.login(email, password);
@@ -64,13 +46,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Handles user registration
-   * @param {string} name - User's name
-   * @param {string} email - User's email
-   * @param {string} password - User's password
-   * @returns {Promise<AuthResult>} Result of registration attempt
-   */
+  // Processes registration attempt
   const handleRegister = async (name, email, password) => {
     try {
       const result = await facade.register(name, email, password);
@@ -90,8 +66,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ============= Effects =============
-  // Initialize auth state from stored token on mount
+  // Initialize auth state from stored token
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -122,12 +97,10 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Show loading state while initializing
   if (loading) {
     return null;
   }
 
-  // ============= Context Value =============
   const value = {
     isAuthenticated,
     user,
@@ -140,11 +113,7 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-/**
- * Custom hook for accessing auth context
- * @returns {Object} Auth context value
- * @throws {Error} If used outside of AuthProvider
- */
+// Hook for accessing auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
