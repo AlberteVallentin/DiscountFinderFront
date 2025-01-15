@@ -1,4 +1,3 @@
-// ============= Imports =============
 import { createContext, useContext, useState } from 'react';
 import { lightTheme, darkTheme } from '../styles/Theme';
 
