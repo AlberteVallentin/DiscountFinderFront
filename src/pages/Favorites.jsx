@@ -1,12 +1,9 @@
-// ============= Imports =============
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useOutletContext } from 'react-router';
 import { useFavorites } from '../context/FavoritesContext';
 import { useErrorHandler } from '../utils/errorHandler';
 import facade from '../utils/apiFacade';
-
-// Components
 import CardGrid from '../components/layout/container/CardGrid';
 import StoreCard from '../components/card/StoreCard';
 import LoadingSpinner from '../components/feedback/LoadingSpinner';
