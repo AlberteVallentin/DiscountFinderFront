@@ -68,18 +68,13 @@ const updateStoresWithFavorites = (stores, isFavorite) => {
   }));
 };
 
-// ============= Component Definition =============
-
 /**
  * Stores page component displaying store list with filtering and search functionality
  */
 function Stores() {
-  // ============= Hooks =============
   const navigate = useNavigate();
   const { isFavorite } = useFavorites();
   const { showToast } = useOutletContext(); //får showToast fra context
-
-  // ============= State Management =============
 
   // Store data state
   const [storeState, setStoreState] = useState({
