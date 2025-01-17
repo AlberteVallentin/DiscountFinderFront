@@ -1,10 +1,6 @@
-// ============= Imports =============
+
 import { isRouteErrorResponse } from 'react-router';
 
-
-
-// ============= Custom Hook =============
-// 
 /**
  * Custom hook for handling errors in async operations
  * @param {Function} showToast - Toast notification function
