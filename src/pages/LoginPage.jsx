@@ -1,4 +1,3 @@
-// ============= Imports =============
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import styled from 'styled-components';
@@ -8,7 +7,6 @@ import { useFavorites } from '../context/FavoritesContext';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import { borderRadius, borders } from '../styles/Theme';
 
-// ============= Styled Components =============
 const FormCard = styled.div`
   background: ${({ theme }) => theme.colors.card};
   padding: 2rem;
