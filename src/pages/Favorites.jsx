@@ -16,13 +16,11 @@ import EmptyState from '../components/feedback/EmptyState';
  * Displays and manages user's favorite stores with options to view products
  */
 function Favorites() {
-  // ============= Hooks =============
   const { showToast } = useOutletContext();
   const navigate = useNavigate();
   const { isFavorite, favorites } = useFavorites();
   const handleError = useErrorHandler(showToast);
 
-  // ============= State =============
   const [favoriteStores, setFavoriteStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStore, setSelectedStore] = useState(null);

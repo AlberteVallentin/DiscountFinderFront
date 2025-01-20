@@ -1,5 +1,3 @@
-// errorMessages.js
-
 export const ErrorMessages = {
     TYPE_ERROR: 'Der opstod en uventet fejl i applikationen. Vi arbejder på at løse problemet.',
     REFERENCE_ERROR: 'Der opstod en teknisk fejl. Prøv at genindlæse siden.',
