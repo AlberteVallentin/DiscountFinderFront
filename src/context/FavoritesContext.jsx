@@ -8,7 +8,6 @@ import {
 import facade from '../utils/apiFacade';
 import { useAuth } from './AuthContext';
 
-// ============= Context Creation =============
 export const FavoritesContext = createContext(null);
 
 /**
@@ -119,7 +118,6 @@ export const FavoritesProvider = ({ children }) => {
   );
 };
 
-// ============= Custom Hook =============
 /**
  * Custom hook for accessing favorites functionality
  * @throws {Error} When used outside FavoritesProvider
