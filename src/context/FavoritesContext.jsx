@@ -40,7 +40,6 @@ export const FavoritesProvider = ({ children }) => {
     }
   }, []);
 
-  // ============= Effects =============
   // Load favorites when authentication status changes
   useEffect(() => {
     if (isAuthenticated) {
