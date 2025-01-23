@@ -1,14 +1,10 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { useNavigate } from 'react-router';
-
-// Component imports
 import Icon from '../components/ui/Icon';
 import Button from '../components/button/Button';
 import OutletContainer from '../components/layout/container/OutletContainer';
 import ScrollToTop from '../components/layout/navigation/ScrollToTop';
-
-// Style imports
 import { borderRadius } from '../styles/Theme';
 
 // ============= Animations =============
