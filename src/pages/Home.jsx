@@ -55,9 +55,6 @@ const HeroAccent = styled.div`
   ${({ $position }) => $position};
 `;
 
-/**
- * Container for hero content with proper z-index
- */
 const HeroContent = styled.div`
   position: relative;
   z-index: 1;
