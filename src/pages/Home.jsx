@@ -7,10 +7,6 @@ import OutletContainer from '../components/layout/container/OutletContainer';
 import ScrollToTop from '../components/layout/navigation/ScrollToTop';
 import { borderRadius } from '../styles/Theme';
 
-// ============= Animations =============
-/**
- * Fade in animation for content entrance
- */
 const fadeIn = keyframes`
   from { 
     opacity: 0; 
@@ -22,10 +18,6 @@ const fadeIn = keyframes`
   }
 `;
 
-// ============= Styled Components =============
-/**
- * Container for the entire page with responsive width
- */
 const PageContainer = styled(OutletContainer)`
   max-width: 1400px;
   margin: 0 auto;
@@ -33,9 +25,6 @@ const PageContainer = styled(OutletContainer)`
   overflow-x: hidden;
 `;
 
-/**
- * Hero section with gradient background and animation
- */
 const HeroSection = styled.section`
   display: flex;
   flex-direction: column;
