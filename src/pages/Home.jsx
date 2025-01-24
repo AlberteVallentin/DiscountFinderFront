@@ -7,10 +7,6 @@ import OutletContainer from '../components/layout/container/OutletContainer';
 import ScrollToTop from '../components/layout/navigation/ScrollToTop';
 import { borderRadius } from '../styles/Theme';
 
-// ============= Animations =============
-/**
- * Fade in animation for content entrance
- */
 const fadeIn = keyframes`
   from { 
     opacity: 0; 
@@ -22,10 +18,6 @@ const fadeIn = keyframes`
   }
 `;
 
-// ============= Styled Components =============
-/**
- * Container for the entire page with responsive width
- */
 const PageContainer = styled(OutletContainer)`
   max-width: 1400px;
   margin: 0 auto;
@@ -33,9 +25,6 @@ const PageContainer = styled(OutletContainer)`
   overflow-x: hidden;
 `;
 
-/**
- * Hero section with gradient background and animation
- */
 const HeroSection = styled.section`
   display: flex;
   flex-direction: column;
@@ -66,9 +55,6 @@ const HeroAccent = styled.div`
   ${({ $position }) => $position};
 `;
 
-/**
- * Container for hero content with proper z-index
- */
 const HeroContent = styled.div`
   position: relative;
   z-index: 1;
@@ -79,9 +65,6 @@ const HeroContent = styled.div`
   align-items: center;
 `;
 
-/**
- * Main hero title with responsive sizing
- */
 const HeroTitle = styled.h1`
   font-size: clamp(2.5rem, 5vw, 4rem);
   margin-bottom: 1.5rem;
