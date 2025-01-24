@@ -65,9 +65,6 @@ const HeroContent = styled.div`
   align-items: center;
 `;
 
-/**
- * Main hero title with responsive sizing
- */
 const HeroTitle = styled.h1`
   font-size: clamp(2.5rem, 5vw, 4rem);
   margin-bottom: 1.5rem;
