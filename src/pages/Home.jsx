@@ -74,9 +74,6 @@ const HeroTitle = styled.h1`
   letter-spacing: -0.02em;
 `;
 
-/**
- * Hero subtitle with max width for readability
- */
 const HeroSubtitle = styled.p`
   font-size: var(--fs-l);
   max-width: 600px;
