@@ -88,9 +88,6 @@ const FeaturesGrid = styled.div`
   gap: 1.5rem;
 `;
 
-/**
- * Individual feature card with hover effects
- */
 const FeatureCard = styled.div`
   display: flex;
   flex-direction: column;
