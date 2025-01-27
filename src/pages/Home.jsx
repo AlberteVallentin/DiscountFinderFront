@@ -125,9 +125,6 @@ const FeatureCard = styled.div`
   }
 `;
 
-/**
- * Container for feature icon
- */
 const IconWrapper = styled.div`
   width: 64px;
   height: 64px;
