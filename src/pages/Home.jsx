@@ -147,9 +147,6 @@ const FeatureTitle = styled.h3`
   font-weight: var(--fw-semi-bold);
 `;
 
-/**
- * Feature card description
- */
 const FeatureDescription = styled.p`
   font-size: var(--fs-n);
   color: ${({ theme }) => theme.colors.text}CC;
