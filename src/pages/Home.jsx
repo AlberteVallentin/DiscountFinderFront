@@ -137,9 +137,6 @@ const IconWrapper = styled.div`
   border-radius: ${borderRadius.rounded};
 `;
 
-/**
- * Feature card title
- */
 const FeatureTitle = styled.h3`
   font-size: var(--fs-m);
   margin-bottom: 1rem;
