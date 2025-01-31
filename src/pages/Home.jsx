@@ -150,9 +150,6 @@ const FeatureDescription = styled.p`
   line-height: 1.6;
 `;
 
-/**
- * Call-to-action section
- */
 const CTASection = styled.section`
   display: flex;
   flex-direction: column;
