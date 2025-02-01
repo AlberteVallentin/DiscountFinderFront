@@ -165,9 +165,6 @@ const CTASection = styled.section`
   width: calc(100% - 2rem);
 `;
 
-/**
- * CTA section title
- */
 const CTATitle = styled.h2`
   font-size: var(--fs-xl);
   margin-bottom: 1.5rem;
