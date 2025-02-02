@@ -172,9 +172,6 @@ const CTATitle = styled.h2`
   font-weight: var(--fw-bold);
 `;
 
-/**
- * CTA section description
- */
 const CTADescription = styled.p`
   font-size: var(--fs-m);
   max-width: 600px;
