@@ -180,9 +180,6 @@ const CTADescription = styled.p`
   line-height: 1.6;
 `;
 
-/**
- * Stats display bar
- */
 const StatsBar = styled.div`
   display: flex;
   justify-content: center;
