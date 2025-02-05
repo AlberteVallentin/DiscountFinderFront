@@ -190,16 +190,10 @@ const StatsBar = styled.div`
   width: calc(100% - 2rem);
 `;
 
-/**
- * Individual stat item
- */
 const StatItem = styled.div`
   text-align: center;
 `;
 
-/**
- * Stat value display
- */
 const StatValue = styled.div`
   font-size: var(--fs-xl);
   font-weight: var(--fw-bold);
