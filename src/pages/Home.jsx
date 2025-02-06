@@ -246,7 +246,6 @@ const Home = () => {
     },
   ];
 
-  // ============= Render =============
   return (
     <PageContainer>
       {/* Hero Section */}
