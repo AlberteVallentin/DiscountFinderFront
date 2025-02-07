@@ -248,7 +248,6 @@ const Home = () => {
 
   return (
     <PageContainer>
-      {/* Hero Section */}
       <HeroSection>
         <HeroAccent $position='top: -150px; right: -150px;' />
         <HeroAccent $position='bottom: -100px; left: -100px;' />
