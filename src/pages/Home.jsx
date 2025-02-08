@@ -264,7 +264,6 @@ const Home = () => {
         </HeroContent>
       </HeroSection>
 
-      {/* Statistics Section */}
       <StatsBar>
         <StatItem>
           <StatValue>50.000+</StatValue>
