@@ -279,7 +279,6 @@ const Home = () => {
         </StatItem>
       </StatsBar>
 
-      {/* Features Section */}
       <FeaturesGrid>
         {features.map((feature, index) => (
           <FeatureCard key={index}>
