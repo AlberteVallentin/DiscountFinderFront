@@ -289,7 +289,6 @@ const Home = () => {
         ))}
       </FeaturesGrid>
 
-      {/* Call-to-Action Section */}
       <CTASection>
         <CTATitle>Start din sparerejse i dag</CTATitle>
         <CTADescription>
