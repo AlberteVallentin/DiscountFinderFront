@@ -279,7 +279,6 @@ const Home = () => {
         </StatItem>
       </StatsBar>
 
-      {/* Features Section */}
       <FeaturesGrid>
         {features.map((feature, index) => (
           <FeatureCard key={index}>
@@ -290,7 +289,6 @@ const Home = () => {
         ))}
       </FeaturesGrid>
 
-      {/* Call-to-Action Section */}
       <CTASection>
         <CTATitle>Start din sparerejse i dag</CTATitle>
         <CTADescription>
