@@ -201,9 +201,6 @@ const StatValue = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-/**
- * Stat label display
- */
 const StatLabel = styled.div`
   font-size: var(--fs-n);
   color: ${({ theme }) => theme.colors.text}CC;
